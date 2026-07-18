@@ -1,0 +1,111 @@
+---
+title: "Untitled"
+format: html
+---
+
+# Introduction
+
+
+
+# Libraries
+
+```{r}
+
+library(dplyr)
+
+
+```
+
+
+# Data
+
+
+```{r}
+
+
+US_accidents <- read.csv("/Users/francislauder/Documents/Data Sets/US Acciidents/US_Accidents_March23.csv")
+
+
+```
+
+
+```{r}
+
+
+saveRDS(US_accidents, "US_accidents.rds")
+
+```
+
+```{r}
+
+
+US_accidents <- readRDS("US_accidents.rds")
+
+
+```
+
+
+
+```{r}
+
+
+glimpse(US_accidents)
+
+
+```
+
+
+
+```{r}
+
+
+MA_accidents <- US_accidents |> 
+    filter(State == "MA")
+
+
+```
+
+
+```{r}
+
+
+saveRDS(MA_accidents, "MA_accidents.rds")
+
+
+
+```
+
+```{r}
+
+
+MA_accidents <- readRDS("MA_accidents.rds")
+
+
+```
+
+```{r}
+
+
+MA_accidents |> glimpse()
+
+
+```
+
+
+```{r}
+
+
+dim(MA_accidents)
+
+
+```
+
+```{r}
+
+
+summary(MA_accidents)
+
+
+```
+
+
