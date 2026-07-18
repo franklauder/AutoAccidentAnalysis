@@ -14,6 +14,7 @@ format: html
 library(dplyr)
 
 
+
 ```
 
 
@@ -104,6 +105,18 @@ dim(MA_accidents)
 
 
 summary(MA_accidents)
+
+
+```
+
+```{r}
+
+
+
+MA_accidents |> 
+    count(Severity) |> 
+    mutate(perc = round(n / sum(n),3)) |> 
+    arrange(desc(perc))
 
 
 ```
