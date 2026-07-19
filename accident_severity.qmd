@@ -313,7 +313,63 @@ From the output, we see the accident duration is in minutes.
 
 ```{r}
 
+saveRDS(MA_accidents_2, "MA_accidents_2.rds")
 
+
+```
+
+
+```{r}
+
+
+MA_accidents_2 <- readRDS("MA_accidents_2.rds")
+
+
+```
+
+
+```{r}
+
+
+
+
+
+
+```
+
+
+```{r}
+
+
+
+
+
+
+
+
+```
+
+## US Census Data
+
+
+```{r}
+
+
+census_api_key("2f743d3250c4e6afe611f8686d00b9abcd000a05", install = TRUE)
+
+
+
+
+
+
+```
+
+
+
+```{r}
+
+
+Sys.getenv("CENSUS_API_KEY")
 
 
 ```
