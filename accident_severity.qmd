@@ -12,13 +12,43 @@ format: html
 ```{r}
 
 library(dplyr)
+library(ggplot2)
+library(plotly)
+library(RColorBrewer)
+library(forcats)
+library(tidycensus)
+
+library(sf)
+
+library(jsonlite)
+
+library(tigris)
+
+library(stringr)
+
+library(leaflet)
+library(htmlwidgets)
+library(htmltools)
+library(gt)
+library(DT)
+library(GGally)
+library(lme4)
+library(lmerTest)
+library(rstanarm)
+library(brms)
+library(broom)
+library(lubridate)
+
+
 
 
 
 ```
 
 
-# Data
+# Data Inspection and Cleaning
+
+## US Accident Data
 
 
 ```{r}
@@ -92,6 +122,14 @@ MA_accidents |> glimpse()
 
 ```
 
+```{r}
+
+
+summary(MA_accidents)
+
+
+```
+
 
 ```{r}
 
@@ -121,4 +159,161 @@ MA_accidents |>
 
 ```
 
+```{r}
 
+
+
+MA_accidents <- MA_accidents %>% 
+  mutate(Weather_Timestamp = as.Date(Weather_Timestamp))
+
+```
+
+
+
+Some features are in the correct data types for use in our analysis.  We will tranform them to the required data types. 
+
+
+
+First, Sverity, which is our outcome feature, will be transformed to a factor from an integer data type. 
+
+```{r}
+
+
+
+
+MA_accidents_2 <- MA_accidents |> 
+    mutate(Severity = as.factor(Severity))
+
+
+```
+
+
+
+```{r}
+
+
+class(MA_accidents_2$Severity)
+
+
+```
+
+
+
+
+We will now extract the year, month,day, and hourm of the day from the Start_Time feature. 
+
+
+
+
+
+```{r}
+
+
+
+MA_accidents_2 <- MA_accidents_2 |> 
+    mutate(Year = year(Start_Time)) |> 
+    mutate(Month = month(Start_Time)) |> 
+    mutate(day_of_week = wday(Start_Time)) |> 
+    mutate(hour_of_day = hour(Start_Time))
+
+
+```
+
+
+```{r}
+
+
+MA_accidents_2 |> 
+    select(Year, Month, day_of_week, hour_of_day) |> 
+    head()
+
+
+```
+
+Day of week starts with Sunday (1) and ends with Saturday (7)
+
+Hour of day starts at 1:00 am (1) and ends at 12:00 am (24)
+
+
+
+
+```{r}
+
+
+MA_accidents_2 |> 
+    select(Year, Month, day_of_week, hour_of_day) |> 
+    glimpse()
+
+
+
+```
+
+
+
+```{r}
+
+
+MA_accidents_2 <- MA_accidents_2 |> 
+    mutate(Year = as.factor(Year)) |> 
+    mutate(Month = as.factor(Month)) |> 
+    mutate(day_of_week = as.factor(day_of_week))
+
+
+
+```
+
+
+
+```{r}
+
+
+MA_accidents_2 |> 
+    select(Year, Month, day_of_week, hour_of_day) |> 
+    glimpse()
+
+
+```
+
+For us to be able to calculate the time duration of accidents we'll first need to onverty the start and endtimes to a date time object that includes year, month, day, hours, minutes, and seconds. 
+
+
+```{r}
+
+
+MA_accidents_2 <- MA_accidents_2 |> 
+    mutate(Start_Time = ymd_hms(Start_Time)) |> 
+    mutate(End_Time = ymd_hms(End_Time))
+
+
+```
+
+```{r}
+
+MA_accidents_2 |> 
+    select(Start_Time, End_Time) |> 
+    glimpse()
+
+
+```
+
+
+```{r}
+
+
+MA_accidents_2 |> 
+    mutate(accident_duration = round(difftime(End_Time,Start_Time, units = "mins"), 0))|> 
+    head()
+
+
+```
+
+From the output, we see the accident duration is in minutes. 
+
+
+
+```{r}
+
+
+
+
+```
