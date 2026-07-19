@@ -355,7 +355,7 @@ MA_accidents_2 <- readRDS("MA_accidents_2.rds")
 ```{r}
 
 
-census_api_key("2f743d3250c4e6afe611f8686d00b9abcd000a05", install = TRUE)
+
 
 
 
