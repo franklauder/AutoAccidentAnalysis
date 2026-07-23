@@ -38,6 +38,7 @@ library(rstanarm)
 library(brms)
 library(broom)
 library(lubridate)
+library(tidymodels)
 
 
 
@@ -332,7 +333,9 @@ MA_accidents_2 <- readRDS("MA_accidents_2.rds")
 
 
 
+MA_accidents_2$LATITUDE <- MA_accidents_2$Start_Lat
 
+MA_accidents_2$LONGITUDE <- MA_accidents_2$Start_Lng
 
 
 ```
@@ -342,7 +345,8 @@ MA_accidents_2 <- readRDS("MA_accidents_2.rds")
 
 
 
-
+MA_accidents_2 <- MA_accidents_2 |> 
+    mutate(id = row_number())
 
 
 
@@ -358,7 +362,66 @@ MA_accidents_2 <- readRDS("MA_accidents_2.rds")
 
 
 
+long_lat_1 <- MA_accidents_2 |> 
+    filter(id <=5000) |> 
+    select(LATITUDE, LONGITUDE)
 
+
+
+```
+
+
+```{r}
+
+
+long_lat_2 <- MA_accidents_2 |> 
+    filter(id > 5000 & id <=15000) |> 
+    select(LATITUDE, LONGITUDE)
+
+
+
+```
+
+
+```{r}
+
+
+
+
+long_lat_3 <- MA_accidents_2 |> 
+    filter(id > 15000 & id <=25000) |> 
+    select(LATITUDE, LONGITUDE)
+
+```
+
+
+```{r}
+
+
+long_lat_4 <- MA_accidents_2 |> 
+    filter(id > 25000 & id <=35000) |> 
+    select(LATITUDE, LONGITUDE)
+
+
+```
+
+```{r}
+
+
+long_lat_5 <- MA_accidents_2 |> 
+    filter(id > 35000 & id <=45000) |> 
+    select(LATITUDE, LONGITUDE)
+
+
+
+```
+
+```{r}
+
+
+long_lat_6 <- MA_accidents_2 |> 
+    filter(id > 45000 & id <=55000) |> 
+    select(LATITUDE, LONGITUDE)
 
 
 
@@ -370,6 +433,172 @@ MA_accidents_2 <- readRDS("MA_accidents_2.rds")
 
 
 Sys.getenv("CENSUS_API_KEY")
+
+
+```
+
+
+```{r}
+
+
+long_lat_1$census_code <- apply(long_lat_1, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
+
+
+
+
+```
+
+
+```{r}
+
+
+saveRDS(long_lat_1 , "long_lat_1.rds")
+
+
+```
+
+```{r}
+
+
+long_lat_1  <- readRDS("long_lat_1.rds")
+
+
+```
+
+
+```{r}
+
+long_lat_2$census_code <- apply(long_lat_2, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
+
+
+```
+
+```{r}
+
+saveRDS(long_lat_2, "long_lat_2.rds")
+
+```
+
+```{r}
+
+
+long_lat_2 <- readRDS("long_lat_2.rds")
+
+
+```
+
+
+```{r}
+
+
+
+long_lat_3$census_code <- apply(long_lat_3, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
+
+
+```
+
+
+
+```{r}
+
+
+saveRDS(long_lat_3, "long_lat_3.rds")
+
+
+```
+
+
+```{r}
+
+
+long_lat_3 <- readRDS("long_lat_3.rds")
+
+
+
+```
+
+
+```{r}
+
+
+long_lat_4$census_code <- apply(long_lat_4, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
+
+
+```
+
+
+```{r}
+
+
+
+saveRDS(long_lat_4, "long_lat_4.rds")
+
+
+
+```
+
+
+```{r}
+
+
+long_lat_4 <- readRDS("long_lat_4.rds")
+
+
+```
+
+
+```{r}
+
+long_lat_5$census_code <- apply(long_lat_5, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
+
+
+```
+
+
+```{r}
+
+
+saveRDS(long_lat_5, "long_lat_5.rds")
+
+
+
+```
+
+
+```{r}
+
+
+
+long_lat_5 <- readRDS("long_lat_5.rds")
+
+
+```
+
+
+```{r}
+
+
+long_lat_6$census_code <- apply(long_lat_6, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
+
+
+
+
+```
+
+
+
+```{r}
+
+saveRDS(long_lat_6, "long_lat_6.rds")
+
+
+
+```
+
+
+```{r}
+
+long_lat_6 <- readRDS("long_lat_6.rds")
 
 
 ```
