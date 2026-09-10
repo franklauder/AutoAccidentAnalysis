@@ -1,15 +1,33 @@
 ---
-title: "Untitled"
-format: html
+title: "Predicting time of auto accidents"
+author: Francis Lauder
+date: 2026-09-10
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc_float: true
+    number-sections: false
+    toc-location: left
+    embed-resources: true
 ---
 
 # Introduction
+<br><br>
 
+
+# Data Dictionary
+
+<br><br>
 
 
 # Libraries
 
+<br>
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 library(dplyr)
 library(ggplot2)
@@ -46,6 +64,8 @@ library(tidymodels)
 
 ```
 
+<br><br>
+
 
 # Data Inspection and Cleaning
 
@@ -53,6 +73,9 @@ library(tidymodels)
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 US_accidents <- read.csv("/Users/francislauder/Documents/Data Sets/US Acciidents/US_Accidents_March23.csv")
@@ -62,6 +85,9 @@ US_accidents <- read.csv("/Users/francislauder/Documents/Data Sets/US Acciidents
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(US_accidents, "US_accidents.rds")
@@ -69,6 +95,9 @@ saveRDS(US_accidents, "US_accidents.rds")
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 US_accidents <- readRDS("US_accidents.rds")
@@ -79,6 +108,10 @@ US_accidents <- readRDS("US_accidents.rds")
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
 
 
 glimpse(US_accidents)
@@ -89,6 +122,9 @@ glimpse(US_accidents)
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 MA_accidents <- US_accidents |> 
@@ -97,8 +133,23 @@ MA_accidents <- US_accidents |>
 
 ```
 
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+MA_accidents <- MA_accidents %>% 
+  mutate(Weather_Timestamp = as.Date(Weather_Timestamp))
+
+
+```
+
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(MA_accidents, "MA_accidents.rds")
@@ -108,6 +159,7 @@ saveRDS(MA_accidents, "MA_accidents.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 MA_accidents <- readRDS("MA_accidents.rds")
@@ -116,6 +168,9 @@ MA_accidents <- readRDS("MA_accidents.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 MA_accidents |> glimpse()
@@ -124,6 +179,8 @@ MA_accidents |> glimpse()
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 summary(MA_accidents)
@@ -133,6 +190,8 @@ summary(MA_accidents)
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 dim(MA_accidents)
@@ -140,15 +199,11 @@ dim(MA_accidents)
 
 ```
 
-```{r}
 
-
-summary(MA_accidents)
-
-
-```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -157,15 +212,6 @@ MA_accidents |>
     mutate(perc = round(n / sum(n),3)) |> 
     arrange(desc(perc))
 
-
-```
-
-```{r}
-
-
-
-MA_accidents <- MA_accidents %>% 
-  mutate(Weather_Timestamp = as.Date(Weather_Timestamp))
 
 ```
 
@@ -178,6 +224,8 @@ Some features are in the correct data types for use in our analysis.  We will tr
 First, Sverity, which is our outcome feature, will be transformed to a factor from an integer data type. 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -191,6 +239,8 @@ MA_accidents_2 <- MA_accidents |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 class(MA_accidents_2$Severity)
@@ -208,6 +258,8 @@ We will now extract the year, month,day, and hourm of the day from the Start_Tim
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -222,6 +274,8 @@ MA_accidents_2 <- MA_accidents_2 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 MA_accidents_2 |> 
@@ -239,6 +293,8 @@ Hour of day starts at 1:00 am (1) and ends at 12:00 am (24)
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 MA_accidents_2 |> 
@@ -252,6 +308,8 @@ MA_accidents_2 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 MA_accidents_2 <- MA_accidents_2 |> 
@@ -266,7 +324,27 @@ MA_accidents_2 <- MA_accidents_2 |>
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
+
+saveRDS(MA_accidents_2, "MA_accidents_2.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+MA_accidents_2 <- readRDS("MA_accidents_2.rds")
+
+
+
+```
+
+```{r}
 
 MA_accidents_2 |> 
     select(Year, Month, day_of_week, hour_of_day) |> 
@@ -275,22 +353,127 @@ MA_accidents_2 |>
 
 ```
 
-For us to be able to calculate the time duration of accidents we'll first need to onverty the start and endtimes to a date time object that includes year, month, day, hours, minutes, and seconds. 
-
-
 ```{r}
 
 
-MA_accidents_2 <- MA_accidents_2 |> 
-    mutate(Start_Time = ymd_hms(Start_Time)) |> 
-    mutate(End_Time = ymd_hms(End_Time))
+MA_accidents_2 |> 
+    count(Year)
+
+
+```
+
+
+Before continuing, we will filter our data into the years 2016-2021 for training and testing, and the year 2022 for predicting on unseen data.  Since the year 2023 appears to be incomplete, we will omit it from our analysis. 
+
+<br>
+
+Years 2016 through 2021
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+ma_accidents_16_21 <- MA_accidents_2 |> 
+    filter(Year %in% c("2016", "2017", "2018", "2019", "2020","2021"))
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(ma_accidents_16_21, "ma_accidents_16_21.rds")
+
+```
+
+```{r}
+#| echo: false
+
+
+ma_accidents_16_21 <- readRDS("ma_accidents_16_21.rds")
+
 
 
 ```
 
 ```{r}
 
-MA_accidents_2 |> 
+
+dim(ma_accidents_16_21)
+
+
+```
+
+Year 2022
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+
+ma_accidents_22 <- MA_accidents_2 |> 
+    filter(Year == "2022")
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(ma_accidents_22, "ma_accidents_22.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+ma_accidents_22 <- readRDS("ma_accidents_22.rds")
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+dim(ma_accidents_22)
+
+
+```
+
+
+For us to be able to calculate the time duration of accidents we'll first need to convert the start and endtimes to a date time object that includes year, month, day, hours, minutes, and seconds. 
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+ma_accidents_16_21_2 <- ma_accidents_16_21 |> 
+    mutate(Start_Time = ymd_hms(Start_Time)) |> 
+    mutate(End_Time = ymd_hms(End_Time))
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+ma_accidents_16_21_2 |> 
     select(Start_Time, End_Time) |> 
     glimpse()
 
@@ -299,11 +482,79 @@ MA_accidents_2 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
-MA_accidents_2 |> 
-    mutate(accident_duration = round(difftime(End_Time,Start_Time, units = "mins"), 0))|> 
+ma_accidents_16_21_2 |> 
+    select(Start_Time, End_Time) |> 
     head()
+
+
+```
+
+Next, we'll create a new feature accident_duration, which will calcualte the duration of an accident in minutes. 
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+ma_accidents_16_21_2 <- ma_accidents_16_21_2 |> 
+    mutate(accident_duration = round(difftime(End_Time,Start_Time, units = "mins"), 0))
+
+
+```
+
+ We also will create LATTITUDE and LONGITUDE features from Start_Lat and Start_Lng. These features will be useful for retieving US Census data and mapping. 
+
+
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+
+ma_accidents_16_21_2$LATITUDE <- ma_accidents_16_21_2$Start_Lat
+
+ma_accidents_16_21_2$LONGITUDE <- ma_accidents_16_21_2$Start_Lng
+
+
+```
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(ma_accidents_16_21_2, "ma_accidents_16_21_2.rds")
+
+
+```
+
+
+```{r}
+#| echo: false
+
+
+ ma_accidents_16_21_2 <- readRDS("ma_accidents_16_21_2.rds")
+
+
+```
+
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+ma_accidents_16_21_2 |> select(accident_duration) |>  head()
 
 
 ```
@@ -311,43 +562,62 @@ MA_accidents_2 |>
 From the output, we see the accident duration is in minutes. 
 
 
-
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
-saveRDS(MA_accidents_2, "MA_accidents_2.rds")
+
+ma_accidents_16_21_2 |> select(LATITUDE, LONGITUDE) |> head()
 
 
 ```
 
-
-```{r}
-
-
-MA_accidents_2 <- readRDS("MA_accidents_2.rds")
+Our output shows the two new featurres. 
 
 
-```
+
+Next, we will create artificial row numbers.  These will be useful for analyzing and filtering visualizations  along with removing row(s).
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
-MA_accidents_2$LATITUDE <- MA_accidents_2$Start_Lat
-
-MA_accidents_2$LONGITUDE <- MA_accidents_2$Start_Lng
-
-
-```
-
-
-```{r}
-
-
-
-MA_accidents_2 <- MA_accidents_2 |> 
+ma_accidents_16_21_3  <- ma_accidents_16_21_2  |> 
     mutate(id = row_number())
 
+
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(ma_accidents_16_21_3 , "ma_accidents_16_21_3.rds")
+
+```
+
+```{r}
+#| echo: false
+
+
+ma_accidents_16_21_3 <- readRDS("ma_accidents_16_21_3.rds")
+
+
+```
+
+```{r}
+
+ma_accidents_16_21_3 |> 
+    select(id) |> 
+    head()
 
 
 
@@ -362,7 +632,7 @@ MA_accidents_2 <- MA_accidents_2 |>
 
 
 
-long_lat_1 <- MA_accidents_2 |> 
+long_lat_1 <- ma_accidents_16_21_3 |> 
     filter(id <=5000) |> 
     select(LATITUDE, LONGITUDE)
 
@@ -374,7 +644,7 @@ long_lat_1 <- MA_accidents_2 |>
 ```{r}
 
 
-long_lat_2 <- MA_accidents_2 |> 
+long_lat_2 <- ma_accidents_16_21_3 |> 
     filter(id > 5000 & id <=15000) |> 
     select(LATITUDE, LONGITUDE)
 
@@ -388,7 +658,7 @@ long_lat_2 <- MA_accidents_2 |>
 
 
 
-long_lat_3 <- MA_accidents_2 |> 
+long_lat_3 <- ma_accidents_16_21_3 |> 
     filter(id > 15000 & id <=25000) |> 
     select(LATITUDE, LONGITUDE)
 
@@ -398,7 +668,7 @@ long_lat_3 <- MA_accidents_2 |>
 ```{r}
 
 
-long_lat_4 <- MA_accidents_2 |> 
+long_lat_4 <- ma_accidents_16_21_3 |> 
     filter(id > 25000 & id <=35000) |> 
     select(LATITUDE, LONGITUDE)
 
@@ -408,7 +678,7 @@ long_lat_4 <- MA_accidents_2 |>
 ```{r}
 
 
-long_lat_5 <- MA_accidents_2 |> 
+long_lat_5 <- ma_accidents_16_21_3 |> 
     filter(id > 35000 & id <=45000) |> 
     select(LATITUDE, LONGITUDE)
 
@@ -419,25 +689,13 @@ long_lat_5 <- MA_accidents_2 |>
 ```{r}
 
 
-long_lat_6 <- MA_accidents_2 |> 
-    filter(id > 45000 & id <=55000) |> 
+long_lat_6 <- ma_accidents_16_21_3 |> 
+    filter(id > 45000 & id <=55587) |> 
     select(LATITUDE, LONGITUDE)
 
 
 
 ```
-
-```{r}
-
-
-
-long_lat_7 <- MA_accidents_2 |> 
-    filter(id > 55000) |> 
-    select(LATITUDE, LONGITUDE)
-
-
-```
-
 
 
 ```{r}
@@ -647,7 +905,7 @@ long_lat_7 <- readRDS("long_lat_7.rds")
 
 
 
-long_lat <- rbind(long_lat_1, long_lat_2, long_lat_3, long_lat_4, long_lat_5, long_lat_6, long_lat_7)
+long_lat <- rbind(long_lat_1, long_lat_2, long_lat_3, long_lat_4, long_lat_5, long_lat_6)
 
 
 
@@ -728,7 +986,7 @@ census_geo |> head()
 
 
 
-MA_accidents_3 <- cbind(MA_accidents_2, census_geo)
+ma_accidents_16_21_4 <- cbind(ma_accidents_16_21_3, census_geo)
 
 
 
@@ -738,7 +996,7 @@ MA_accidents_3 <- cbind(MA_accidents_2, census_geo)
 
 
 
-saveRDS(MA_accidents_3, "MA_accidents_3.rds")
+saveRDS(ma_accidents_16_21_4, "ma_accidents_16_21_4.rds")
 
 
 ```
@@ -747,16 +1005,19 @@ saveRDS(MA_accidents_3, "MA_accidents_3.rds")
 ```{r}
 
 
-MA_accidents_3 <- readRDS("MA_accidents_3.rds")
+ma_accidents_16_21_4 <- readRDS("ma_accidents_16_21_4.rds")
 
 
 ```
+
+
+
 
 ```{r}
 
 
 
-MA_accidents_3 |> 
+ma_accidents_16_21_4 |> 
     summary()
 
 ```
