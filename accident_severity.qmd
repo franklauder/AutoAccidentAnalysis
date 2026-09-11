@@ -1022,6 +1022,155 @@ ma_accidents_16_21_4 |>
 
 ```
 
+There are five mssing values in the newly created GEOID.  These missing values (NAs) will be removed. 
+
+
+```{r}
+
+
+ma_accidents_16_21_5 <- ma_accidents_16_21_4 |> 
+    filter(!is.na(GEOID))
+
+
+```
+
+```{r}
+
+
+ma_accidents_16_21_5 |> 
+    select(GEOID, census_code) |> 
+    summary()
+
+
+```
+
+```{r}
+
+
+ma_accidents_16_21_5 |> 
+    filter(!is.na(Wind_Speed.mph.)) |> 
+    group_by(Severity) |> 
+    summarise(median_wind_speed = median(Wind_Speed.mph.))
+
+
+```
+
+
+```{r}
+
+
+ma_accidents_16_21_5 <- ma_accidents_16_21_5 |> 
+    filter(!is.na(Wind_Speed.mph.))
+
+
+```
+
+```{r}
+
+ma_accidents_16_21_5 |> 
+    summary()
+
+
+```
+
+```{r}
+
+
+ma_accidents_16_21_5 |> 
+    filter(!is.na(Visibility.mi.)) |> 
+    group_by(Severity) |> 
+    summarise(median_visibility = median(Visibility.mi.))
+
+
+```
+
+```{r}
+
+
+ma_accidents_16_21_5 |> 
+    filter(!is.na(Precipitation.in.)) |> 
+    group_by(Severity) |> 
+    summarise(median_visibility = median(Precipitation.in.))
+
+
+```
+
+```{r}
+
+
+ma_accidents_16_21_5 |> 
+    select(id, Description) |> 
+    filter(id == "51113") 
+
+
+```
+
+```{r}
+
+
+ma_accidents_16_21_5  |> filter(accident_duration > 1000)  |> head()
+
+
+```
+
+```{r}
+
+ma_accidents_16_21_5  |> filter(accident_duration > 1000)  |> tail()
+
+
+```
+
+```{r}
+
+
+ma_accidents_16_21_5  |> filter(accident_duration <=1000) |> dim()
+
+
+```
+
+
+```{r}
+
+
+ma_accidents_16_21_5 <- ma_accidents_16_21_5 |> 
+    select(-Start_Lat, -End_Lat, -Start_Lng, -End_Lng, -State, -Zipcode, -Country, -Timezone, -Airport_Code, -Weather_Timestamp, -Wind_Chill.F., -Visibility.mi., -Precipitation.in.)
+
+
+```
+
+
+```{r}
+
+
+saveRDS(ma_accidents_16_21_5, "ma_accidents_16_21_5.rds")
+
+```
+
+```{r}
+#| echo: false
+
+
+ma_accidents_16_21_5 <- readRDS("ma_accidents_16_21_5.rds")
+
+
+```
+
+
+
+
+
+
+```{r}
+
+
+ma_accidents_16_21_5 |> 
+    count(County)
+
+
+```
+
+
+
 
 ```{r}
 
