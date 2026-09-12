@@ -1387,6 +1387,98 @@ ma_county
 
 ```
 
+
+```{r}
+
+
+census_county_urban <- readxl::read_xlsx("/Users/francislauder/Documents/census/2020_UA_COUNTY.xlsx")
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(census_county_urban, "census_county_urban.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+census_county_urban <- readRDS("census_county_urban.rds")
+
+
+```
+
+
+```{r}
+
+
+census_county_urban |> glimpse()
+
+
+```
+
+```{r}
+
+
+census_county_urban |> 
+    count(STATE)
+
+
+```
+
+
+```{r}
+
+
+ma_county_urban <- census_county_urban |> 
+    filter(STATE_NAME == "Massachusetts")
+
+
+```
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(ma_county_urban , "ma_county_urban.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+ma_county_urban  <- readRDS("ma_county_urban.rds")
+
+```
+
+```{r}
+
+
+ma_county_urban |> summary()
+
+
+```
+
+```{r}
+
+
+ma_county_urban |> 
+    select(COUNTY_NAME, POPDEN_COU, POPPCT_URB, HOUDEN_COU, HOUDEN_URB,HOUDEN_RUR, HOUPCT_URB)
+
+
+```
+
 ## Tracts
 
 ```{r}
@@ -1398,6 +1490,9 @@ ma_tracts <- tracts("MA", year = 2024)
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(ma_tracts, "ma_tracts.rds")
