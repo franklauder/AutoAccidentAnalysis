@@ -173,7 +173,7 @@ MA_accidents <- readRDS("MA_accidents.rds")
 
 
 
-options(browser="false", scipen = 999, max.print = 10000)
+options(browser="false", scipen = 999, max.print = 20000)
 
 
 ```
@@ -588,52 +588,7 @@ Our output shows the two new featurres.
 
 
 
-Next, we will create artificial row numbers.  These will be useful for analyzing and filtering visualizations  along with removing row(s).
 
-
-```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
-#| eval: false
-
-
-
-ma_accidents_16_21_3  <- ma_accidents_16_21_2  |> 
-    mutate(id = row_number())
-
-
-
-
-```
-
-```{r}
-#| echo: false
-#| include: false
-#| eval: false
-
-
-saveRDS(ma_accidents_16_21_3 , "ma_accidents_16_21_3.rds")
-
-```
-
-```{r}
-#| echo: false
-
-
-ma_accidents_16_21_3 <- readRDS("ma_accidents_16_21_3.rds")
-
-
-```
-
-```{r}
-
-ma_accidents_16_21_3 |> 
-    select(id) |> 
-    head()
-
-
-
-```
 
 ## US Census Data
 
@@ -1008,7 +963,7 @@ census_geo |> head()
 
 
 
-ma_accidents_16_21_4 <- cbind(ma_accidents_16_21_3, census_geo)
+ma_accidents_16_21_3 <- cbind(ma_accidents_16_21_2, census_geo)
 
 
 
@@ -1021,7 +976,7 @@ ma_accidents_16_21_4 <- cbind(ma_accidents_16_21_3, census_geo)
 
 
 
-saveRDS(ma_accidents_16_21_4, "ma_accidents_16_21_4.rds")
+saveRDS(ma_accidents_16_21_3, "ma_accidents_16_21_3.rds")
 
 
 ```
@@ -1030,7 +985,7 @@ saveRDS(ma_accidents_16_21_4, "ma_accidents_16_21_4.rds")
 ```{r}
 
 
-ma_accidents_16_21_4 <- readRDS("ma_accidents_16_21_4.rds")
+ma_accidents_16_21_3 <- readRDS("ma_accidents_16_21_3.rds")
 
 
 ```
@@ -1042,7 +997,7 @@ ma_accidents_16_21_4 <- readRDS("ma_accidents_16_21_4.rds")
 
 
 
-ma_accidents_16_21_4 |> 
+ma_accidents_16_21_3 |> 
     summary()
 
 ```
@@ -1053,7 +1008,7 @@ There are five mssing values in the newly created GEOID.  These missing values (
 ```{r}
 
 
-ma_accidents_16_21_5 <- ma_accidents_16_21_4 |> 
+ma_accidents_16_21_4 <- ma_accidents_16_21_3 |> 
     filter(!is.na(GEOID))
 
 
@@ -1062,7 +1017,7 @@ ma_accidents_16_21_5 <- ma_accidents_16_21_4 |>
 ```{r}
 
 
-ma_accidents_16_21_5 |> 
+ma_accidents_16_21_4 |> 
     select(GEOID, census_code) |> 
     summary()
 
@@ -1072,7 +1027,7 @@ ma_accidents_16_21_5 |>
 ```{r}
 
 
-ma_accidents_16_21_5 |> 
+ma_accidents_16_21_4 |> 
     filter(!is.na(Wind_Speed.mph.)) |> 
     group_by(Severity) |> 
     summarise(median_wind_speed = median(Wind_Speed.mph.))
@@ -1084,7 +1039,7 @@ ma_accidents_16_21_5 |>
 ```{r}
 
 
-ma_accidents_16_21_5 <- ma_accidents_16_21_5 |> 
+ma_accidents_16_21_4 <- ma_accidents_16_21_4 |> 
     filter(!is.na(Wind_Speed.mph.))
 
 
@@ -1092,7 +1047,7 @@ ma_accidents_16_21_5 <- ma_accidents_16_21_5 |>
 
 ```{r}
 
-ma_accidents_16_21_5 |> 
+ma_accidents_16_21_4 |> 
     summary()
 
 
@@ -1101,7 +1056,7 @@ ma_accidents_16_21_5 |>
 ```{r}
 
 
-ma_accidents_16_21_5 |> 
+ma_accidents_16_21_4 |> 
     filter(!is.na(Visibility.mi.)) |> 
     group_by(Severity) |> 
     summarise(median_visibility = median(Visibility.mi.))
@@ -1112,7 +1067,7 @@ ma_accidents_16_21_5 |>
 ```{r}
 
 
-ma_accidents_16_21_5 |> 
+ma_accidents_16_21_4|> 
     filter(!is.na(Precipitation.in.)) |> 
     group_by(Severity) |> 
     summarise(median_visibility = median(Precipitation.in.))
@@ -1123,7 +1078,7 @@ ma_accidents_16_21_5 |>
 ```{r}
 
 
-ma_accidents_16_21_5 |> 
+ma_accidents_16_21_4 |> 
     select(id, Description) |> 
     filter(id == "51113") 
 
@@ -1133,14 +1088,14 @@ ma_accidents_16_21_5 |>
 ```{r}
 
 
-ma_accidents_16_21_5  |> filter(accident_duration > 1000)  |> head()
+ma_accidents_16_21_4  |> filter(accident_duration > 1000)  |> head()
 
 
 ```
 
 ```{r}
 
-ma_accidents_16_21_5  |> filter(accident_duration > 1000)  |> tail()
+ma_accidents_16_21_4  |> filter(accident_duration > 1000)  |> tail()
 
 
 ```
@@ -1148,7 +1103,7 @@ ma_accidents_16_21_5  |> filter(accident_duration > 1000)  |> tail()
 ```{r}
 
 
-ma_accidents_16_21_5  |> filter(accident_duration <=1000) |> dim()
+ma_accidents_16_21_4  |> filter(accident_duration <=1000) |> dim()
 
 
 ```
@@ -1157,7 +1112,7 @@ ma_accidents_16_21_5  |> filter(accident_duration <=1000) |> dim()
 ```{r}
 
 
-ma_accidents_16_21_5 <- ma_accidents_16_21_5 |> 
+ma_accidents_16_21_4 <- ma_accidents_16_21_4 |> 
     select(-Start_Lat, -End_Lat, -Start_Lng, -End_Lng, -State, -Zipcode, -Country, -Timezone, -Airport_Code, -Weather_Timestamp, -Wind_Chill.F., -Visibility.mi., -Precipitation.in.)
 
 
@@ -1170,7 +1125,7 @@ ma_accidents_16_21_5 <- ma_accidents_16_21_5 |>
 #| eval: false
 
 
-saveRDS(ma_accidents_16_21_5, "ma_accidents_16_21_5.rds")
+saveRDS(ma_accidents_16_21_4, "ma_accidents_16_21_4.rds")
 
 ```
 
@@ -1178,7 +1133,7 @@ saveRDS(ma_accidents_16_21_5, "ma_accidents_16_21_5.rds")
 #| echo: false
 
 
-ma_accidents_16_21_5 <- readRDS("ma_accidents_16_21_5.rds")
+ma_accidents_16_21_4 <- readRDS("ma_accidents_16_21_4.rds")
 
 
 ```
@@ -1186,7 +1141,7 @@ ma_accidents_16_21_5 <- readRDS("ma_accidents_16_21_5.rds")
 ```{r}
 
 
-ma_accidents_16_21_5 |> 
+ma_accidents_16_21_4 |> 
     summary()
 
 
@@ -1197,7 +1152,7 @@ Remove NAs fron Temperature feature.
 ```{r}
 
 
-ma_accidents_16_21_6 <- ma_accidents_16_21_5 |>
+ma_accidents_16_21_5 <- ma_accidents_16_21_4|>
     filter(!is.na(Temperature.F.)) 
 
 
@@ -1208,7 +1163,7 @@ Remove NAs from Humidity feature.
 ```{r}
 
 
-ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
+ma_accidents_16_21_5 <- ma_accidents_16_21_5 |> 
     filter(!is.na(Humidity...))
 
 
@@ -1221,7 +1176,7 @@ Transform accident_duration from difftime to numeric.
 
 
 
-ma_accidents_16_21_6$accident_duration <- as.numeric(ma_accidents_16_21_6$accident_duration)
+ma_accidents_16_21_5$accident_duration <- as.numeric(ma_accidents_16_21_5$accident_duration)
 
 
 ```
@@ -1230,7 +1185,7 @@ ma_accidents_16_21_6$accident_duration <- as.numeric(ma_accidents_16_21_6$accide
 ```{r}
 
 
-ma_accidents_16_21_6 |> 
+ma_accidents_16_21_5 |> 
     count(County)
 
 
@@ -1245,7 +1200,7 @@ Remove Dukes and Nantucket levels from Counties.
 ```{r}
 
 
-ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
+ma_accidents_16_21_5 <- ma_accidents_16_21_5 |> 
     filter(County  %in% c("Barnstable", "Berkshire", "Bristol", "Essex", "Franklin", "Hampden", "Hampshire", "Middlesex", "Norfolk", "Plymouth", "Suffolk", "Worcester"))
 
 
@@ -1257,7 +1212,7 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
 #| eval: false
 
 
-saveRDS(ma_accidents_16_21_6, "ma_accidents_16_21_6.rds")
+saveRDS(ma_accidents_16_21_5, "ma_accidents_16_21_5.rds")
 
 
 ```
@@ -1269,7 +1224,7 @@ saveRDS(ma_accidents_16_21_6, "ma_accidents_16_21_6.rds")
 #| echo: false
 
 
-ma_accidents_16_21_6  <- readRDS("ma_accidents_16_21_6.rds")
+ma_accidents_16_21_5  <- readRDS("ma_accidents_16_21_5.rds")
 
 
 ```
@@ -1277,7 +1232,7 @@ ma_accidents_16_21_6  <- readRDS("ma_accidents_16_21_6.rds")
 
 ```{r}
 
-ma_accidents_16_21_6 |> 
+ma_accidents_16_21_5 |> 
     count(County)
 
 
@@ -1289,7 +1244,7 @@ ma_accidents_16_21_6 |>
 
 
 
-ma_accidents_16_21_6  |> select(accident_duration, Severity, Start_Time,End_Time, City, LONGITUDE, LATITUDE, Street, Sunrise_Sunset, Civil_Twilight,Street)  |> 
+ma_accidents_16_21_5 |> select(accident_duration, Severity, Start_Time,End_Time, City, LONGITUDE, LATITUDE, Street, Sunrise_Sunset, Civil_Twilight,Street)  |> 
   filter(accident_duration > 5000)  |> head()
 
 
@@ -1300,7 +1255,7 @@ ma_accidents_16_21_6  |> select(accident_duration, Severity, Start_Time,End_Time
 
 
 
-ma_accidents_16_21_6  |> select(accident_duration, Severity, Start_Time,End_Time, City, LONGITUDE, LATITUDE, Street, Sunrise_Sunset, Civil_Twilight,Street)  |> 
+ma_accidents_16_21_5  |> select(accident_duration, Severity, Start_Time,End_Time, City, LONGITUDE, LATITUDE, Street, Sunrise_Sunset, Civil_Twilight,Street)  |> 
   filter(City == "Milton" & Street == "Adams St")  |> head()
 
 
@@ -1312,7 +1267,7 @@ ma_accidents_16_21_6  |> select(accident_duration, Severity, Start_Time,End_Time
 
 
 
-ma_accidents_16_21_6  |> select(accident_duration, Severity, Start_Time,End_Time, Year, Month, day_of_week, City, LONGITUDE, LATITUDE, Street, Sunrise_Sunset, Civil_Twilight,Street)  |> 
+ma_accidents_16_21_5  |> select(accident_duration, Severity, Start_Time,End_Time, Year, Month, day_of_week, City, LONGITUDE, LATITUDE, Street, Sunrise_Sunset, Civil_Twilight,Street)  |> 
   filter(Year == "2021" & Month == "4" & day_of_week == "4")  |> tail()
 
 ```
@@ -1324,31 +1279,252 @@ ma_accidents_16_21_6  |> select(accident_duration, Severity, Start_Time,End_Time
 
 
 
-```
-
-
-```{r}
-
-
-
-
-
-
-```
-
-
-
-
-
-
-```{r}
-
-
 ma_accidents_16_21_5 |> 
-    count(County)
+    select_if(is.numeric) |> 
+    glimpse()
 
 
 ```
+
+hour_of_day is numeric datatype.  We'll need to transform this feature to a factor for our analysis and modeling. 
+
+
+```{r}
+
+
+
+ma_accidents_16_21_6 <- ma_accidents_16_21_5 |> 
+    mutate(hour_of_day = as.factor(hour_of_day))
+
+
+```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
+    rename(temperature = Temperature.F., humidity = Humidity..., wind_speed = Wind_Speed.mph.)
+
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
+    select(-Source, -Start_Time, -End_Time, -Distance.mi., -Pressure.in. )
+
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
+    mutate(Wind_Direction = as.factor(Wind_Direction),
+            Weather_Condition = as.factor(Weather_Condition),
+            Amenity = as.factor(Amenity),
+            Bump = as.factor(Bump),
+            Crossing = as.factor(Crossing),
+            Give_Way = as.factor(Give_Way),
+            Junction = as.factor(Junction),
+            No_Exit = as.factor(No_Exit),
+            Railway = as.factor(Railway),
+            Roundabout = as.factor(Roundabout),
+            Station = as.factor(Station),
+            Stop = as.factor(Stop),
+            Traffic_Calming = as.factor(Traffic_Calming),
+            Traffic_Signal = as.factor(Traffic_Signal),
+            Turning_Loop = as.factor(Turning_Loop),
+            Sunrise_Sunset = as.factor(Sunrise_Sunset),
+            Civil_Twilight = as.factor(Civil_Twilight),
+            Nautical_Twilight = as.factor(Nautical_Twilight),
+            Astronomical_Twilight = as.factor(Astronomical_Twilight))
+
+
+ ```
+
+ ```{r}
+ 
+
+saveRDS(ma_accidents_16_21_6 , "ma_accidents_16_21_6.rds")
+
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_6  <- readRDS("ma_accidents_16_21_6.rds")
+
+
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_6 |> 
+    select_if(is.factor) |> 
+    summary()
+
+
+ ```
+
+
+ ```{r}
+ 
+
+
+ma_accidents_16_21_6 |> 
+    count(Crossing) |> 
+    mutate(perc = round(n/sum(n),2)) |> 
+    arrange(desc(perc))
+
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_6 |> 
+    count(Wind_Direction) |> 
+    mutate(perc = round(n/sum(n),2)) |> 
+    arrange(desc(perc))
+
+
+ ```
+
+ ```{r}
+ 
+ma_accidents_16_21_6 |> 
+    count(County, Give_Way)
+
+
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_6 |> 
+    count(County, Railway)
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_6 |> 
+    count(County, Bump)
+
+
+
+ ```
+
+ ```{r}
+ 
+ma_accidents_16_21_6 |> 
+    count(County, No_Exit)
+
+
+ ```
+
+
+
+```{r}
+
+
+ma_accidents_16_21_7 <- ma_accidents_16_21_6 |> 
+    select(-No_Exit, -Bump)
+
+
+
+```
+
+
+
+  No_Exit 
+
+ ```{r}
+ 
+
+ma_accidents_16_21_6 |> 
+    group_by(Traffic_Calming) |> 
+    summarise(median_acc_dur = median(accident_duration))
+
+
+ ```
+
+
+ ```{r}
+ 
+
+
+ ma_accidents_16_21_6 |> 
+    group_by(No_Exit ) |> 
+    summarise(median_acc_dur = median(accident_duration))
+ ```
+
+
+ ```{r}
+ 
+
+
+
+ma_accidents_16_21_7 <- ma_accidents_16_21_6 |> 
+    select(-No_Exit, -Bump, -Traffic_Calming)
+
+
+ ```
+
+
+
+
+
+
+```{r}
+
+
+
+
+
+ny_housing_census_2 <- ny_housing_census_2 |> 
+    mutate(TYPE = recode_values(TYPE, "Condop for sale" ~ "Condo for sale"))
+
+
+```
+
+```{r}
+
+
+class(ma_accidents_16_21_7$hour_of_day)
+
+
+```
+
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+
+ma_accidents_16_21_3  <- ma_accidents_16_21_2  |> 
+    mutate(id = row_number())
+
+
+```
+
+
+
+
 
 # Census
 
@@ -1545,5 +1721,200 @@ ma_accidents_16_21_6 |>
 
 ```
 
+
+
+# Preprocessing
+
+
+```{r}
+
+
+
+```
+
+
+#rows / columns 
+10:1 rule 
+You should have at least 10 rows of data for every 1 column (feature) in your dataset. 
+
+```{r}
+
+
+# Allocates 80% to training, 20% to testing
+data_split <- initial_split(your_dataframe, prop = 0.80) 
+
+
+```
+
+```{r}
+
+
+test_df <- ma_accidents_16_21_6 |> 
+    select(-Severity, -Bump, -Roundabout, -Turning_Loop, -Nautical_Twilight, -Astronomical_Twilight, -Description, -Street, -City, -LATITUDE, -LONGITUDE, -census_code)
+
+
+
+```
+
+```{r}
+
+
+test_df <- test_df |> 
+    mutate(Wind_Direction = recode_values(Wind_Direction, "VAR" ~ "Variable", "S" ~ "South", "N" ~ "North", "E" ~ "East", "W" ~ "West", "ENE" ~ "East_NE", "Calm" ~ "CALM", "ESE" ~ "East_SE", "NE" ~ "North_NE", "NNE" ~ "North_NE", "NNW" ~ "North_NNW", "NW" ~ "North_NW", "SE" ~ "South_SE", "SSE" ~ "South_SE", "SSW" ~ "South_SSW", "SW" ~ "South_SW", "WNW" ~ "West_WNW", "WSW" ~ "West_SW"))
+
+
+
+```
+
+```{r}
+
+
+
+test_df <- test_df |> 
+    mutate(Wind_Direction = recode(Wind_Direction,  "VAR" = "Variable", "S" = "South", "N" = "North", "E" = "East", "W" = "West"))
+
+```
+
+```{r}
+
+test_model_df <- initial_split(test_df, prop = 0.80)
+
+
+```
+
+
+```{r}
+
+
+
+
+
+```
+
+
+```{r}
+
+
+train_data <- training(test_model_df)
+
+
+```
+
+```{r}
+
+test_data <- testing(test_model_df)
+
+
+```
+
+```{r}
+
+
+# Stratify by a categorical or numeric target column
+data_split <- initial_split(your_dataframe, prop = 0.80, strata = target_variable)
+
+
+```
+
+
+
+```{r}
+
+
+
+set.seed(1353)
+car_split <- initial_validation_split(mtcars)
+train_data <- training(car_split)
+validation_data <- validation(car_split)
+test_data <- testing(car_split)
+
+
+```
+
+```{r}
+
+
+
+validation_split(data, prop = 3/4, strata = NULL, breaks = 4, pool = 0.1, ...)
+
+validation_time_split(data, prop = 3/4, lag = 0, ...)
+
+group_validation_split(data, group, prop = 3/4, ..., strata = NULL, pool = 0.1)
+
+
+```
+
+```{r}
+
+
+print(test_model_df)
+
+
+```
+
+```{r}
+
+
+rec <- recipe(PRICE ~ ., data = model_df) |> 
+    step_center(all_numeric_predictors()) |> 
+    step_scale(all_numeric_predictors())
+
+
+```
+
+```{r}
+
+
+rec <- recipe(accident_duration ~ ., data = train_data) |> 
+    step_center(all_numeric_predictors()) |> 
+    step_scale(all_numeric_predictors())
+
+
+```
+
+```{r}
+
+
+
+model_rec <- prep(rec, training= model_df)
+scaled_df <- bake(model_rec, new_data = model_df)
+
+
+```
+
+```{r}
+
+train_rec <- prep(rec, training= train_data)
+scaled_train <- bake(train_rec, new_data = train_data)
+
+
+```
+
+```{r}
+
+
+model
+
+
+
+```
+
+```{r}
+
+
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+
+```
 
 
