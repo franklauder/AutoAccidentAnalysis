@@ -1305,7 +1305,7 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_5 |>
 ```
 
  ```{r}
- #| code-fold: true
+#| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
  
@@ -1317,7 +1317,7 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
  ```
 
  ```{r}
- #| code-fold: true
+#| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
  
@@ -1329,7 +1329,7 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
  ```
 
  ```{r}
- #| code-fold: true
+#| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
  
@@ -1429,7 +1429,7 @@ ma_accidents_16_21_6 |>
 
  
  ```{r}
- #| code-fold: true
+#| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
  
@@ -1442,7 +1442,7 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_6 |>
  ```
 
  ```{r}
- #| code-fold: true
+#| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
  
@@ -1459,7 +1459,7 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7 |>
  
 
  ```{r}
- #| code-fold: true
+#| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
  
@@ -1523,7 +1523,7 @@ ma_accidents_16_21_6 |> select(Weather_Condition, City) |>
  ```
 
  ```{r}
- #| code-fold: true
+#| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
  
@@ -1534,7 +1534,7 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7 |>
  ```
 
  ```{r}
- #| code-fold: true
+#| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
  
@@ -1545,7 +1545,7 @@ ma_accidents_16_21_7$Weather_Condition[trimws(ma_accidents_16_21_7$Weather_Condi
  ```
 
  ```{r}
- #| code-fold: true
+#| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
  
@@ -1571,7 +1571,7 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7 |>
  ```
 
  ```{r}
- #| echo: false
+#| echo: false
 #| include: false
 #| eval: false
  
@@ -1611,6 +1611,15 @@ ma_accidents_16_21_7 |>
 
  ```
 
+ ```{r}
+ 
+
+ma_accidents_16_21_7 |> 
+    select_if(is.factor) |> 
+    summary()
+
+ ```
+
 
  ```{r}
  
@@ -1629,6 +1638,16 @@ ma_accidents_16_21_7 |>
     count(County, No_Exit)
 
  ```
+
+
+```{r}
+
+
+ma_accidents_16_21_7|> 
+    group_by(No_Exit ) |> 
+    summarise(median_acc_dur = median(accident_duration))
+
+```
 
  ```{r}
  
@@ -1684,9 +1703,18 @@ ma_accidents_16_21_7 |>
  ```{r}
  
 
-test_df <- test_df |> 
-    mutate(Wind_Direction = recode(Wind_Direction,  "VAR" = "Variable", "S" = "South", "N" = "North", "E" = "East", "W" = "West"))
+ma_accidents_16_21_7 |> 
+    count(Amenity) |> 
+    mutate(perc = round(n/sum(n),2)) |> 
+    arrange(desc(perc))
 
+
+ ```
+
+ ```{r}
+ 
+ma_accidents_16_21_7 |> 
+    count(County, Amenity)
 
 
  ```
@@ -1694,36 +1722,141 @@ test_df <- test_df |>
  ```{r}
  
 
-
-
+ma_accidents_16_21_7 |> 
+    count(Junction) |> 
+    mutate(perc = round(n/sum(n),2)) |> 
+    arrange(desc(perc))
 
 
  ```
 
+ ```{r}
+ 
+
+ma_accidents_16_21_7 |> 
+    count(County, Junction)
 
 
-```{r}
-
-
-ma_accidents_16_21_7 <- ma_accidents_16_21_6 |> 
-    select(-No_Exit, -Bump)
-
-
-
-```
-
-
-
-  No_Exit 
+ ```
 
  ```{r}
  
 
-ma_accidents_16_21_6 |> 
+ma_accidents_16_21_7 |> 
+    count(Station) |> 
+    mutate(perc = round(n/sum(n),2)) |> 
+    arrange(desc(perc))
+
+ ```
+
+ ```{r}
+ 
+
+
+ma_accidents_16_21_7 |> 
+    count(County, Station)
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_7 |> 
+    count(Stop) |> 
+    mutate(perc = round(n/sum(n),2)) |> 
+    arrange(desc(perc))
+
+
+ ```
+
+ ```{r}
+ 
+
+ ma_accidents_16_21_7 |> 
+    count(County, Stop)
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_7 |> 
+    count(Traffic_Calming) |> 
+    mutate(perc = round(n/sum(n),3)) |> 
+    arrange(desc(perc))
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_7|> 
     group_by(Traffic_Calming) |> 
     summarise(median_acc_dur = median(accident_duration))
 
 
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_7 |> 
+    count(Stop) |> 
+    mutate(perc = round(n/sum(n),2)) |> 
+    arrange(desc(perc))
+
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_7 |> 
+    count(Traffic_Signal) |> 
+    mutate(perc = round(n/sum(n),2)) |> 
+    arrange(desc(perc))
+
+
+ ```
+
+ ```{r}
+ 
+
+ ma_accidents_16_21_7 |> 
+    count(County, Traffic_Signal)
+
+
+ ```
+
+ ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+ 
+
+ma_accidents_16_21_8 <- ma_accidents_16_21_7 |> 
+    select(-No_Exit, -Traffic_Calming, -Nautical_Twilight, -Astronomical_Twilight, -Give_Way, -Railway, -Wind_Direction, -Description, -Street)
+
+
+ ```
+
+ ```{r}
+#| echo: false
+#| include: false
+#| eval: false
+ 
+saveRDS(ma_accidents_16_21_8, "ma_accidents_16_21_8.rds")
+
+
+ ```
+
+ ```{r}
+ #| echo: false
+ 
+
+
+ma_accidents_16_21_8 <- readRDS("ma_accidents_16_21_8.rds")
+
  ```
 
 
@@ -1731,19 +1864,7 @@ ma_accidents_16_21_6 |>
  
 
 
- ma_accidents_16_21_6 |> 
-    group_by(No_Exit ) |> 
-    summarise(median_acc_dur = median(accident_duration))
- ```
 
-
- ```{r}
- 
-
-
-
-ma_accidents_16_21_7 <- ma_accidents_16_21_6 |> 
-    select(-No_Exit, -Bump, -Traffic_Calming)
 
 
  ```
@@ -1753,17 +1874,9 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_6 |>
 
 
 
-```{r}
 
 
 
-
-
-ny_housing_census_2 <- ny_housing_census_2 |> 
-    mutate(TYPE = recode_values(TYPE, "Condop for sale" ~ "Condo for sale"))
-
-
-```
 
 ```{r}
 
