@@ -57,6 +57,8 @@ library(brms)
 library(broom)
 library(lubridate)
 library(tidymodels)
+library(performance)
+
 
 
 
@@ -1290,6 +1292,9 @@ hour_of_day is numeric datatype.  We'll need to transform this feature to a fact
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -1300,6 +1305,9 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_5 |>
 ```
 
  ```{r}
+ #| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
  
 
 ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
@@ -1309,6 +1317,9 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
  ```
 
  ```{r}
+ #| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
  
 
 ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
@@ -1318,6 +1329,9 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
  ```
 
  ```{r}
+ #| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
  
 
 ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
@@ -1345,6 +1359,9 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
  ```
 
  ```{r}
+#| echo: false
+#| include: false
+#| eval: false
  
 
 saveRDS(ma_accidents_16_21_6 , "ma_accidents_16_21_6.rds")
@@ -1353,6 +1370,7 @@ saveRDS(ma_accidents_16_21_6 , "ma_accidents_16_21_6.rds")
  ```
 
  ```{r}
+ #| echo: false 
  
 
 ma_accidents_16_21_6  <- readRDS("ma_accidents_16_21_6.rds")
@@ -1395,22 +1413,8 @@ ma_accidents_16_21_6 |>
 
  ```
 
- ```{r}
- 
-ma_accidents_16_21_6 |> 
-    count(County, Give_Way)
-
-
-
- ```
-
- ```{r}
  
 
-ma_accidents_16_21_6 |> 
-    count(County, Railway)
-
- ```
 
  ```{r}
  
@@ -1422,10 +1426,276 @@ ma_accidents_16_21_6 |>
 
  ```
 
+
+ 
+ ```{r}
+ #| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+ 
+
+
+ma_accidents_16_21_7 <- ma_accidents_16_21_6 |> 
+    select(-Bump, -Roundabout, -Turning_Loop)
+
+ 
+ ```
+
+ ```{r}
+ #| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+ 
+
+
+ma_accidents_16_21_7 <- ma_accidents_16_21_7 |> 
+    mutate(Street = recode(Street,  "Mass Pike" = "I-90"))
+
+
+ ```
+
+ 
+
+ 
+
+ ```{r}
+ #| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+ 
+
+
+
+# Force-create the category column directly onto your existing dataframe
+# (Replace 'Street' below if your column is lowercase 'street')
+col_to_check <- ma_accidents_16_21_7$Street
+
+ma_accidents_16_21_7$road_category <- "Uncategorized"
+
+# Apply regex flags directly
+ma_accidents_16_21_7$road_category[grepl("\\b(I|Interstate)[-\\s]?\\d+", col_to_check, ignore.case = TRUE)] <- "Interstate"
+ma_accidents_16_21_7$road_category[grepl("\\b(Route|Rte|Rt|State Route|SR|State Hwy|MA)[. -]*\\d+", col_to_check, ignore.case = TRUE)] <- "MA Highway"
+ma_accidents_16_21_7$road_category[grepl("\\b(US)[-\\s]?\\d+", col_to_check, ignore.case = TRUE)] <- "US Route"
+ma_accidents_16_21_7$road_category[grepl("\\b(Rd|Road)\\b", col_to_check, ignore.case = TRUE)] <- "Road"
+ma_accidents_16_21_7$road_category[grepl("way(\\b|[ .]+(N|S|E|W|NE|NW|SE|SW|North|South|East|West)?$)", col_to_check, ignore.case = TRUE)] <- "Way"
+ma_accidents_16_21_7$road_category[grepl("\\b(St|Street)\\b", col_to_check, ignore.case = TRUE)] <- "Street"
+ma_accidents_16_21_7$road_category[grepl("\\b(Ave|Avenue)\\b", col_to_check, ignore.case = TRUE)] <- "Avenue"
+ma_accidents_16_21_7$road_category[grepl("\\b(Blvd|Boulevard)\\b", col_to_check, ignore.case = TRUE)] <- "Boulevard"
+ma_accidents_16_21_7$road_category[grepl("\\b(Dr|Drive)\\b", col_to_check, ignore.case = TRUE)] <- "Drive"
+ma_accidents_16_21_7$road_category[grepl("\\b(Ln|Lane)\\b", col_to_check, ignore.case = TRUE)] <- "Lane"
+ma_accidents_16_21_7$road_category[grepl("\\b(Hwy|Highway)\\b", col_to_check, ignore.case = TRUE)] <- "Highway"
+ma_accidents_16_21_7$road_category[grepl("\\b(Pkwy|Parkway)\\b", col_to_check, ignore.case = TRUE)] <- "Parkway"
+ma_accidents_16_21_7$road_category[grepl("\\b(Brg|Bridge)\\b", col_to_check, ignore.case = TRUE)] <- "Bridge"
+ma_accidents_16_21_7$road_category[grepl("\\b(Cir|Circle)\\b", col_to_check, ignore.case = TRUE)] <- "Circle"
+ma_accidents_16_21_7$road_category[grepl("\\b(Trl|Trail)\\b", col_to_check, ignore.case = TRUE)] <- "Trail"
+ma_accidents_16_21_7$road_category[grepl("\\b(Ct|Cor|Court)\\b", col_to_check, ignore.case = TRUE)] <- "Court"
+ma_accidents_16_21_7$road_category[grepl("\\b(Ter|Terrace)\\b", col_to_check, ignore.case = TRUE)] <- "Terrace"
+ma_accidents_16_21_7$road_category[grepl("\\b(Pl|Place)\\b", col_to_check, ignore.case = TRUE)] <- "Place"
+ma_accidents_16_21_7$road_category[grepl("\\b(Tpke|Turnpike)\\b", col_to_check, ignore.case = TRUE)] <- "Turnpike"
+ma_accidents_16_21_7$road_category[grepl("\\b(Sq|Square)\\b", col_to_check, ignore.case = TRUE)] <- "Square"
+ma_accidents_16_21_7$road_category[grepl("\\b(Pth|Path)\\b", col_to_check, ignore.case = TRUE)] <- "Path"
+ma_accidents_16_21_7$road_category[grepl("\\b(Conn|Connector)\\b", col_to_check, ignore.case = TRUE)] <- "Connector"
+ma_accidents_16_21_7$road_category[grepl("\\b(Ext|Exit)\\b", col_to_check, ignore.case = TRUE)] <- "Exit"
+ma_accidents_16_21_7$road_category[grepl("\\b(Rty|Rotary)\\b", col_to_check, ignore.case = TRUE)] <- "Rotary"
+ma_accidents_16_21_7$road_category[grepl("\\b(Expy|Expressway)\\b", col_to_check, ignore.case = TRUE)] <- "Expressway"
+ma_accidents_16_21_7$road_category[grepl("\\b(Tunl|Tunnel)\\b", col_to_check, ignore.case = TRUE)] <- "Tunnel"
+
+
+ ```
+
+ 
+
  ```{r}
  
-ma_accidents_16_21_6 |> 
+ma_accidents_16_21_6 |> count(Weather_Condition)
+
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_6 |> select(Weather_Condition, City) |> 
+    filter(Weather_Condition == "") |> 
+    head(15)
+
+
+ ```
+
+ ```{r}
+ #| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+ 
+ma_accidents_16_21_7 <- ma_accidents_16_21_7 |> 
+    mutate(Weather_Condition = as.character(Weather_Condition))
+
+
+ ```
+
+ ```{r}
+ #| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+ 
+
+ma_accidents_16_21_7$Weather_Condition[trimws(ma_accidents_16_21_7$Weather_Condition) == ""] <- "NR"
+
+
+ ```
+
+ ```{r}
+ #| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+ 
+
+ma_accidents_16_21_7 <- ma_accidents_16_21_7 |> 
+    mutate(Weather_Condition = as.factor(Weather_Condition))
+
+
+ ```
+
+ ```{r}
+ #| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+ 
+
+ma_accidents_16_21_7 <- ma_accidents_16_21_7 |> 
+    mutate(Weather_Condition = recode(Weather_Condition,  " " = "No Report", "Light Rain / Windy" = "Light Rain", "Light Rain Shower" = "Light Rain", "Light Rain with Thunder" = "Light Rain", "Light Drizzle" = "Light Rain","Rain / Windy" = "Rain", "Thunderstorms and Rain" = "Rain", "Thunderstorm" = "Rain", "T-Storm" = "Rain","Thunder" = "Overcast", "Cloudy" = "Overcast", "Thunder / Windy" = "Overcast", "Thunder in the Vicinity" = "Overcast","Cloudy / Windy" = "Overcast", "Mostly Cloudy" = "Overcast", "Mostly Cloudy / Windy" = "Overcast","Light Thunderstorms and Rain" = "Rain","Heavy Rain / Windy" = "Heavy Rain", "Heavy Thunderstorms and Rain" = "Heavy Rain","Heavy T-Storm / Windy" = "Heavy Rain","Heavy T-Storm" = "Heavy Rain", "Light Snow / Windy" = "Light Snow", "Light Snow and Sleet" = "Light Snow", "Clear" = "Fair Partley Cloudy","Blowing Snow" = "Heavy Snow", "Heavy Snow / Windy" = "Heavy Snow", "Light Drizzle / Windy" = "Light Rain", "Mist" = "Light Rain", "Drizzle and Fog" = "Light Rain", "Fair / Windy" = "Fair Partley Cloudy", "Partly Cloudy" = "Fair Partley Cloudy", "Partly Cloudy / Windy" = "Fair Partley Cloudy", "Fair" = "Fair Partley Cloudy", "Scattered Clouds" = "Fair Partley Cloudy",
+   "Fog / Windy" = "Fog", "Patches of Fog" = "Fog","Shallow Fog" = "Fog","Wintry Mix / Windy" = "Wintry Mix", "Light Freezing Drizzle" = "Wintry Mix" , "Light Freezing Rain" = "Wintry Mix","Smoke" = "Haze", "Squalls" = "Snow",
+   "Light Freezing Fog" = "Wintry Mix", "Ice Pellets" = "Wintry Mix","Small Hail" = "Wintry Mix",  "Snow / Windy" = "Snow", "N/A Precipitation" = "NR") )
+
+
+ ```
+
+ ```{r}
+ #| echo: false
+#| include: false
+#| eval: false
+ 
+
+saveRDS(ma_accidents_16_21_7, "ma_accidents_16_21_7.rds")
+
+
+
+ ```
+
+
+ ```{r}
+#| echo: false
+ 
+
+ma_accidents_16_21_7 <- readRDS("ma_accidents_16_21_7.rds")
+
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_7 |> 
+    count(road_category)
+
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_7 |> 
+    count(Weather_Condition)
+
+
+
+ ```
+
+
+ ```{r}
+ 
+
+ma_accidents_16_21_7 |> 
+    count(No_Exit) |> 
+    mutate(perc = round(n/sum(n),4)) |> 
+    arrange(desc(perc))
+
+
+ ```
+
+ ```{r}
+ 
+ma_accidents_16_21_7 |> 
     count(County, No_Exit)
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_7 |> 
+    count(Crossing) |> 
+    mutate(perc = round(n/sum(n),2)) |> 
+    arrange(desc(perc))
+
+
+ ```
+
+ ```{r}
+ 
+ma_accidents_16_21_7 |> 
+    count(Railway) |> 
+    mutate(perc = round(n/sum(n),2)) |> 
+    arrange(desc(perc))
+
+
+
+ ```
+
+ ```{r}
+ 
+
+
+ ma_accidents_16_21_7 |> 
+    count(County, Railway)
+
+ ```
+
+ ```{r}
+ 
+ma_accidents_16_21_7 |> 
+    count(Give_Way) |> 
+    mutate(perc = round(n/sum(n),2)) |> 
+    arrange(desc(perc))
+
+
+ ```
+
+ ```{r}
+ 
+
+
+ma_accidents_16_21_7 |> 
+    count(County, Give_Way)
+
+
+ ```
+
+ ```{r}
+ 
+
+test_df <- test_df |> 
+    mutate(Wind_Direction = recode(Wind_Direction,  "VAR" = "Variable", "S" = "South", "N" = "North", "E" = "East", "W" = "West"))
+
+
+
+ ```
+
+ ```{r}
+ 
+
+
+
 
 
  ```
@@ -1649,6 +1919,14 @@ ma_county_urban |> summary()
 ```{r}
 
 
+ma_county_urban |> glimpse()
+
+
+```
+
+```{r}
+
+
 ma_county_urban |> 
     select(COUNTY_NAME, POPDEN_COU, POPPCT_URB, HOUDEN_COU, HOUDEN_URB,HOUDEN_RUR, HOUPCT_URB)
 
@@ -1749,9 +2027,8 @@ data_split <- initial_split(your_dataframe, prop = 0.80)
 ```{r}
 
 
-test_df <- ma_accidents_16_21_6 |> 
-    select(-Severity, -Bump, -Roundabout, -Turning_Loop, -Nautical_Twilight, -Astronomical_Twilight, -Description, -Street, -City, -LATITUDE, -LONGITUDE, -census_code)
-
+ma_county_urban_test <- ma_county_urban |> 
+    select(COUNTY, COUNTY_NAME, POP_COU, HOU_COU, POPDEN_COU, HOUDEN_COU, POPPCT_URB, HOU_URB, HOUPCT_URB)
 
 
 ```
@@ -1759,12 +2036,14 @@ test_df <- ma_accidents_16_21_6 |>
 ```{r}
 
 
-test_df <- test_df |> 
-    mutate(Wind_Direction = recode_values(Wind_Direction, "VAR" ~ "Variable", "S" ~ "South", "N" ~ "North", "E" ~ "East", "W" ~ "West", "ENE" ~ "East_NE", "Calm" ~ "CALM", "ESE" ~ "East_SE", "NE" ~ "North_NE", "NNE" ~ "North_NE", "NNW" ~ "North_NNW", "NW" ~ "North_NW", "SE" ~ "South_SE", "SSE" ~ "South_SE", "SSW" ~ "South_SSW", "SW" ~ "South_SW", "WNW" ~ "West_WNW", "WSW" ~ "West_SW"))
+test_df <- ma_accidents_16_21_6 |> 
+    select(-Severity, -Bump, -Roundabout, -Turning_Loop, -Nautical_Twilight, -Astronomical_Twilight, -Description, -Street, -City, -LATITUDE, -LONGITUDE, -census_code, -ID, -GEOID, -Weather_Condition)
 
 
 
 ```
+
+
 
 ```{r}
 
@@ -1775,9 +2054,36 @@ test_df <- test_df |>
 
 ```
 
+
 ```{r}
 
-test_model_df <- initial_split(test_df, prop = 0.80)
+test_df <- test_df |> 
+    rename(COUNTY_NAME = County)
+
+
+```
+
+
+```{r}
+
+
+test_df_2 <- test_df |> 
+    left_join(ma_county_urban_test, by = "COUNTY_NAME")
+
+
+```
+
+```{r}
+
+test_df_2 <- test_df_2 |> 
+    select(-COUNTY_NAME)
+
+
+```
+
+```{r}
+
+test_model_df <- initial_split(test_df_2, prop = 0.80)
 
 
 ```
@@ -1893,7 +2199,7 @@ scaled_train <- bake(train_rec, new_data = train_data)
 ```{r}
 
 
-model
+model_lme_1 <- lmer(log(accident_duration) ~ . + (1 | COUNTY), data = scaled_train)
 
 
 
@@ -1903,6 +2209,31 @@ model
 
 
 
+# Extract fixed-effect formula without random effects
+ff <- nobars(formula(your_model)
+X <- model.matrix(ff, data = your_data)
+)
+# Check for linear combinations
+caret::findLinearCombos(X)
+
+
+```
+
+```{r}
+
+
+library(caret)
+```
+
+```{r}
+
+# Extract fixed-effect formula without random effects
+ff <- nobars(formula(model_lme_1))
+X <- model.matrix(ff, data = train_data) 
+
+
+# Check for linear combinations
+caret::findLinearCombos(X)
 
 
 
@@ -1911,9 +2242,16 @@ model
 ```{r}
 
 
+summary(model_lme_1)
 
 
 
+```
+
+```{r}
+
+
+icc(model_lme_1, nrep=50)
 
 ```
 
