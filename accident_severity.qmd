@@ -1876,10 +1876,10 @@ ma_example<- ma_example|>
         between(hour_of_day,5,6) ~ "Dawn",
         between(hour_of_day,6,9) ~ "Early Morning",
         between(hour_of_day,9,12) ~ "Late Morning",
-        between(hour_of_day,12,4) ~ "Early Afternoon",
-        between(hour_of_day,4,6) ~ "Late Afternoon",
-        between(hour_of_day,6,9) ~ "Evening",
-        between(hour_of_day,9,24) ~ "Night",
+        between(hour_of_day,12,16) ~ "Early Afternoon",
+        between(hour_of_day,16,18) ~ "Late Afternoon",
+        between(hour_of_day,18,21) ~ "Evening",
+        between(hour_of_day,21,24) ~ "Night",
         TRUE ~ "Middle of Night"
 
     ))
