@@ -58,6 +58,15 @@ library(broom)
 library(lubridate)
 library(tidymodels)
 library(performance)
+library(boot.pval)
+library(bayesplot)
+library(units)
+library(tidybayes)
+library(marginaleffects)
+library(collapse)
+library(ggfortify)
+library(bayesplot)
+library(tidyr)
 
 
 
@@ -668,6 +677,9 @@ long_lat_6 <- ma_accidents_16_21_3 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 Sys.getenv("CENSUS_API_KEY")
@@ -1862,16 +1874,45 @@ ma_accidents_16_21_8 <- readRDS("ma_accidents_16_21_8.rds")
  ```{r}
  
 
-ma_example <- ma_accidents_16_21_8 |> 
+ma_accidents_16_21_8 |> 
+    glimpse()
+
+
+ ```
+
+ Our hour fo day feature has 24 categories (24 hour clock: 01 to 24).  We will reduce the number of categories by binning them. First, hour of day must be transformed to a numeric data type. 
+
+ <br><br>
+
+ ```{r}
+ 
+
+ma_accidents_16_21_9 <- ma_accidents_16_21_8 |> 
     mutate(hour_of_day = as.numeric(hour_of_day))
 
  ```
+
+  <br><br>
+
+
+ ```{r}
+ 
+class(ma_accidents_16_21_9$hour_of_day)
+
+
+ ```
+
+  <br><br>
+
+  Now we can perform our binning.  Essentiall we will place hour of day into eight ranges. 
+
+   <br><br> 
 
 
  ```{r}
  
 
-ma_example<- ma_example|> 
+ma_accidents_16_21_9 <- ma_accidents_16_21_9|> 
     mutate(hour_day_sections = case_when(
         between(hour_of_day,5,6) ~ "Dawn",
         between(hour_of_day,6,9) ~ "Early Morning",
@@ -1889,33 +1930,71 @@ ma_example<- ma_example|>
  ```
 
 
- ```{r}
  
-ma_example |> 
-    count(hour_day_sections) |> 
-    mutate(perc = round(n/sum(n),3)) |> 
-    arrange(desc(perc))
 
-
-
- ```
-
+  <br><br>
 
 
 
 
 Main Sections of the DayMorning (5:00 AM – 12:00 PM):Dawn / Sunrise: First light and when the sun comes up (approx. 5:00 AM – 6:00 AM).Early Morning: The start of typical morning routines (approx. 6:00 AM – 9:00 AM).Late Morning: Approaching midday (approx. 10:00 AM – 12:00 PM).Midday / Noon (12:00 PM): The exact middle of the day when the sun is highest.Afternoon (12:00 PM – 5:00 PM / 6:00 PM):Early Afternoon: Right after lunch (1:00 PM – 3:00 PM).Late Afternoon: Leading toward sunset (4:00 PM – 6:00 PM).Evening (5:00 PM / 6:00 PM – 9:00 PM):Sunset / Dusk: The sun goes down and twilight begins.Early/Late Evening: Transition time for relaxation and dinner.Night (9:00 PM – 4:00 AM / 5:00 AM):Late Night: Hours leading up to midnight (10:00 PM – 12:00 AM).Midnight: 12:00 AM, the middle of the night.Predawn / Middle of the Night: The quiet hours before the new day starts (1:00 AM – 4:00 AM).
 
+ <br><br>
+
+
+ Hour of day feature is no longer required and can be dropped from our dataset. 
+
+  <br><br>
+
+
+  ```{r}
+  
+
+ma_accidents_16_21_9 <- ma_accidents_16_21_9 |> 
+    select(-hour_of_day)
+
+
+  ```
+
+  ```{r}
+  
+saveRDS(ma_accidents_16_21_9, "ma_accidents_16_21_9.rds")
+
+
+  ```
+
+  ```{r}
+  
+
+ma_accidents_16_21_9 <- readRDS("ma_accidents_16_21_9.rds")
+
+
+  ```
+
+
+  <br><br>
 
 
 
 ```{r}
 
 
-class(ma_accidents_16_21_7$hour_of_day)
+ma_accidents_16_21_9 |> 
+    count(hour_day_sections) |> 
+    mutate(perc = round(n/sum(n),3)*100) |> 
+    arrange(desc(perc))
 
 
 ```
+
+  <br><br>
+
+
+We now have eight categories of different parts of the day. 
+
+  <br><br>
+
+
 
 
 ```{r}
@@ -2112,6 +2191,615 @@ ma_tracts
 
 ```
 
+
+Define the census tract variables we want to retrieve from the acs. 
+
+```{r}
+
+
+variables_to_get <- c(
+    total_tract_housing_units = "B25001_001",
+    total_vehicles_tract = "B25046_001",
+    total_households_tract = "B25044_001",
+    total_population_tract = "B01003_001"
+
+
+)
+
+
+```
+
+
+
+```{r}
+
+
+ma_tract_data <- get_acs(
+    geography = "tract",
+    variables = variables_to_get,
+    state = "MA",
+    geometry = TRUE,
+    output = "wide",
+    year = 2021
+)
+
+
+
+```
+
+```{r}
+
+
+ma_tract_data |> 
+    glimpse()
+
+
+```
+
+```{r}
+
+
+ma_tract_data |> summary()
+
+
+```
+
+
+
+```{r}
+
+
+ma_tract_geometry <- ma_tract_data |> 
+    select(GEOID, geometry)
+
+
+```
+
+
+```{r}
+
+
+saveRDS(ma_tract_geometry, "ma_tract_geometry.rds")
+
+```
+
+```{r}
+
+
+ma_tract_geometry <- readRDS("ma_tract_geometry.rds")
+
+
+```
+
+```{r}
+
+
+
+ma_tract_cls <- ma_tract_geometry |> 
+    st_transform(5070) 
+
+
+```
+
+```{r}
+
+saveRDS(ma_tract_cls, "ma_tract_cls.rds")
+
+
+```
+
+```{r}
+
+
+ma_tract_cls <- readRDS("ma_tract_cls.rds")
+
+
+```
+
+```{r}
+
+
+ma_tract_data |> 
+    select(NAME) |> 
+    head(10)
+
+
+
+```
+
+
+
+The output of the NAME column shows it contains Census Tract, Coumty, and State. Will will use the separate function to split the NAME column into three new columns.
+
+
+
+```{r}
+
+ma_tract_data_2 <- ma_tract_data |> 
+    separate(NAME, into=c("census_tract", "County", "state"), sep=", ") |> 
+    st_drop_geometry()
+
+
+
+```
+
+Remove State
+
+```{r}
+
+
+ma_tract_data_2 <- ma_tract_data_2 |> 
+    select(-state)
+
+
+```
+
+
+```{r}
+
+
+saveRDS(ma_tract_data_2 , "ma_tract_data_2.rds")
+
+```
+
+
+```{r}
+
+ma_tract_data_2  <- readRDS("ma_tract_data_2.rds")
+
+
+```
+
+```{r}
+
+
+ma_tract_data_3 <- ma_tract_cls |> 
+    full_join(ma_tract_data_2, by = "GEOID")
+
+
+```
+
+```{r}
+saveRDS(ma_tract_data_3 , "ma_tract_data_3.rds")
+
+```
+
+```{r}
+
+
+ma_tract_data_3  <- readRDS("ma_tract_data_3.rds")
+
+
+```
+
+### Feature Engineering
+
+
+Extract land areaa and convert square meters to square miles
+
+
+
+
+```{r}
+
+
+
+ma_tract_data_3 |> summary()
+
+
+
+
+```
+
+```{r}
+
+
+ma_tract_data_3 |> 
+    select(GEOID, total_vehicles_tractE) |> 
+    filter(is.na(total_vehicles_tractE)) |> 
+    st_drop_geometry() |> 
+    summary()
+
+
+
+```
+
+
+```{r}
+
+
+
+
+ma_tract_data_3 |> 
+    select(GEOID, census_tract,County, total_vehicles_tractE) |> 
+    filter(is.na(total_vehicles_tractE)) |> 
+    st_drop_geometry() |> 
+    head(72)
+
+```
+
+
+```{r}
+
+
+
+
+
+ma_tract_data_3 |> 
+    filter(County == "Suffolk County") |> 
+    filter(!is.na(total_vehicles_tractE)) |> 
+    st_drop_geometry() |> 
+    summarise(median_tract_vehicles = median(total_vehicles_tractE))
+
+
+
+
+```
+
+```{r}
+
+
+ma_tract_data_4 <- ma_tract_data_3 |> 
+    mutate(total_vehicles_tractE = ifelse(County == "Suffolk County" & is.na(total_vehicles_tractE), 1310,total_vehicles_tractE ))
+
+
+
+
+```
+
+
+
+```{r}
+
+
+
+ma_tract_data_3 |> 
+    filter(County == "Bristol County") |> 
+    filter(!is.na(total_vehicles_tractE)) |> 
+    st_drop_geometry() |> 
+    summarise(median_tract_vehicles = median(total_vehicles_tractE))
+
+
+```
+
+```{r}
+
+
+
+ma_tract_data_4 <- ma_tract_data_4 |> 
+    mutate(total_vehicles_tractE = ifelse(County == "Bristol County" & is.na(total_vehicles_tractE), 2785,total_vehicles_tractE ))
+
+
+
+```
+
+```{r}
+
+
+
+ma_tract_data_3 |> 
+    filter(County == "Hampshire County") |> 
+    filter(!is.na(total_vehicles_tractE)) |> 
+    st_drop_geometry() |> 
+    summarise(median_tract_vehicles = median(total_vehicles_tractE))
+
+
+
+```
+
+```{r}
+
+
+
+ma_tract_data_4 <- ma_tract_data_4 |> 
+    mutate(total_vehicles_tractE = ifelse(County == "Hampshire County" & is.na(total_vehicles_tractE), 3340,total_vehicles_tractE ))
+
+
+```
+
+```{r}
+
+
+ma_tract_data_3 |> 
+    filter(County == "Essex County") |> 
+    filter(!is.na(total_vehicles_tractE)) |> 
+    st_drop_geometry() |> 
+    summarise(median_tract_vehicles = median(total_vehicles_tractE))
+
+
+```
+
+```{r}
+
+
+
+ma_tract_data_4 <- ma_tract_data_4 |> 
+    mutate(total_vehicles_tractE = ifelse(County == "Essex County" & is.na(total_vehicles_tractE), 2989,total_vehicles_tractE ))
+
+
+```
+
+```{r}
+
+
+ma_tract_data_3 |> 
+    filter(County == "Middlesex County") |> 
+    filter(!is.na(total_vehicles_tractE)) |> 
+    st_drop_geometry() |> 
+    summarise(median_tract_vehicles = median(total_vehicles_tractE))
+
+
+```
+
+```{r}
+
+
+
+ma_tract_data_4 <- ma_tract_data_4 |> 
+    mutate(total_vehicles_tractE = ifelse(County == "Middlesex County" & is.na(total_vehicles_tractE), 2828,total_vehicles_tractE))
+```
+
+
+```{r}
+
+ma_tract_data_3 |> 
+    filter(County == "Plymouth County") |> 
+    filter(!is.na(total_vehicles_tractE)) |> 
+    st_drop_geometry() |> 
+    summarise(median_tract_vehicles = median(total_vehicles_tractE))
+
+```
+
+```{r}
+
+
+
+ma_tract_data_4 <- ma_tract_data_4 |> 
+    mutate(total_vehicles_tractE = ifelse(County == "Plymouth County" & is.na(total_vehicles_tractE), 3471,total_vehicles_tractE))
+
+
+
+```
+
+```{r}
+
+
+
+ma_tract_data_3 |> 
+    filter(County == "Worcester County") |> 
+    filter(!is.na(total_vehicles_tractE)) |> 
+    st_drop_geometry() |> 
+    summarise(median_tract_vehicles = median(total_vehicles_tractE))
+
+
+```
+
+```{r}
+
+
+ma_tract_data_4 <- ma_tract_data_4 |> 
+    mutate(total_vehicles_tractE = ifelse(County == "Worcester County" & is.na(total_vehicles_tractE), 2898,total_vehicles_tractE))
+
+
+
+```
+
+```{r}
+
+
+ma_tract_data_3 |> 
+    filter(County == "Barnstable County") |> 
+    filter(!is.na(total_vehicles_tractE)) |> 
+    st_drop_geometry() |> 
+    summarise(median_tract_vehicles = median(total_vehicles_tractE))
+
+```
+
+```{r}
+
+
+ma_tract_data_4 <- ma_tract_data_4 |> 
+    mutate(total_vehicles_tractE = ifelse(County == "Barnstable County" & is.na(total_vehicles_tractE), 3166,total_vehicles_tractE))
+
+
+```
+
+```{r}
+
+ma_tract_data_3 |> 
+    filter(County == "Hampden County") |> 
+    filter(!is.na(total_vehicles_tractE)) |> 
+    st_drop_geometry() |> 
+    summarise(median_tract_vehicles = median(total_vehicles_tractE))
+
+
+```
+
+```{r}
+
+
+ma_tract_data_4 <- ma_tract_data_4 |> 
+    mutate(total_vehicles_tractE = ifelse(County == "Hampden County" & is.na(total_vehicles_tractE), 2736,total_vehicles_tractE))
+
+
+```
+
+```{r}
+
+
+ma_tract_data_3 |> 
+    filter(County == "Berkshire County") |> 
+    filter(!is.na(total_vehicles_tractE)) |> 
+    st_drop_geometry() |> 
+    summarise(median_tract_vehicles = median(total_vehicles_tractE))
+
+
+```
+
+```{r}
+
+
+ma_tract_data_4 <- ma_tract_data_4 |> 
+    mutate(total_vehicles_tractE = ifelse(County == "Berkshire County" & is.na(total_vehicles_tractE), 2248,total_vehicles_tractE))
+
+
+```
+
+```{r}
+
+ma_tract_data_4 |> 
+    select(GEOID, census_tract,County, total_vehicles_tractE) |> 
+    filter(is.na(total_vehicles_tractE)) |> 
+    st_drop_geometry() |> 
+    head(72)
+
+
+```
+
+
+
+
+
+```{r}
+
+
+ma_tract_data_4 <- ma_tract_data_4 |> 
+    mutate(total_vehicles_tractE = ifelse(County == "Norfolk County" & is.na(total_vehicles_tractE), 3080,total_vehicles_tractE))
+
+
+
+```
+
+```{r}
+
+
+ma_tract_data_3 |> 
+    select(GEOID, total_population_tractE) |> 
+    filter(total_population_tractE == 0) |> 
+    st_drop_geometry() |> 
+    summary()
+
+```
+
+```{r}
+
+ma_tract_data_3 |> 
+    select(GEOID, census_tract,County, total_population_tractE) |> 
+    filter(total_population_tractE == 0) |> 
+    st_drop_geometry() |> 
+    head(72)
+
+
+
+```
+
+```{r}
+
+
+saveRDS(ma_tract_data_4, "ma_tract_data_4.rds")
+
+
+
+```
+
+```{r}
+
+
+ma_tract_data_4 <- readRDS("ma_tract_data_4.rds")
+
+
+```
+
+
+
+
+
+
+```{r}
+ma_tract_data_5 <- ma_tract_data_4 |> 
+    mutate(
+        tract_house_density_sqmi = round(as.numeric(set_units(total_tract_housing_unitsE/ st_area(geometry),"1/km2") * 2.589988),0),
+        tract_pop_density_sqmi = round(as.numeric(set_units(total_population_tractE/ st_area(geometry),"1/km2") * 2.589988),0),
+        avg_cars_per_household = round(total_vehicles_tractE / total_households_tractE, 2)  
+    #select(!ends_with("M"))
+    #rename_with(.fn = ~str_remove(.x, "E$"))
+
+
+    )
+
+
+
+```
+
+
+
+
+
+
+```{r}
+
+
+ma_tract_data_5 <- ma_tract_data_5 |> 
+    select(-total_tract_housing_unitsM, -total_vehicles_tractM, -total_households_tractM, -total_population_tractM)
+
+
+```
+
+```{r}
+
+saveRDS(ma_tract_data_5 , "ma_tract_data_5.rds")
+
+
+```
+
+```{r}
+
+
+ma_tract_data_5  <- readRDS("ma_tract_data_5.rds")
+
+
+```
+
+
+
+```{r}
+
+
+
+
+ma_tract_data_5|> glimpse()
+
+
+
+```
+
+```{r}
+
+
+ma_tract_data_5 |> summary()
+
+
+```
+
+```{r}
+
+
+
+ny_census_combined |> 
+    select(GEOID, median_year_built) |> 
+    filter(is.na(median_year_built)) |> 
+    st_drop_geometry() |> 
+    summary()
+
+
+
+```
+
+
+
+
+
+
 ## Joining
 
 
@@ -2139,6 +2827,65 @@ ma_accidents_16_21_6 |>
 ma_accidents_16_21_6 |> 
     ggplot(aes(x=log(accident_duration), y=Temperature.F.)) +
     geom_point()
+
+
+```
+
+## Maps
+
+### County
+
+
+```{r}
+
+
+county_map <- ggplot()+
+    geom_sf(data=ma_county, fill=NA)+
+    ggtitle("Counties of Massachusetts") +
+    theme(legend.position = "none",plot.title = element_text(color="blue", size=14, face="bold.italic", hjust=0.5)) +
+    theme_bw()
+
+
+```
+
+
+```{r}
+
+
+county_map
+
+
+```
+
+### Census Tracts
+
+```{r}
+
+ma_tracts_2 <- ma_tracts |> 
+    filter(COUNTYFP != "019") |> 
+    filter(COUNTYFP != "007")
+
+
+```
+
+
+```{r}
+
+
+
+ma_tracts_plot <- ggplot(ma_tracts_2) +
+    geom_sf()+
+    ggtitle("Census Tracts of Massachusetts") +
+    theme(legend.position = "none",plot.title = element_text(color="blue", size=14, face="bold.italic", hjust=0.5)) +
+    theme_void()
+
+
+
+```
+
+```{r}
+
+ma_tracts_plot
 
 
 ```
