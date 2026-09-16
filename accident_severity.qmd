@@ -31,7 +31,7 @@ format:
 
 library(dplyr)
 library(ggplot2)
-library(plotly)
+#library(plotly)
 library(RColorBrewer)
 library(forcats)
 library(tidycensus)
@@ -239,11 +239,11 @@ MA_accidents |>
 
 
 
-Some features are in the correct data types for use in our analysis.  We will tranform them to the required data types. 
+Some features are not in the correct data types for use in our analysis.  We will tranform them to the required data types. 
 
 
 
-First, Sverity, which is our outcome feature, will be transformed to a factor from an integer data type. 
+First, Sverity,  will be transformed to a factor from an integer data type. 
 
 ```{r}
 #| code-fold: true
@@ -2051,7 +2051,106 @@ ma_county <- readRDS("ma_county.rds")
 ```{r}
 
 
-ma_county
+ma_county |> 
+    glimpse()
+
+
+```
+
+```{r}
+
+
+ma_county |> 
+    summary()
+
+
+```
+
+```{r}
+
+
+print(ma_county |> select(NAME), n=14)
+
+
+```
+
+
+```{r}
+
+
+ma_county_shape <- ma_county |> 
+    filter(NAME != "Nantucket") |> 
+    filter(NAME != "Dukes")
+
+
+```
+
+```{r}
+
+saveRDS(ma_county_shape , "ma_county_shape.rds")
+
+
+```
+
+
+```{r}
+
+
+ma_county_shape  <- readRDS("ma_county_shape.rds")
+
+
+
+```
+
+```{r}
+
+
+
+print(ma_county_shape |> select(NAME), n=14) 
+
+
+```
+
+```{r}
+
+
+
+ma_county_shape_2 <- ma_county_shape |> 
+    select(COUNTYFP, GEOID, NAME, NAMELSAD, INTPTLAT, INTPTLON, geometry)
+
+
+```
+
+```{r}
+
+ma_county_shape_2 <- ma_county_shape_2 |> 
+    rename("GEOID_COUNTY" = "GEOID")
+
+
+```
+
+```{r}
+
+
+
+saveRDS(ma_county_shape_2, "ma_county_shape_2.rds")
+
+```
+
+```{r}
+
+
+
+ma_county_shape_2 <- readRDS("ma_county_shape_2.rds")
+
+
+```
+
+```{r}
+
+
+ma_county_shape_2 |> glimpse()
+
 
 
 ```
@@ -2142,10 +2241,149 @@ ma_county_urban |> summary()
 ```{r}
 
 
-ma_county_urban |> glimpse()
+print(ma_county_urban |> select(COUNTY_NAME), n=14 )
 
 
 ```
+
+```{r}
+
+
+ma_county_urban_2 <- ma_county_urban |> 
+    filter(COUNTY_NAME != "Dukes") |> 
+    filter(COUNTY_NAME != "Nantucket")
+
+
+```
+
+```{r}
+
+
+ma_county_urban_2 <- ma_county_urban_2 |> 
+    select(COUNTY, POP_COU, HOU_COU, `ALAND_Mi²_COU`, POP_URB, POPPCT_URB, HOU_URB, HOUPCT_URB, `ALAND_Mi²_URB`, ALAND_PCT_URB, POP_RUR, POPPCT_RUR, HOU_URB, HOUPCT_RUR, `ALAND_Mi²_RUR`, ALAND_PCT_RUR)
+
+
+
+```
+
+```{r}
+
+
+ma_county_urban_2 <- ma_county_urban_2 |> 
+    rename("ALAND_MI_COU" = "ALAND_Mi²_COU", "ALAND_MI_URB" = "ALAND_Mi²_URB", "ALAND_MI_RUR" = "ALAND_Mi²_RUR", "COUNTYFP" = "COUNTY")
+
+```
+
+```{r}
+
+
+saveRDS(ma_county_urban_2, "ma_county_urban_2.rds")
+
+
+
+```
+
+```{r}
+
+
+ma_county_urban_2 <- readRDS("ma_county_urban_2.rds")
+
+
+```
+
+```{r}
+
+
+ma_county_urban_2 |> glimpse()
+
+
+```
+
+```{r}
+
+
+
+print(ma_county_urban_2 |> select(COUNTYFP), n=14)
+
+
+
+
+```
+
+```{r}
+
+
+
+ma_county_urban_3 <- ma_county_urban_2 |> 
+    mutate(county_pop_density = round(POP_COU / ALAND_MI_COU,0), county_house_density = round(HOU_COU / ALAND_MI_COU,0))
+
+
+```
+
+```{r}
+
+saveRDS(ma_county_urban_3, "ma_county_urban_3.rds")
+
+
+```
+
+```{r}
+
+
+ma_county_urban_3 <- readRDS("ma_county_urban_3.rds")
+
+
+```
+
+```{r}
+
+
+print(ma_county_urban_3 |> select(county_house_density, county_pop_density),n=14)
+
+
+
+```
+
+
+
+```{r}
+
+
+county_geo <- ma_county_shape_2 |> 
+    full_join(ma_county_urban_3, by="COUNTYFP")
+
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+
+
+```
+
+```{r}
+
+
+
+county_geo |> glimpse()
+
+
+```
+
+
 
 ```{r}
 
@@ -2372,10 +2610,6 @@ ma_tract_data_3  <- readRDS("ma_tract_data_3.rds")
 
 ```
 
-### Feature Engineering
-
-
-Extract land areaa and convert square meters to square miles
 
 
 
@@ -2647,11 +2881,11 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 
 ```{r}
 
-ma_tract_data_4 |> 
-    select(GEOID, census_tract,County, total_vehicles_tractE) |> 
-    filter(is.na(total_vehicles_tractE)) |> 
+ma_tract_data_3 |> 
+    filter(County == "Norfolk County") |> 
+    filter(!is.na(total_vehicles_tractE)) |> 
     st_drop_geometry() |> 
-    head(72)
+    summarise(median_tract_vehicles = median(total_vehicles_tractE))
 
 
 ```
@@ -2666,6 +2900,23 @@ ma_tract_data_4 |>
 ma_tract_data_4 <- ma_tract_data_4 |> 
     mutate(total_vehicles_tractE = ifelse(County == "Norfolk County" & is.na(total_vehicles_tractE), 3080,total_vehicles_tractE))
 
+
+
+```
+
+
+
+```{r}
+
+
+
+
+
+ma_tract_data_4 |> 
+    select(GEOID, census_tract,County, total_vehicles_tractE) |> 
+    filter(is.na(total_vehicles_tractE)) |> 
+    st_drop_geometry() |> 
+    head(72)
 
 
 ```
@@ -2711,8 +2962,11 @@ ma_tract_data_4 <- readRDS("ma_tract_data_4.rds")
 ```
 
 
+### Feature Engineering
 
 
+
+From our retrieved census tract variables, we will create new variables for housing density of census tract, population density of census tract, and average cars per houshold of census tract. 
 
 
 ```{r}
@@ -2740,6 +2994,18 @@ ma_tract_data_5 <- ma_tract_data_4 |>
 
 ma_tract_data_5 <- ma_tract_data_5 |> 
     select(-total_tract_housing_unitsM, -total_vehicles_tractM, -total_households_tractM, -total_population_tractM)
+
+
+```
+
+```{r}
+
+
+ma_tract_data_5 <- ma_tract_data_5 |> 
+    filter(County != "Nantucket County") |> 
+    filter(County != "Dukes County")
+
+
 
 
 ```
@@ -2784,11 +3050,7 @@ ma_tract_data_5 |> summary()
 
 
 
-ny_census_combined |> 
-    select(GEOID, median_year_built) |> 
-    filter(is.na(median_year_built)) |> 
-    st_drop_geometry() |> 
-    summary()
+
 
 
 
@@ -2851,21 +3113,132 @@ county_map <- ggplot()+
 ```{r}
 
 
-county_map
+ma_county_geo_4326 <- county_geo |> 
+    st_transform(crs=4326)
 
 
 ```
-
-### Census Tracts
 
 ```{r}
 
-ma_tracts_2 <- ma_tracts |> 
-    filter(COUNTYFP != "019") |> 
-    filter(COUNTYFP != "007")
+
+ma_county_stcrs <- st_crs(ma_county_geo_4326)
 
 
 ```
+
+
+```{r}
+
+
+ma_county_stcrs$input
+
+
+
+```
+
+
+
+
+
+
+
+
+
+```{r}
+
+
+bins<-c(0,150000,300000,500000,700000,810000,Inf)
+
+
+```
+
+```{r}
+
+
+
+pal<-colorBin(palette="#7554d8",
+            domain=ma_county_geo_4326$POP_COU,bins=bins)
+```
+
+```{r}
+
+
+
+ma_county_formated <- ma_county_geo_4326 |> 
+    mutate(county_pop_density = format(county_pop_density, big.mark = ",", big.interval = 3, digits=12) ) |> 
+    mutate(POPPCT_URB = round(POPPCT_URB * 100,2))
+
+
+```
+
+```{r}
+
+
+
+
+mytext <- paste(
+  "County: ", ma_county_formated$NAME,"<br/>",
+  "Population Density: ", ma_county_formated$county_pop_density, "<br/>",
+  "County Population Percent Urban: ", ma_county_formated$POPPCT_URB,"<br/>", 
+    sep="") %>%
+  lapply(htmltools::HTML)
+
+
+```
+
+
+
+```{r}
+
+
+map_county_pop_density_plt<- ma_county_geo_4326 |> leaflet(options = leafletOptions(minZoom = 9.4, maxZoom = 18)) |> 
+  addProviderTiles(providers$Esri.WorldStreetMap) |> 
+  setView(lng = -071.9402820, lat = 42.3116934, zoom = 9.4) |> 
+  addPolygons(
+ fillColor=~pal(POP_COU),
+ weight=2,
+ opacity=0.8,
+ color= "white",
+ label=~mytext,
+ dashArray = "3",
+ fillOpacity=0.3,
+ highlightOptions = highlightOptions(
+    weight = 5,
+    color = "#666",
+    dashArray = "",
+    fillOpacity = 0.5,
+    bringToFront = FALSE)) 
+    
+  
+
+
+
+
+```
+
+
+
+```{r}
+
+county_map_pop_density<-map_county_pop_density_plt %>% 
+  addLegend(pal = pal, values = ~county_pop_density, opacity = 0.6, title = "Massachusetts County Population Density",
+  position = "bottomright")
+
+
+```
+
+```{r}
+
+county_map_pop_density
+
+
+
+```
+
+
+
+### Census Tracts
 
 
 ```{r}
