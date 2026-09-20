@@ -288,7 +288,8 @@ We will now extract the year, month,day, and hourm of the day from the Start_Tim
 MA_accidents_2 <- MA_accidents_2 |> 
     mutate(Year = year(Start_Time)) |> 
     mutate(Month = month(Start_Time)) |> 
-    mutate(day_of_week = wday(Start_Time)) |> 
+    mutate(day_of_week = wday(Start_Time)) |>
+    mutate(day_type = if_else(wday(Start_Time) %in% c(1,7), "Weekend", "Weekday")) |> 
     mutate(hour_of_day = hour(Start_Time))
 
 
@@ -301,7 +302,7 @@ MA_accidents_2 <- MA_accidents_2 |>
 
 
 MA_accidents_2 |> 
-    select(Year, Month, day_of_week, hour_of_day) |> 
+    select(Year, Month, day_of_week, hour_of_day, day_type) |> 
     head()
 
 
@@ -338,7 +339,8 @@ MA_accidents_2 |>
 MA_accidents_2 <- MA_accidents_2 |> 
     mutate(Year = as.factor(Year)) |> 
     mutate(Month = as.factor(Month)) |> 
-    mutate(day_of_week = as.factor(day_of_week))
+    mutate(day_of_week = as.factor(day_of_week)) |> 
+    mutate(day_type = as.factor(day_type))
 
 
 
@@ -1016,6 +1018,8 @@ ma_accidents_16_21_3 |>
 
 ```
 
+
+
 There are five mssing values in the newly created GEOID.  These missing values (NAs) will be removed. 
 
 
@@ -1038,6 +1042,18 @@ ma_accidents_16_21_4 |>
 
 ```
 
+
+```{r}
+
+
+ma_accidents_16_21_3 |> 
+    select(GEOID,County, Wind_Speed.mph.) |> 
+    filter(is.na(Wind_Speed.mph.)) |> 
+    head(72)
+
+
+```
+
 ```{r}
 
 
@@ -1051,6 +1067,7 @@ ma_accidents_16_21_4 |>
 
 
 ```{r}
+#| eval: false
 
 
 ma_accidents_16_21_4 <- ma_accidents_16_21_4 |> 
@@ -1127,7 +1144,7 @@ ma_accidents_16_21_4  |> filter(accident_duration <=1000) |> dim()
 
 
 ma_accidents_16_21_4 <- ma_accidents_16_21_4 |> 
-    select(-Start_Lat, -End_Lat, -Start_Lng, -End_Lng, -State, -Zipcode, -Country, -Timezone, -Airport_Code, -Weather_Timestamp, -Wind_Chill.F., -Visibility.mi., -Precipitation.in.)
+    select(-Start_Lat, -End_Lat, -Start_Lng, -End_Lng, -State, -Zipcode, -Country, -Timezone, -Airport_Code, -Weather_Timestamp, -Wind_Chill.F., -Visibility.mi., -Precipitation.in., -Wind_Speed.mph.)
 
 
 ```
@@ -1300,21 +1317,9 @@ ma_accidents_16_21_5 |>
 
 ```
 
-hour_of_day is numeric datatype.  We'll need to transform this feature to a factor for our analysis and modeling. 
-
-
-```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
-#| eval: false
 
 
 
-ma_accidents_16_21_6 <- ma_accidents_16_21_5 |> 
-    mutate(hour_of_day = as.factor(hour_of_day))
-
-
-```
 
  ```{r}
 #| code-fold: true
@@ -1322,20 +1327,66 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_5 |>
 #| eval: false
  
 
-ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
-    rename(temperature = Temperature.F., humidity = Humidity..., wind_speed = Wind_Speed.mph.)
+ma_accidents_16_21_6 <- ma_accidents_16_21_5 |> 
+    rename(temperature = Temperature.F.)
 
 
  ```
 
  ```{r}
+ 
+
+
+ma_accidents_16_21_5 |> 
+    count(Wind_Direction)
+
+
+
+ ```
+
+
+ ```{r}
+ 
+
+ma_accidents_16_21_6$Wind_Direction[trimws(ma_accidents_16_21_6$Wind_Direction) == ""] <- "NR"
+
+
+ ```
+
+ ```{r}
+ 
+
+
+ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
+    mutate(Wind_Direction = as.factor(Wind_Direction))
+
+
+ ```
+
+ ```{r}
+ 
+
+
+
+
+ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
+    mutate(Wind_Direction = recode(Wind_Direction,  "CALM" = "Calm", "NR" = "Calm", "ENE" = "E", "ESE" = "E", "East" = "E", "NE" = "N", "NNE" = "N", "NNW" = "N", "NW" = "N", "North" = "N", "SE" = "S", 
+                                                    "SSE" = "S", "SSW" ="S", "SW" = "S", "South" = "S", "VAR" = "Variable", "WNW" = "W", "WSW" = "W", "West" = "W"))
+
+
+
+ ```
+
+
+
+ ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
  
 
 ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
-    select(-Source, -Start_Time, -End_Time, -Distance.mi., -Pressure.in. )
+    select(-Source, -Start_Time, -End_Time, -Distance.mi., -Pressure.in.,-Humidity... )
 
 
  ```
@@ -1439,7 +1490,8 @@ ma_accidents_16_21_6 |>
  ```
 
 
- 
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1448,19 +1500,6 @@ ma_accidents_16_21_6 |>
 
 
 ma_accidents_16_21_7 <- ma_accidents_16_21_6 |> 
-    select(-Bump, -Roundabout, -Turning_Loop)
-
- 
- ```
-
- ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
-#| eval: false
- 
-
-
-ma_accidents_16_21_7 <- ma_accidents_16_21_7 |> 
     mutate(Street = recode(Street,  "Mass Pike" = "I-90"))
 
 
@@ -1575,9 +1614,58 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7 |>
  
 
 ma_accidents_16_21_7 <- ma_accidents_16_21_7 |> 
-    mutate(Weather_Condition = recode(Weather_Condition,  " " = "No Report", "Light Rain / Windy" = "Light Rain", "Light Rain Shower" = "Light Rain", "Light Rain with Thunder" = "Light Rain", "Light Drizzle" = "Light Rain","Rain / Windy" = "Rain", "Thunderstorms and Rain" = "Rain", "Thunderstorm" = "Rain", "T-Storm" = "Rain","Thunder" = "Overcast", "Cloudy" = "Overcast", "Thunder / Windy" = "Overcast", "Thunder in the Vicinity" = "Overcast","Cloudy / Windy" = "Overcast", "Mostly Cloudy" = "Overcast", "Mostly Cloudy / Windy" = "Overcast","Light Thunderstorms and Rain" = "Rain","Heavy Rain / Windy" = "Heavy Rain", "Heavy Thunderstorms and Rain" = "Heavy Rain","Heavy T-Storm / Windy" = "Heavy Rain","Heavy T-Storm" = "Heavy Rain", "Light Snow / Windy" = "Light Snow", "Light Snow and Sleet" = "Light Snow", "Clear" = "Fair Partley Cloudy","Blowing Snow" = "Heavy Snow", "Heavy Snow / Windy" = "Heavy Snow", "Light Drizzle / Windy" = "Light Rain", "Mist" = "Light Rain", "Drizzle and Fog" = "Light Rain", "Fair / Windy" = "Fair Partley Cloudy", "Partly Cloudy" = "Fair Partley Cloudy", "Partly Cloudy / Windy" = "Fair Partley Cloudy", "Fair" = "Fair Partley Cloudy", "Scattered Clouds" = "Fair Partley Cloudy",
+    mutate(Weather_Condition = recode(Weather_Condition,  "NR" = "Fair Partley Cloudy", "Light Rain / Windy" = "Light Rain", "Light Rain Shower" = "Light Rain", "Light Rain with Thunder" = "Light Rain", "Light Drizzle" = "Light Rain","Rain / Windy" = "Rain", "Thunderstorms and Rain" = "Rain", "Thunderstorm" = "Rain", "T-Storm" = "Rain","Thunder" = "Overcast", "Cloudy" = "Overcast", "Thunder / Windy" = "Overcast", "Thunder in the Vicinity" = "Overcast","Cloudy / Windy" = "Overcast", "Mostly Cloudy" = "Overcast", "Mostly Cloudy / Windy" = "Overcast","Light Thunderstorms and Rain" = "Rain","Heavy Rain / Windy" = "Heavy Rain", "Heavy Thunderstorms and Rain" = "Heavy Rain","Heavy T-Storm / Windy" = "Heavy Rain","Heavy T-Storm" = "Heavy Rain", "Light Snow / Windy" = "Light Snow", "Light Snow and Sleet" = "Light Snow", "Clear" = "Fair Partley Cloudy","Blowing Snow" = "Heavy Snow", "Heavy Snow / Windy" = "Heavy Snow", "Light Drizzle / Windy" = "Light Rain", "Mist" = "Light Rain", "Drizzle and Fog" = "Light Rain", "Fair / Windy" = "Fair Partley Cloudy", "Partly Cloudy" = "Fair Partley Cloudy", "Partly Cloudy / Windy" = "Fair Partley Cloudy", "Fair" = "Fair Partley Cloudy", "Scattered Clouds" = "Fair Partley Cloudy",
    "Fog / Windy" = "Fog", "Patches of Fog" = "Fog","Shallow Fog" = "Fog","Wintry Mix / Windy" = "Wintry Mix", "Light Freezing Drizzle" = "Wintry Mix" , "Light Freezing Rain" = "Wintry Mix","Smoke" = "Haze", "Squalls" = "Snow",
-   "Light Freezing Fog" = "Wintry Mix", "Ice Pellets" = "Wintry Mix","Small Hail" = "Wintry Mix",  "Snow / Windy" = "Snow", "N/A Precipitation" = "NR") )
+   "Light Freezing Fog" = "Wintry Mix", "Ice Pellets" = "Wintry Mix","Small Hail" = "Wintry Mix",  "Snow / Windy" = "Snow", "N/A Precipitation" = "Fair Partley Cloudy") )
+
+
+ ```
+
+
+
+
+   Now we can perform our binning.  Essentiall we will place hour of day into eight ranges.
+
+
+
+
+ ```{r}
+ 
+
+
+
+ma_accidents_16_21_7 <- ma_accidents_16_21_7|> 
+    mutate(hour_day_sections = case_when(
+        between(hour_of_day,5,6) ~ "Dawn",
+        between(hour_of_day,6,9) ~ "Early Morning",
+        between(hour_of_day,9,12) ~ "Late Morning",
+        between(hour_of_day,12,16) ~ "Early Afternoon",
+        between(hour_of_day,16,18) ~ "Late Afternoon",
+        between(hour_of_day,18,21) ~ "Evening",
+        between(hour_of_day,21,24) ~ "Night",
+        TRUE ~ "Middle of Night"
+
+    ))
+
+
+
+ ```
+
+ ```{r}
+ 
+
+
+ma_accidents_16_21_7 <- ma_accidents_16_21_7 |> 
+    mutate(hour_day_sections = as.factor(hour_day_sections))
+
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_7 <- ma_accidents_16_21_7 |> 
+    select(-hour_of_day)
 
 
  ```
@@ -1603,6 +1691,19 @@ ma_accidents_16_21_7 <- readRDS("ma_accidents_16_21_7.rds")
 
 
  ```
+
+
+
+ ```{r}
+ 
+
+
+
+
+
+ ```
+
+
 
  ```{r}
  
@@ -1840,6 +1941,21 @@ ma_accidents_16_21_7 |>
 
  ```
 
+
+ ```{r}
+ 
+
+
+ma_accidents_16_21_7 |> 
+    count(Wind_Direction)
+
+
+
+
+ ```
+
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1847,7 +1963,7 @@ ma_accidents_16_21_7 |>
  
 
 ma_accidents_16_21_8 <- ma_accidents_16_21_7 |> 
-    select(-No_Exit, -Traffic_Calming, -Nautical_Twilight, -Astronomical_Twilight, -Give_Way, -Railway, -Wind_Direction, -Description, -Street)
+    select(-No_Exit, -Traffic_Calming, -Nautical_Twilight, -Astronomical_Twilight, -Give_Way, -Railway, -Description, -Street, -Bump, -Roundabout, -Turning_Loop)
 
 
  ```
@@ -1880,17 +1996,11 @@ ma_accidents_16_21_8 |>
 
  ```
 
- Our hour fo day feature has 24 categories (24 hour clock: 01 to 24).  We will reduce the number of categories by binning them. First, hour of day must be transformed to a numeric data type. 
+ 
 
  <br><br>
 
- ```{r}
  
-
-ma_accidents_16_21_9 <- ma_accidents_16_21_8 |> 
-    mutate(hour_of_day = as.numeric(hour_of_day))
-
- ```
 
   <br><br>
 
@@ -1904,33 +2014,9 @@ class(ma_accidents_16_21_9$hour_of_day)
 
   <br><br>
 
-  Now we can perform our binning.  Essentiall we will place hour of day into eight ranges. 
-
-   <br><br> 
-
-
- ```{r}
  
 
-ma_accidents_16_21_9 <- ma_accidents_16_21_9|> 
-    mutate(hour_day_sections = case_when(
-        between(hour_of_day,5,6) ~ "Dawn",
-        between(hour_of_day,6,9) ~ "Early Morning",
-        between(hour_of_day,9,12) ~ "Late Morning",
-        between(hour_of_day,12,16) ~ "Early Afternoon",
-        between(hour_of_day,16,18) ~ "Late Afternoon",
-        between(hour_of_day,18,21) ~ "Evening",
-        between(hour_of_day,21,24) ~ "Night",
-        TRUE ~ "Middle of Night"
 
-    ))
-
-
-
- ```
-
-
- 
 
   <br><br>
 
@@ -1942,19 +2028,10 @@ Main Sections of the DayMorning (5:00 AM – 12:00 PM):Dawn / Sunrise: First lig
  <br><br>
 
 
- Hour of day feature is no longer required and can be dropped from our dataset. 
+
 
   <br><br>
 
-
-  ```{r}
-  
-
-ma_accidents_16_21_9 <- ma_accidents_16_21_9 |> 
-    select(-hour_of_day)
-
-
-  ```
 
   ```{r}
   
@@ -2150,6 +2227,14 @@ ma_county_shape_2 <- readRDS("ma_county_shape_2.rds")
 
 
 ma_county_shape_2 |> glimpse()
+
+
+
+```
+
+```{r}
+
+
 
 
 
@@ -2359,7 +2444,7 @@ county_geo <- ma_county_shape_2 |>
 ```{r}
 
 
-
+saveRDS(county_geo , "county_geo.rds")
 
 
 ```
@@ -2368,7 +2453,7 @@ county_geo <- ma_county_shape_2 |>
 
 
 
-
+county_geo  <- readRDS("county_geo.rds")
 
 
 
@@ -2379,6 +2464,46 @@ county_geo <- ma_county_shape_2 |>
 
 
 county_geo |> glimpse()
+
+
+```
+
+```{r}
+
+
+county_geo_2 <- county_geo |> 
+    select(COUNTYFP, NAME, POP_COU, HOU_COU, POPPCT_URB, HOU_URB, county_pop_density) |> 
+    st_drop_geometry()
+
+
+```
+
+```{r}
+
+county_geo_2 <- county_geo_2 |> 
+    rename("County" = "NAME", "Cou_POPPCT_URB" = "POPPCT_URB", "COU_HOU_URB" = "HOU_URB")
+
+
+```
+
+```{r}
+
+
+county_geo_2 |> glimpse()
+
+```
+
+```{r}
+
+
+saveRDS(county_geo_2, "county_geo_2.rds")
+
+```
+
+```{r}
+
+
+county_geo_2 <- readRDS("county_geo_2.rds")
 
 
 ```
@@ -2591,7 +2716,7 @@ ma_tract_data_2  <- readRDS("ma_tract_data_2.rds")
 ```{r}
 
 
-ma_tract_data_3 <- ma_tract_cls |> 
+ma_tract_data_3 <- ma_tract_geometry |> 
     full_join(ma_tract_data_2, by = "GEOID")
 
 
@@ -2621,6 +2746,38 @@ ma_tract_data_3  <- readRDS("ma_tract_data_3.rds")
 ma_tract_data_3 |> summary()
 
 
+
+
+```
+
+
+```{r}
+
+
+ma_tract_data_4 <- ma_tract_data_3 |> 
+    filter(GEOID != "25001990000") |> 
+    filter(GEOID != "25023990003")
+
+
+
+```
+
+
+```{r}
+
+
+ma_tract_data_4 |> 
+    filter(GEOID == "25001990000" | GEOID == "25023990003") |> 
+    head()
+
+
+```
+
+```{r}
+
+ma_tract_data_4 |> 
+    filter(GEOID == "25001990000") |> 
+    head()
 
 
 ```
@@ -2673,7 +2830,7 @@ ma_tract_data_3 |>
 ```{r}
 
 
-ma_tract_data_4 <- ma_tract_data_3 |> 
+ma_tract_data_4 <- ma_tract_data_4 |> 
     mutate(total_vehicles_tractE = ifelse(County == "Suffolk County" & is.na(total_vehicles_tractE), 1310,total_vehicles_tractE ))
 
 
@@ -2912,7 +3069,7 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 
 
 
-ma_tract_data_4 |> 
+ma_tract_data_3 |> 
     select(GEOID, census_tract,County, total_vehicles_tractE) |> 
     filter(is.na(total_vehicles_tractE)) |> 
     st_drop_geometry() |> 
@@ -2924,32 +3081,7 @@ ma_tract_data_4 |>
 ```{r}
 
 
-ma_tract_data_3 |> 
-    select(GEOID, total_population_tractE) |> 
-    filter(total_population_tractE == 0) |> 
-    st_drop_geometry() |> 
-    summary()
-
-```
-
-```{r}
-
-ma_tract_data_3 |> 
-    select(GEOID, census_tract,County, total_population_tractE) |> 
-    filter(total_population_tractE == 0) |> 
-    st_drop_geometry() |> 
-    head(72)
-
-
-
-```
-
-```{r}
-
-
 saveRDS(ma_tract_data_4, "ma_tract_data_4.rds")
-
-
 
 ```
 
@@ -2959,7 +3091,96 @@ saveRDS(ma_tract_data_4, "ma_tract_data_4.rds")
 ma_tract_data_4 <- readRDS("ma_tract_data_4.rds")
 
 
+
 ```
+
+```{r}
+
+
+ma_tract_data_4 |> 
+    summary()
+
+
+```
+
+
+```{r}
+
+
+ma_tract_data_5 <- ma_tract_data_4 |> 
+    filter(total_population_tractE != 0)
+
+
+```
+
+
+```{r}
+
+
+ma_tract_data_5 <- ma_tract_data_5 |> 
+    filter(County != "Nantucket County") |> 
+    filter(County != "Dukes County")
+
+
+```
+
+```{r}
+
+
+ma_tract_data_5 <- ma_tract_data_5 |> 
+    filter(total_households_tractE != 0)
+
+
+
+```
+
+
+
+```{r}
+
+
+saveRDS(ma_tract_data_5, "ma_tract_data_5.rds")
+
+
+```
+
+```{r}
+
+
+ma_tract_data_5 <- readRDS("ma_tract_data_5.rds")
+
+
+
+```
+
+```{r}
+
+ma_tract_data_5 |> count(County)
+
+
+```
+
+```{r}
+
+ma_tract_data_5 |> 
+    filter(is.na(total_vehicles_tractE)) |> 
+    count(County)
+
+
+```
+
+
+
+```{r}
+
+
+ma_tract_data_5 |> 
+    summary()
+
+
+```
+
+
 
 
 ### Feature Engineering
@@ -2969,11 +3190,16 @@ ma_tract_data_4 <- readRDS("ma_tract_data_4.rds")
 From our retrieved census tract variables, we will create new variables for housing density of census tract, population density of census tract, and average cars per houshold of census tract. 
 
 
+
+
+
+
+
 ```{r}
-ma_tract_data_5 <- ma_tract_data_4 |> 
+ma_tract_data_6 <- ma_tract_data_5 |> 
     mutate(
-        tract_house_density_sqmi = round(as.numeric(set_units(total_tract_housing_unitsE/ st_area(geometry),"1/mi2")),0),
-        tract_pop_density_sqmi = round(as.numeric(set_units(total_population_tractE/ st_area(geometry),"1/mi2")),0),
+        tract_house_density_sqmi = round(as.numeric(set_units(total_tract_housing_unitsE/ st_area(geometry),"1/mi2")),2),
+        tract_pop_density_sqmi = round(as.numeric(set_units(total_population_tractE/ st_area(geometry),"1/mi2")),2),
         avg_cars_per_household = round(total_vehicles_tractE / total_households_tractE, 2)  
     #select(!ends_with("M"))
     #rename_with(.fn = ~str_remove(.x, "E$"))
@@ -2987,12 +3213,25 @@ ma_tract_data_5 <- ma_tract_data_4 |>
 
 
 
+```{r}
+
+
+
+print(ma_tract_data_5 |> 
+    filter(total_households_tractE == 0), n=70)
+
+
+```
+
+
+
+
 
 
 ```{r}
 
 
-ma_tract_data_5 <- ma_tract_data_5 |> 
+ma_tract_data_6 <- ma_tract_data_6 |> 
     select(-total_tract_housing_unitsM, -total_vehicles_tractM, -total_households_tractM, -total_population_tractM)
 
 
@@ -3001,9 +3240,55 @@ ma_tract_data_5 <- ma_tract_data_5 |>
 ```{r}
 
 
-ma_tract_data_5 <- ma_tract_data_5 |> 
-    filter(County != "Nantucket County") |> 
-    filter(County != "Dukes County")
+ma_tract_data_6 <- ma_tract_data_6 |> 
+    select(-County)
+
+
+```
+
+
+```{r}
+
+saveRDS(ma_tract_data_6 , "ma_tract_data_6.rds")
+
+
+```
+
+```{r}
+
+
+ma_tract_data_6 <- readRDS("ma_tract_data_6.rds")
+
+
+```
+
+
+
+```{r}
+
+
+
+
+ma_tract_data_6|> glimpse()
+
+
+
+```
+
+```{r}
+
+
+ma_tract_data_6 |> summary()
+
+
+```
+
+```{r}
+
+
+ma_tract_data_7 <- ma_tract_data_6 |> 
+    select(-census_tract, -County) |> 
+    st_drop_geometry()
 
 
 
@@ -3012,46 +3297,25 @@ ma_tract_data_5 <- ma_tract_data_5 |>
 
 ```{r}
 
-saveRDS(ma_tract_data_5 , "ma_tract_data_5.rds")
+
+saveRDS(ma_tract_data_7, "ma_tract_data_7.rds")
 
 
 ```
 
 ```{r}
 
-
-ma_tract_data_5  <- readRDS("ma_tract_data_5.rds")
+ma_tract_data_7 <- readRDS("ma_tract_data_7.rds")
 
 
 ```
-
 
 
 ```{r}
 
 
-
-
-ma_tract_data_5|> glimpse()
-
-
-
-```
-
-```{r}
-
-
-ma_tract_data_5 |> summary()
-
-
-```
-
-```{r}
-
-
-
-
-
+ma_tract_data_7|> 
+    glimpse()
 
 
 ```
@@ -3148,7 +3412,7 @@ ma_county_stcrs$input
 ```{r}
 
 
-bins<-c(0,150000,300000,500000,700000,810000,Inf)
+bins<-c(0,71029,129026,162308,228996,465825,530819,579200,725981,797936,809829,862111,Inf)
 
 
 ```
@@ -3157,7 +3421,7 @@ bins<-c(0,150000,300000,500000,700000,810000,Inf)
 
 
 
-pal<-colorBin(palette="#7554d8",
+pal<-colorBin(palette="RdYlBu",
             domain=ma_county_geo_4326$POP_COU,bins=bins)
 ```
 
@@ -3198,7 +3462,7 @@ map_county_pop_density_plt<- ma_county_geo_4326 |> leaflet(options = leafletOpti
   addPolygons(
  fillColor=~pal(POP_COU),
  weight=2,
- opacity=0.8,
+ opacity=0.3,
  color= "white",
  label=~mytext,
  dashArray = "3",
@@ -3230,7 +3494,7 @@ county_map_pop_density<-map_county_pop_density_plt %>%
 
 ```{r}
 
-county_map_pop_density
+map_county_pop_density_plt
 
 
 
@@ -3262,6 +3526,515 @@ ma_tracts_plot
 
 ```
 
+```{r}
+
+tract_accident_count <- ma_accidents_16_21_8 |> 
+    count(GEOID, name = "tract_accident_count")
+
+
+```
+
+```{r}
+
+saveRDS(tract_accident_count, "tract_accident_count.rds")
+
+```
+
+```{r}
+
+
+tract_accident_count <- readRDS("tract_accident_count.rds")
+
+
+
+```
+
+```{r}
+
+
+
+tract_accident_count |> 
+    slice_max(tract_accident_count, n=20) 
+
+```
+
+```{r}
+
+ma_accidents_16_21_8 |> 
+    filter(GEOID == "25017334100")
+
+
+
+```
+
+```{r}
+
+
+ma_accidents_16_21_8 |> 
+    filter(accident_duration >=30 & accident_duration <=60)
+
+```
+
+
+```{r}
+
+
+ma_accidents_16_21_10 <- ma_accidents_16_21_8 |> 
+    full_join(tract_accident_count, by = "GEOID")
+
+
+
+```
+
+```{r}
+
+
+saveRDS(ma_accidents_16_21_10, "ma_accidents_16_21_10.rds")
+
+
+```
+
+```{r}
+
+
+
+ma_accidents_16_21_10 <- readRDS("ma_accidents_16_21_10.rds")
+
+
+```
+
+ ```{r}
+ 
+ma_accidents_16_21_10 |> 
+ count(GEOID) |> 
+ arrange(desc(n))
+
+
+ ```
+
+ ```{r}
+ 
+
+
+
+ ```
+
+ ```{r}
+ 
+
+ma_accidents_16_21_10 |> 
+    summary()
+
+
+
+ ```
+
+```{r}
+
+
+
+ma_tract_accident <- ma_tract_data_6 |> 
+    full_join(ma_accidents_16_21_10, by = "GEOID")
+
+
+```
+
+```{r}
+
+
+
+saveRDS(ma_tract_accident, "ma_tract_accident.rds")
+
+
+```
+
+```{r}
+
+
+ma_tract_accident <- readRDS("ma_tract_accident.rds")
+
+
+```
+
+```{r}
+
+
+
+ma_tract_accident |> 
+    summary()
+
+
+
+```
+
+```{r}
+
+
+ma_tract_accident |> 
+    filter(is.na(total_households_tractE)) |> 
+    summary()
+
+
+```
+
+```{r}
+
+
+
+
+ma_tract_accident |> 
+    filter(is.na(total_households_tractE)) |> 
+    count(GEOID)
+
+
+```
+
+```{r}
+
+ma_tract_accident |> 
+    filter(is.na(total_households_tractE)) |> 
+    head(1000)
+
+
+
+```
+
+```{r}
+
+
+ma_tract_accident_2 <- ma_tract_accident |> 
+    mutate(total_households_tractE = replace_na(total_households_tractE, 0), 
+           total_population_tractE = replace_na(total_population_tractE, 0),
+           tract_house_density_sqmi = replace_na(tract_house_density_sqmi,0),
+           tract_pop_density_sqmi = replace_na(tract_pop_density_sqmi,0),
+           total_vehicles_tractE = replace_na(total_vehicles_tractE,0),
+           total_tract_housing_unitsE = replace_na(total_tract_housing_unitsE,0) )
+
+
+```
+
+```{r}
+
+saveRDS(ma_tract_accident_2, "ma_tract_accident_2.rds")
+
+```
+
+```{r}
+
+
+ma_tract_accident_2 <- readRDS("ma_tract_accident_2.rds")
+
+```
+
+```{r}
+
+ma_tract_accident_2 |> 
+    summary()
+
+```
+
+```{r}
+
+
+
+
+ma_tract_accident_3 <- ma_tract_accident_2 |> 
+    filter(!is.na(day_of_week))
+```
+
+```{r}
+
+saveRDS(ma_tract_accident_3, "ma_tract_accident_3.rds")
+
+```
+
+```{r}
+
+ma_tract_accident_3 <- readRDS("ma_tract_accident_3.rds")
+
+
+```
+
+```{r}
+
+ma_tract_accident_3 |> 
+    summary()
+
+
+```
+
+```{r}
+
+ma_tract_cls <- st_crs(ma_tract_accident_3)
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+
+```{r}
+
+ma_census4326 <- ma_tract_accident_3 |> 
+    st_transform(crs=4326)
+
+
+```
+
+```{r}
+
+
+saveRDS(ma_census4326, "ma_census4326.rds")
+
+
+```
+
+```{r}
+
+
+
+ma_census4326 <- readRDS("ma_census4326.rds")
+
+
+```
+
+```{r}
+
+
+ma_tract_cls_2 <- st_crs(ma_census4326)
+
+
+```
+
+```{r}
+
+ma_tract_cls_2$input
+
+
+```
+
+```{r}
+
+bins<-c(0,500,2000,3000,4000,5000,6500,8500,9500,10500,Inf)
+
+
+```
+
+```{r}
+
+
+pal<-colorBin(palette="RdYlBu",
+            domain=ma_census4326$total_population_tractE,bins=bins)
+
+
+
+```
+
+```{r}
+
+       
+       
+ma_tract_formated <- ma_tract_accident_3 |> 
+    mutate(total_tract_housing_unitsE = format(total_tract_housing_unitsE, big.mark = ",", big.interval = 3, digits=12) ) |> 
+    mutate(total_vehicles_tractE = format(total_vehicles_tractE, big.mark = ",", big.interval = 3, digits=12) ) 
+   
+
+
+```
+
+```{r}
+
+
+mytext <- paste(
+  "County: ", ma_tract_formated$County,"<br/>",
+  "Census Tract: ", ma_tract_formated$GEOID, "<br/>",
+  "Total Vehicles Census Tract: ", ma_tract_formated$total_vehicles_tractE, "<br/>",
+  "Total Housing Census Tract: ", ma_tract_formated$total_tract_housing_unitsE,"<br/>", 
+  "Census Tract Accident County: ", ma_tract_formated$tract_accident_count,"<br/>",
+    sep="") %>%
+  lapply(htmltools::HTML)
+
+
+```
+
+```{r}
+
+
+
+map_tract_population_plt<- ma_census4326 |> leaflet(options = leafletOptions(minZoom = 9.4, maxZoom = 18)) |> 
+  addProviderTiles(providers$Esri.WorldStreetMap) |> 
+  setView(lng = -071.9402820, lat = 42.3116934, zoom = 9.4) |> 
+  addPolygons(
+ fillColor=~pal(total_population_tractE),
+ weight=2,
+ opacity=0.8,
+ color= "white",
+ label=~mytext,
+ dashArray = "3",
+ fillOpacity=0.3,
+ highlightOptions = highlightOptions(
+    weight = 5,
+    color = "#666",
+    dashArray = "",
+    fillOpacity = 0.5,
+    bringToFront = FALSE)) 
+
+
+```
+
+```{r}
+
+
+
+tract_map_population<-map_tract_population_plt %>% 
+  addLegend(pal = pal, values = ~total_population_tractE, opacity = 0.6, title = "Massachusetts Census Tract Population",
+  position = "bottomright")
+
+```
+
+```{r}
+
+
+tract_map_population
+  
+
+```
+
+
+```{r}
+
+
+ma_census4326 |> 
+    filter(GEOID == "25017368102")
+
+
+```
+
+```{r}
+
+
+ma_census_middle <- ma_census4326 |> 
+    filter(County == "Middlesex")
+
+
+
+```
+
+```{r}
+
+
+saveRDS(ma_census_middle, "ma_census_middle.rds")
+
+```
+
+```{r}
+
+
+ma_census_middle <- readRDS("ma_census_middle.rds")
+
+
+
+```
+
+```{r}
+
+
+pal_2<-colorBin(palette="RdYlBu",
+            domain=ma_census_middle$total_population_tractE,bins=bins)
+
+
+```
+
+```{r}
+
+
+ma_tract_middle_formated <- ma_census_middle |> 
+    mutate(total_tract_housing_unitsE = format(total_tract_housing_unitsE, big.mark = ",", big.interval = 3, digits=12) ) |> 
+    mutate(total_vehicles_tractE = format(total_vehicles_tractE, big.mark = ",", big.interval = 3, digits=12) ) 
+
+
+```
+
+```{r}
+
+saveRDS(ma_tract_middle_formated, "ma_tract_middle_formated.rds")
+
+```
+
+```{r}
+
+ma_tract_middle_formated <- readRDS("ma_tract_middle_formated.rds")
+
+
+```
+
+```{r}
+
+
+
+mytext_2 <- paste(
+  "County: ", ma_tract_middle_formated$County,"<br/>",
+  "Census Tract: ", ma_tract_middle_formated$GEOID, "<br/>",
+  "Total Vehicles Census Tract: ", ma_tract_middle_formated$total_vehicles_tractE, "<br/>",
+  "Total Housing Census Tract: ", ma_tract_middle_formated$total_tract_housing_unitsE,"<br/>", 
+  "Census Tract Accident County: ", ma_tract_middle_formated$tract_accident_count,"<br/>",
+    sep="") %>%
+  lapply(htmltools::HTML)
+
+
+```
+
+```{r}
+
+
+
+map_middle_tract_population_plt<- ma_census_middle |> leaflet(options = leafletOptions(minZoom = 11, maxZoom = 18)) |> 
+  addProviderTiles(providers$Esri.WorldStreetMap) |> 
+  setView(lng = -071.23928, lat = 42.38980, zoom = 11.5) |> 
+  addPolygons(
+ fillColor=~pal_2(total_population_tractE),
+ weight=2,
+ opacity=0.8,
+ color= "white",
+ label=~mytext_2,
+ dashArray = "3",
+ fillOpacity=0.3,
+ highlightOptions = highlightOptions(
+    weight = 5,
+    color = "#666",
+    dashArray = "",
+    fillOpacity = 0.5,
+    bringToFront = FALSE)) 
+
+
+
+
+```
+
+```{r}
+
+
+
+tract_middle_map_population<-map_middle_tract_population_plt %>% 
+  addLegend(pal = pal_2, values = ~total_population_tractE, opacity = 0.6, title = "Middlesex County  Census Tract Population",
+  position = "bottomright")
+
+
+```
+
+```{r}
+
+
+tract_middle_map_population
+
+
+```
+
 
 
 # Preprocessing
@@ -3278,11 +4051,36 @@ ma_tracts_plot
 10:1 rule 
 You should have at least 10 rows of data for every 1 column (feature) in your dataset. 
 
+`
+
 ```{r}
 
 
-# Allocates 80% to training, 20% to testing
-data_split <- initial_split(your_dataframe, prop = 0.80) 
+census_tract_df <- ma_accidents_16_21_8 |> 
+    left_join(ma_tract_data_7, by = "GEOID")
+
+```
+
+```{r}
+
+
+
+census_tract_df |> 
+   summary()
+
+
+```
+
+```{r}
+
+census_tract_df  |> filter(is.na(total_population_tractE))  |> count(GEOID)
+
+
+```
+
+```{r}
+
+census_tract_df |> filter(total_tract_housing_unitsE == 0) |> head(10)
 
 
 ```
@@ -3290,8 +4088,8 @@ data_split <- initial_split(your_dataframe, prop = 0.80)
 ```{r}
 
 
-ma_county_urban_test <- ma_county_urban |> 
-    select(COUNTY, COUNTY_NAME, POP_COU, HOU_COU, POPDEN_COU, HOUDEN_COU, POPPCT_URB, HOU_URB, HOUPCT_URB)
+census_tract_county_df <- census_tract_df |> 
+    left_join(county_geo_2, by = "County")
 
 
 ```
@@ -3299,9 +4097,87 @@ ma_county_urban_test <- ma_county_urban |>
 ```{r}
 
 
-test_df <- ma_accidents_16_21_6 |> 
-    select(-Severity, -Bump, -Roundabout, -Turning_Loop, -Nautical_Twilight, -Astronomical_Twilight, -Description, -Street, -City, -LATITUDE, -LONGITUDE, -census_code, -ID, -GEOID, -Weather_Condition)
+census_tract_df_2 <- census_tract_df |> 
+    select(-ID, -Severity, -City, -County, -Year, -LATITUDE, -LONGITUDE, -census_code, -tract_house_density_sqmi, -Stop,-Amenity, -Crossing,-Junction ,-Station,-Traffic_Signal,-Sunrise_Sunset,-Civil_Twilight, -day_of_week, -total_tract_housing_unitsE, -total_vehicles_tractE, -total_population_tractE, -avg_cars_per_household, -total_households_tractE, -tract_pop_density_sqmi)
 
+
+```
+
+
+
+
+```{r}
+
+
+census_tract_df_2 |> summary()
+
+```
+
+```{r}
+
+census_tract_df_2 |> count(Weather_Condition)
+
+
+```
+
+```{r}
+
+
+census_tract_df_2 |> 
+    glimpse()
+
+
+```
+
+```{r}
+
+
+
+census_tract_df |> select(GEOID, County, total_households_tractE, total_population_tractE, total_vehicles_tractE) |> filter(is.na(total_households_tractE)) |> head()
+
+```
+
+```{r}
+
+census_tract_df_2 |> 
+    summary()
+
+
+```
+
+```{r}
+
+
+census_tract_df_2 <- census_tract_df_2 |> 
+    filter(!is.na(total_vehicles_tractE))
+
+
+```
+
+```{r}
+
+census_tract_df_2 <- census_tract_df_2 |> 
+    filter(total_tract_housing_unitsE != 0)
+
+
+```
+
+
+```{r}
+
+
+census_tract_county_df_2 <- census_tract_county_df |> 
+    select(-ID, -Severity, -City, -County, -Year, -LATITUDE, -LONGITUDE, -census_code, -tract_house_density_sqmi, -Stop,-Amenity, -Crossing,-Junction ,-Station,-Traffic_Signal,-Sunrise_Sunset,-Civil_Twilight, -day_of_week, -total_tract_housing_unitsE, -total_vehicles_tractE, -total_population_tractE, -avg_cars_per_household, -total_households_tractE, -tract_pop_density_sqmi, -County, 
+    -POP_COU, -HOU_COU, -COU_HOU_URB)
+
+
+
+```
+
+```{r}
+
+
+census_tract_county_df_2 |> summary()
 
 
 ```
@@ -3312,10 +4188,63 @@ test_df <- ma_accidents_16_21_6 |>
 
 
 
-test_df <- test_df |> 
-    mutate(Wind_Direction = recode(Wind_Direction,  "VAR" = "Variable", "S" = "South", "N" = "North", "E" = "East", "W" = "West"))
+census_tract_df_2 |> 
+    ggplot(aes(temperature)) +
+    geom_histogram(bins=25)
+
 
 ```
+
+```{r}
+
+
+census_tract_df_2 |> 
+    ggplot(aes(log(wind_speed))) +
+    geom_histogram(bins=25)
+
+
+```
+
+
+```{r}
+
+
+census_tract_df_2 |> 
+    ggplot(aes(log(accident_duration),log(wind_speed)))) +
+    geom_point()
+
+
+```
+
+```{r}
+
+
+
+census_tract_df_2 |> 
+    mutate(GEOID = as.factor(GEOID)) |> 
+    count(GEOID) |>
+    arrange(desc(n)) 
+
+
+
+```
+
+
+```{r}
+
+census_tract_df_2 |> 
+    summary()
+
+
+```
+
+
+
+
+
+
+
+
 
 
 ```{r}
@@ -3327,26 +4256,19 @@ test_df <- test_df |>
 ```
 
 
+
+
 ```{r}
 
-
-test_df_2 <- test_df |> 
-    left_join(ma_county_urban_test, by = "COUNTY_NAME")
+acci_census_df <- initial_split(census_tract_df_2, prop = 0.80)
 
 
 ```
 
 ```{r}
 
-test_df_2 <- test_df_2 |> 
-    select(-COUNTY_NAME)
 
-
-```
-
-```{r}
-
-test_model_df <- initial_split(test_df_2, prop = 0.80)
+acci_count_tract_df <- initial_split(census_tract_county_df_2, prop = 0.80)
 
 
 ```
@@ -3355,7 +4277,7 @@ test_model_df <- initial_split(test_df_2, prop = 0.80)
 ```{r}
 
 
-
+print(acci_count_tract_df)
 
 
 ```
@@ -3364,38 +4286,14 @@ test_model_df <- initial_split(test_df_2, prop = 0.80)
 ```{r}
 
 
-train_data <- training(test_model_df)
+train_census_data <- training(acci_census_df)
 
 
 ```
 
 ```{r}
 
-test_data <- testing(test_model_df)
-
-
-```
-
-```{r}
-
-
-# Stratify by a categorical or numeric target column
-data_split <- initial_split(your_dataframe, prop = 0.80, strata = target_variable)
-
-
-```
-
-
-
-```{r}
-
-
-
-set.seed(1353)
-car_split <- initial_validation_split(mtcars)
-train_data <- training(car_split)
-validation_data <- validation(car_split)
-test_data <- testing(car_split)
+test_census_data <- testing(acci_census_df)
 
 
 ```
@@ -3403,38 +4301,27 @@ test_data <- testing(car_split)
 ```{r}
 
 
-
-validation_split(data, prop = 3/4, strata = NULL, breaks = 4, pool = 0.1, ...)
-
-validation_time_split(data, prop = 3/4, lag = 0, ...)
-
-group_validation_split(data, group, prop = 3/4, ..., strata = NULL, pool = 0.1)
-
+train_tract_cou <- training(acci_count_tract_df)
 
 ```
 
 ```{r}
 
 
-print(test_model_df)
+
+test_tract_coun <- testing(acci_count_tract_df)
 
 
 ```
 
-```{r}
 
 
-rec <- recipe(PRICE ~ ., data = model_df) |> 
-    step_center(all_numeric_predictors()) |> 
-    step_scale(all_numeric_predictors())
 
-
-```
 
 ```{r}
 
 
-rec <- recipe(accident_duration ~ ., data = train_data) |> 
+census_rec <- recipe(accident_duration ~ ., data = train_census_data) |> 
     step_center(all_numeric_predictors()) |> 
     step_scale(all_numeric_predictors())
 
@@ -3445,16 +4332,45 @@ rec <- recipe(accident_duration ~ ., data = train_data) |>
 
 
 
-model_rec <- prep(rec, training= model_df)
-scaled_df <- bake(model_rec, new_data = model_df)
+census_cou_rec <- recipe(accident_duration ~ ., data = train_tract_cou) |> 
+    step_center(all_numeric_predictors()) |> 
+    step_scale(all_numeric_predictors())
+
+```
+
+
+
+
+```{r}
+
+train_census_rec <- prep(census_rec, training= train_census_data)
+scaled_census_train <- bake(train_census_rec, new_data = train_census_data)
+
+
+```
+
+
+```{r}
+
+
+train_tract_cou_rec <- prep(census_cou_rec, training=train_tract_cou)
+scaled_tract_cou_train <- bake(train_tract_cou_rec, new_data = train_tract_cou)
 
 
 ```
 
 ```{r}
 
-train_rec <- prep(rec, training= train_data)
-scaled_train <- bake(train_rec, new_data = train_data)
+
+model_lme_1 <- lmer(log(accident_duration) ~ . -GEOID + (1 | GEOID), data = scaled_census_train)
+
+
+
+```
+
+```{r}
+
+model_lme_2 <- lmer(log(accident_duration) ~ . -GEOID -COUNTYFP + (1 | COUNTYFP/GEOID), data = scaled_tract_cou_train)
 
 
 ```
@@ -3462,8 +4378,95 @@ scaled_train <- bake(train_rec, new_data = train_data)
 ```{r}
 
 
-model_lme_1 <- lmer(log(accident_duration) ~ . + (1 | COUNTY), data = scaled_train)
+summary(model_lme_2)
 
+```
+
+```{r}
+
+
+summary(model_lme_1)
+
+
+```
+
+
+
+
+
+```{r}
+
+
+stan_model_1 <- stan_lmer(
+    log(accident_duration) ~ . -GEOID + (temperature | GEOID),
+  data = scaled_census_train,
+  chains = 4,
+  iter = 8000,
+  cores = 30, 
+  seed = 42
+)
+
+
+```
+
+
+
+```{r}
+
+
+
+brms_model <- brm(
+  log(accident_duration) ~ . -GEOID + (temperature | GEOID),
+  data = scaled_census_train,
+  chains = 4,
+  iter = 10000,
+  family = student(),
+  cores = 30, 
+  seed = 42
+)
+
+
+
+```
+
+
+```{r}
+
+
+summary(brms_model)
+
+```
+
+```{r}
+
+saveRDS(brms_model, "brms_model.rds")
+
+
+```
+
+
+```{r}
+
+
+
+
+brms_model_2 <- brm(
+  log(accident_duration) ~ . -GEOID -COUNTYFP + (temperature | COUNTYFP),
+  data = scaled_tract_cou_train,
+  chains = 4,
+  iter = 8000,
+  family = student(),
+  cores = 30, 
+  seed = 42
+)
+
+
+```
+
+```{r}
+
+
+summary(brms_model_2)
 
 
 ```
