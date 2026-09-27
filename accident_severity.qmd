@@ -4103,13 +4103,23 @@ census_tract_df_2 <- census_tract_df |>
 
 ```
 
+```{r}
+
+
+census_tract_df_3 <- census_tract_df |> 
+    select(-ID, -Severity, -City, -County, -Year, -LATITUDE, -LONGITUDE, -census_code, -tract_house_density_sqmi, -Stop,-Amenity, -Crossing,-Junction ,-Station,-Traffic_Signal,-Sunrise_Sunset,-Civil_Twilight, -day_of_week, -total_tract_housing_unitsE, -total_vehicles_tractE, -avg_cars_per_household, -total_households_tractE, -tract_pop_density_sqmi)
+
+
+
+```
+
 
 
 
 ```{r}
 
 
-census_tract_df_2 |> summary()
+census_tract_df_3 |> summary()
 
 ```
 
@@ -4148,8 +4158,8 @@ census_tract_df_2 |>
 ```{r}
 
 
-census_tract_df_2 <- census_tract_df_2 |> 
-    filter(!is.na(total_vehicles_tractE))
+census_tract_df_4 <- census_tract_df_3 |> 
+    filter(!is.na(total_population_tractE))
 
 
 ```
@@ -4268,6 +4278,14 @@ acci_census_df <- initial_split(census_tract_df_2, prop = 0.80)
 ```{r}
 
 
+acci_census_df_2 <- initial_split(census_tract_df_4, prop = 0.80)
+
+
+```
+
+```{r}
+
+
 acci_count_tract_df <- initial_split(census_tract_county_df_2, prop = 0.80)
 
 
@@ -4294,6 +4312,21 @@ train_census_data <- training(acci_census_df)
 ```{r}
 
 test_census_data <- testing(acci_census_df)
+
+
+```
+
+```{r}
+
+train_census_data_2 <- training(acci_census_df_2)
+
+
+```
+
+```{r}
+
+
+test_census_data_2 <- testing(acci_census_df_2)
 
 
 ```
@@ -4331,6 +4364,16 @@ census_rec <- recipe(accident_duration ~ ., data = train_census_data) |>
 ```{r}
 
 
+census_rec_2<- recipe(accident_duration ~ ., data = train_census_data_2) |> 
+    step_center(all_numeric_predictors()) |> 
+    step_scale(all_numeric_predictors())
+
+
+```
+
+```{r}
+
+
 
 census_cou_rec <- recipe(accident_duration ~ ., data = train_tract_cou) |> 
     step_center(all_numeric_predictors()) |> 
@@ -4345,6 +4388,15 @@ census_cou_rec <- recipe(accident_duration ~ ., data = train_tract_cou) |>
 
 train_census_rec <- prep(census_rec, training= train_census_data)
 scaled_census_train <- bake(train_census_rec, new_data = train_census_data)
+
+
+```
+
+```{r}
+
+train_census_rec_2 <- prep(census_rec_2, training= train_census_data_2)
+scaled_census_train_2 <- bake(train_census_rec_2, new_data = train_census_data_2)
+
 
 
 ```
@@ -4419,9 +4471,9 @@ brms_model <- brm(
   log(accident_duration) ~ . -GEOID + (temperature | GEOID),
   data = scaled_census_train,
   chains = 4,
-  iter = 10000,
+  iter = 12000,
   family = student(),
-  cores = 30, 
+  cores = 40, 
   seed = 42
 )
 
@@ -4433,7 +4485,7 @@ brms_model <- brm(
 ```{r}
 
 
-summary(brms_model)
+
 
 ```
 
@@ -4444,6 +4496,115 @@ saveRDS(brms_model, "brms_model.rds")
 
 ```
 
+
+```{r}
+
+
+brms_model <- readRDS("brms_model.rds")
+
+
+```
+
+
+
+
+
+```{r}
+
+summary(brms_model)
+
+
+
+```
+
+```{r}
+
+
+icc(brms_model, nrep=50)
+
+
+```
+
+```{r}
+
+
+
+brms_model_cat_plot_top_60 <- brms_model %>%
+  spread_draws(r_GEOID[GEOID, Intercept]) %>%
+  median_qi(.width = 0.95) %>%
+  slice_max(order_by = abs(r_GEOID), n = 60) %>%
+  ggplot(aes(x = r_GEOID, y = reorder(GEOID, r_GEOID), xmin = .lower, xmax = .upper)) +
+  geom_pointinterval(color = "#1f78b4") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
+  theme_minimal() +
+  labs(
+    title = "Top 60 Most Extreme Census Tract Effects (brms_model)",
+    x = "Log Accident Duration Adjustment",
+    y = "Census Tract (GEOID)"
+  )
+
+
+```
+
+
+
+```{r}
+
+
+
+
+
+
+```
+
+```{r}
+
+
+
+brms_model_cat_plot_top_60
+
+
+```
+
+
+```{r}
+
+
+brms_model_2 <- brm(
+  log(accident_duration) ~ . -GEOID + (temperature | GEOID),
+  data = scaled_census_train_2,
+  chains = 4,
+  iter = 12000,
+  family = student(),
+  cores = 40, 
+  seed = 42
+)
+
+
+
+
+```
+
+```{r}
+
+saveRDS(brms_model_2, "brms_model_2.rds")
+
+
+```
+
+```{r}
+
+
+brms_model_2  <- readRDS("brms_model_2.rds")
+
+```
+
+```{r}
+
+summary(brms_model_2)
+
+
+```
 
 ```{r}
 
