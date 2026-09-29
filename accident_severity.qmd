@@ -4064,6 +4064,23 @@ census_tract_df <- ma_accidents_16_21_8 |>
 ```{r}
 
 
+saveRDS(census_tract_df, "census_tract_df.rds")
+
+
+```
+
+
+```{r}
+
+
+census_tract_df <- readRDS("census_tract_df.rds")
+
+
+```
+
+```{r}
+
+
 
 census_tract_df |> 
    summary()
@@ -4106,8 +4123,25 @@ census_tract_df_2 <- census_tract_df |>
 ```{r}
 
 
+saveRDS(census_tract_df_2, "census_tract_df_2.rds")
+
+
+```
+
+```{r}
+
+
+census_tract_df_2 <- readRDS("census_tract_df_2.rds")
+
+
+
+```
+
+```{r}
+
+
 census_tract_df_3 <- census_tract_df |> 
-    select(-ID, -Severity, -City, -County, -Year, -LATITUDE, -LONGITUDE, -census_code, -tract_house_density_sqmi, -Stop,-Amenity, -Crossing,-Junction ,-Station,-Traffic_Signal,-Sunrise_Sunset,-Civil_Twilight, -day_of_week, -total_tract_housing_unitsE, -total_vehicles_tractE, -avg_cars_per_household, -total_households_tractE, -tract_pop_density_sqmi)
+    select(-ID, -Severity, -City, -Year, -LATITUDE, -LONGITUDE, -census_code, -tract_house_density_sqmi, -Stop,-Amenity, -Crossing,-Junction ,-Station,-Traffic_Signal,-Sunrise_Sunset,-Civil_Twilight, -day_of_week, -total_tract_housing_unitsE, -total_vehicles_tractE, -avg_cars_per_household, -total_households_tractE, -tract_pop_density_sqmi, -total_population_tractE)
 
 
 
@@ -4266,7 +4300,7 @@ test_df <- test_df |>
 ```
 
 
-
+## Train/Test Split
 
 ```{r}
 
@@ -4278,7 +4312,7 @@ acci_census_df <- initial_split(census_tract_df_2, prop = 0.80)
 ```{r}
 
 
-acci_census_df_2 <- initial_split(census_tract_df_4, prop = 0.80)
+acci_census_df_2 <- initial_split(census_tract_df_3, prop = 0.80)
 
 
 ```
@@ -4411,10 +4445,39 @@ scaled_tract_cou_train <- bake(train_tract_cou_rec, new_data = train_tract_cou)
 
 ```
 
+# Models
+
+## Linear Regression
+
 ```{r}
 
 
-model_lme_1 <- lmer(log(accident_duration) ~ . -GEOID + (1 | GEOID), data = scaled_census_train)
+
+lr <- lm(log(accident_duration) ~ . -GEOID, data = train_census_data)
+
+
+```
+
+
+```{r}
+
+
+saveRDS(lr, "lr.rds")
+
+```
+
+```{r}
+
+
+lr <- readRDS("lr.rds")
+
+
+```
+
+```{r}
+
+
+summary(lr)
 
 
 
@@ -4422,7 +4485,87 @@ model_lme_1 <- lmer(log(accident_duration) ~ . -GEOID + (1 | GEOID), data = scal
 
 ```{r}
 
-model_lme_2 <- lmer(log(accident_duration) ~ . -GEOID -COUNTYFP + (1 | COUNTYFP/GEOID), data = scaled_tract_cou_train)
+
+lr_2 <- lm(log(accident_duration) ~ . -GEOID, data = train_census_data_2)
+
+
+```
+
+```{r}
+
+
+summary(lr_2)
+
+
+```
+
+```{r}
+
+saveRDS(lr_2, "lr_2.rds")
+
+
+
+```
+
+```{r}
+
+
+lr_2 <- readRDS("lr_2.rds")
+
+```
+
+
+
+
+## Fixed Effects
+
+
+
+```{r}
+
+
+model_lme_1 <- lmer(log(accident_duration) ~ . -GEOID + (temperature | GEOID), data = scaled_census_train)
+
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+
+summary(model_lme_1)
+
+
+```
+
+```{r}
+
+
+performance::check_singularity(model_lme_1)
+
+
+
+```
+
+```{r}
+
+model_lme_2 <- lmer(log(accident_duration) ~ . -GEOID  + (1 | GEOID), data = scaled_census_train)
 
 
 ```
@@ -4431,6 +4574,43 @@ model_lme_2 <- lmer(log(accident_duration) ~ . -GEOID -COUNTYFP + (1 | COUNTYFP/
 
 
 summary(model_lme_2)
+
+```
+
+
+```{r}
+
+
+icc(model_lme_2)
+
+
+```
+
+```{r}
+
+
+
+performance::check_singularity(model_lme_2)
+
+
+```
+
+The result of TRUE from the check_singularity function informs us that the  lme4 model has some variance components that equal zero and thus random effect variances can not be computed. 
+
+```{r}
+
+
+
+performance::check_heteroscedasticity(model_lme_2)
+
+
+```
+
+```{r}
+
+
+performance::check_heteroskedasticity(model_lme_2)
+
 
 ```
 
@@ -4520,7 +4700,74 @@ summary(brms_model)
 ```{r}
 
 
+
+performance::check_singularity(brms_model)
+
+
+```
+
+```{r}
+
+performance::check_collinearity(brms_model)
+
+
+```
+
+
+
+```{r}
+
+
 icc(brms_model, nrep=50)
+
+
+```
+
+
+```{r}
+
+
+brms_model_2 <- brm(
+  log(accident_duration) ~ . -GEOID -Wind_Direction -Weather_Condition + (temperature | GEOID),
+  data = scaled_census_train,
+  chains = 4,
+  iter = 8000,
+  family = student(),
+  cores = 40, 
+  seed = 42
+)
+
+
+
+```
+
+```{r}
+
+saveRDS(brms_model_2, "brms_model_2.rds")
+
+
+```
+
+```{r}
+
+
+brms_model_2 <- readRDS("brms_model_2.rds")
+
+
+```
+
+```{r}
+
+
+summary(brms_model_2)
+
+
+```
+
+```{r}
+
+
+performance::check_collinearity(brms_model_2)
 
 
 ```
@@ -4529,7 +4776,7 @@ icc(brms_model, nrep=50)
 
 
 
-brms_model_cat_plot_top_60 <- brms_model %>%
+brms_model_cat_plot_top_60 <- brms_model_2 %>%
   spread_draws(r_GEOID[GEOID, Intercept]) %>%
   median_qi(.width = 0.95) %>%
   slice_max(order_by = abs(r_GEOID), n = 60) %>%
@@ -4551,7 +4798,19 @@ brms_model_cat_plot_top_60 <- brms_model %>%
 ```{r}
 
 
-
+brms_model_cat_plot_top_60_2 <- brms_model_2 %>%
+  spread_draws(r_GEOID[GEOID, Intercept]) %>%
+  median_qi(.width = 0.95) %>%
+  slice_max(order_by = abs(r_GEOID), n = 100) %>%
+  ggplot(aes(x = r_GEOID, y = reorder(GEOID, r_GEOID), xmin = .lower, xmax = .upper)) +
+  geom_pointinterval(color = "#1f78b4") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
+  theme_minimal() +
+  labs(
+    title = "Top 60 Most Extreme Census Tract Effects (brms_model)",
+    x = "Log Accident Duration Adjustment",
+    y = "Census Tract (GEOID)"
+  )
 
 
 
@@ -4562,6 +4821,397 @@ brms_model_cat_plot_top_60 <- brms_model %>%
 
 
 brms_model_cat_plot_top_60
+
+
+```
+
+```{r}
+
+
+brms_model_cat_plot_top_60_2
+
+
+```
+
+```{r}
+
+
+ma_census4326 |> 
+    filter(GEOID %in% c("25021418004",  "25001011802","25005644200", "25017321500", "25021416101", "25021421200","25023507101", "25017312000", "25005630202","25017315401", "25021421100", "25017373902",
+                         "25025130402", "25017358700", "25009211201","25025101001", "25025100800", "25025140300","25023520100", "25009208401", "25025981100", "25023502101")) |> 
+                            count(County) |> 
+                            arrange(desc(n)) |> 
+                            st_drop_geometry()
+
+
+```
+
+```{r}
+
+
+ma_census4326 |> 
+    filter(GEOID %in% c("25021418004",  "25001011802","25005644200", "25017321500", "25021416101", "25021421200","25023507101", "25017312000", "25005630202","25017315401", "25021421100", "25017373902",
+                         "25025130402", "25017358700", "25009211201","25025101001", "25025100800", "25025140300","25023520100", "25009208401", "25025981100", "25023502101")) |> 
+                            count(County,GEOID) |> 
+                            arrange(desc(n)) |> 
+                            st_drop_geometry()
+
+
+
+```
+
+```{r}
+
+
+ma_census4326 |> 
+    filter(GEOID %in% c( "25017320105",  "25021419700", "25021419800", "25009254401", "25025010600", "25027744103", "25017368400","25013802101", "25025170301", "25025170400", "25017350105", "25013810100",
+                        "25017320106", "25021411200", "25025081001", "25027732901","25017358600","25017374800", "25005614102", "25017337300", "25027710200", "25021403100", "25017342501", "25023501204",
+                          "25017383700", "25017384003", "25017374200", "25025050901", "25021410100","25021414100")) |> 
+                            count(County) |> 
+                            arrange(desc(n)) |> 
+                            st_drop_geometry()
+
+
+```
+
+```{r}
+
+
+ma_census4326 |> 
+    filter(GEOID %in% c( "25017320105",  "25021419700", "25021419800", "25009254401", "25025010600", "25027744103", "25017368400","25013802101", "25025170301", "25025170400", "25017350105", "25013810100",
+                        "25017320106", "25021411200", "25025081001", "25027732901","25017358600","25017374800", "25005614102", "25017337300", "25027710200", "25021403100", "25017342501", "25023501204",
+                          "25017383700", "25017384003", "25017374200", "25025050901", "25021410100","25021414100")) |> 
+                            count(County, GEOID) |> 
+                            arrange(desc(n)) |> 
+                            st_drop_geometry()
+
+```
+
+```{r}
+
+ma_extreme_middle_higher <- ma_census_middle |> 
+    select(GEOID, ID, accident_duration, County, City, hour_day_sections, day_type, Month,total_vehicles_tractE,road_category, LONGITUDE, LATITUDE) |> 
+    filter(GEOID %in% c("25017321500","25017358700", "25017315401", "25017373902", "25017312000" )) |> 
+        st_drop_geometry()
+
+```
+
+```{r}
+
+
+saveRDS(ma_extreme_middle_higher, "ma_extreme_middle_higher.rds")
+
+
+```
+
+```{r}
+
+ma_extreme_middle_higher <- readRDS("ma_extreme_middle_higher.rds")
+
+
+```
+
+```{r}
+
+bins<-c(0,200,4000,5400,6500,7500,8500,Inf)
+
+```
+
+
+
+
+
+```{r}
+
+pal<-colorBin(palette="RdYlBu",
+            domain=ma_census_middle$total_population_tractE,bins=bins)
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+
+ma_tract_middle_extreme_formatted <- ma_extreme_middle_higher |> 
+    mutate(accident_duration = format(accident_duration, big.mark = ",", big.interval = 3, digits=12) ) 
+     
+
+
+```
+
+```{r}
+
+saveRDS(ma_tract_middle_extreme_formatted, "ma_tract_middle_extreme_formatted.rds")
+
+```
+
+```{r}
+
+ma_tract_middle_extreme_formatted <- readRDS("ma_tract_middle_extreme_formatted.rds")
+
+
+```
+
+```{r}
+
+
+
+mytext <- paste(
+  "Census Tract: ", ma_census_middle$GEOID, "<br/>",
+  "Total Vehicles Census Tract: ", ma_census_middle$total_vehicles_tractE, "<br/>",
+  "Total Housing Census Tract: ", ma_census_middle$total_tract_housing_unitsE,"<br/>", 
+  "Census Tract Accident County: ", ma_census_middle$tract_accident_count,"<br/>",
+    sep="") %>%
+  lapply(htmltools::HTML)
+
+
+```
+
+```{r}
+
+
+
+
+map_tract_extreme_middle_plt <- ma_census_middle |> leaflet(options = leafletOptions(minZoom = 11, maxZoom = 18)) |> 
+  addProviderTiles(providers$Esri.WorldStreetMap) |> 
+  setView(lng = -071.23928, lat = 42.38980, zoom = 11.5) |> 
+  addPolygons(
+ fillColor=~pal(total_population_tractE),
+ weight=2,
+ opacity=0.8,
+ color= "white",
+ label=~mytext,
+ dashArray = "3",
+ fillOpacity=0.05,
+ highlightOptions = highlightOptions(
+    weight = 5,
+    color = "#666",
+    dashArray = "",
+    fillOpacity = 0.2,
+    bringToFront = FALSE)) |> 
+  addMarkers(
+    data = ma_tract_middle_extreme_formatted,
+    lng = ~LONGITUDE,
+    lat = ~LATITUDE,
+    popup = ~paste("Accident ID: ", ID,
+                   "<br>Accident Duration: ", accident_duration, 
+                   "<br>City: ", City, 
+                   "<br>Weekday/Weekend: ", day_type,
+                   "<br>Time of Day: ", hour_day_sections,
+                   "<br>Road Type: ", road_category) )     
+
+```
+
+```{r}
+
+
+tract_map_extreme_middle<-map_tract_extreme_middle_plt %>% 
+  addLegend(pal = pal, values = ~total_population_tractE, opacity = 0.6, title = "Massachusetts Extreme Census Tract Population",
+  position = "bottomright")
+
+
+```
+
+```{r}
+
+tract_map_extreme_middle
+
+
+```
+
+```{r}
+
+
+bins_2<-c(0,200,4000,5400,6500,7500,8500,Inf)
+
+
+```
+
+```{r}
+
+
+ma_census_norfolk <- ma_census4326 |> 
+    filter(County == "Norfolk")
+
+
+```
+
+```{r}
+
+saveRDS(ma_census_norfolk, "ma_census_norfolk.rds")
+
+```
+
+```{r}
+
+
+ma_census_norfolk <- readRDS("ma_census_norfolk.rds")
+
+
+```
+
+```{r}
+
+
+
+ma_extreme_norfolk_higher <- ma_census_norfolk |> 
+    select(GEOID, ID, accident_duration, County, City, hour_day_sections, day_type, Month,total_vehicles_tractE,road_category, LONGITUDE, LATITUDE) |> 
+    filter(GEOID %in% c("25021421200","25021421100","25021416101", "25021418004")) |> 
+        st_drop_geometry()
+
+
+```
+
+```{r}
+
+saveRDS(ma_extreme_norfolk_higher, "ma_extreme_norfolk_higher.rds")
+
+```
+
+```{r}
+
+ma_extreme_norfolk_higher <- readRDS("ma_extreme_norfolk_higher.rds")
+
+
+```
+
+```{r}
+
+pal_2 <- colorBin(palette="RdYlBu",
+            domain=ma_census_norfolk$total_population_tractE,bins=bins_2)
+
+
+```
+
+```{r}
+
+
+ma_tract_norfolk_extreme_formatted <- ma_extreme_norfolk_higher |> 
+    mutate(accident_duration = format(accident_duration, big.mark = ",", big.interval = 3, digits=12) )
+
+
+```
+
+```{r}
+
+saveRDS(ma_tract_norfolk_extreme_formatted, "ma_tract_norfolk_extreme_formatted.rds")
+
+
+```
+
+```{r}
+
+
+ma_tract_norfolk_extreme_formatted <- readRDS("ma_tract_norfolk_extreme_formatted.rds")
+
+
+```
+
+```{r}
+
+
+mytext_2 <- paste(
+  "Census Tract: ", ma_census_norfolk$GEOID, "<br/>",
+  "Total Vehicles Census Tract: ", ma_census_norfolk$total_vehicles_tractE, "<br/>",
+  "Total Housing Census Tract: ", ma_census_norfolk$total_tract_housing_unitsE,"<br/>", 
+  "Census Tract Accident County: ", ma_census_norfolk$tract_accident_count,"<br/>",
+    sep="") %>%
+  lapply(htmltools::HTML)
+
+
+```
+
+```{r}
+
+
+
+map_tract_extreme_norfolk_plt <- ma_census_norfolk |> leaflet(options = leafletOptions(minZoom = 9, maxZoom = 18)) |> 
+  addProviderTiles(providers$Esri.WorldStreetMap) |> 
+  setView(lng = -71.17127  , lat = 42.17051 , zoom = 11.5) |> 
+  addPolygons(
+ fillColor=~pal_2(total_population_tractE),
+ weight=2,
+ opacity=0.5,
+ color= "white",
+ label=~mytext_2,
+ dashArray = "3",
+ fillOpacity=0.05,
+ highlightOptions = highlightOptions(
+    weight = 5,
+    color = "#666",
+    dashArray = "",
+    fillOpacity = 0.2,
+    bringToFront = FALSE)) |> 
+  addMarkers(
+    data = ma_tract_norfolk_extreme_formatted,
+    lng = ~LONGITUDE,
+    lat = ~LATITUDE,
+    popup = ~paste("Accident ID: ", ID,
+                   "<br>Accident Duration: ", accident_duration, 
+                   "<br>City: ", City, 
+                   "<br>Weekday/Weekend: ", day_type,
+                   "<br>Time of Day: ", hour_day_sections,
+                   "<br>Road Type: ", road_category) ) 
+
+
+```
+
+```{r}
+
+
+tract_map_extreme_norfolk<-map_tract_extreme_norfolk_plt %>% 
+  addLegend(pal = pal_2, values = ~total_population_tractE, opacity = 0.6, title = "Norfolk Extreme Census Tract Population",
+  position = "bottomright")
+
+
+```
+
+```{r}
+
+tract_map_extreme_norfolk
+
+
+```
+
+```{r}
+
+
+
+print(ma_census_norfolk  |> select(GEOID, County), n=1500)
+
+
+```
+
+
+```{r}
+
+
+
+
+brms_extreme_df_2 <- brms_model_2 %>%
+  spread_draws(r_GEOID[GEOID, Intercept]) %>%
+  median_qi(.width = 0.95) %>%
+  slice_max(order_by = abs(r_GEOID), n = 100)
+
+
+```
+
+```{r}
+
+
+print(brms_extreme_df_2, n=100)
 
 
 ```
