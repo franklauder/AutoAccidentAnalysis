@@ -170,7 +170,7 @@ saveRDS(MA_accidents, "MA_accidents.rds")
 ```
 
 ```{r}
-#| echo: false
+#| include: false
 
 
 MA_accidents <- readRDS("MA_accidents.rds")
@@ -185,6 +185,16 @@ MA_accidents <- readRDS("MA_accidents.rds")
 
 
 options(browser="false", scipen = 999, max.print = 20000)
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+dim(MA_accidents)
 
 
 ```
@@ -210,16 +220,6 @@ summary(MA_accidents)
 
 ```
 
-
-```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
-
-
-dim(MA_accidents)
-
-
-```
 
 
 
@@ -360,7 +360,7 @@ saveRDS(MA_accidents_2, "MA_accidents_2.rds")
 ```
 
 ```{r}
-#| echo: false
+#| include: false
 
 
 MA_accidents_2 <- readRDS("MA_accidents_2.rds")
@@ -370,6 +370,8 @@ MA_accidents_2 <- readRDS("MA_accidents_2.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 MA_accidents_2 |> 
     select(Year, Month, day_of_week, hour_of_day) |> 
@@ -379,6 +381,8 @@ MA_accidents_2 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 MA_accidents_2 |> 
@@ -418,7 +422,7 @@ saveRDS(ma_accidents_16_21, "ma_accidents_16_21.rds")
 ```
 
 ```{r}
-#| echo: false
+#| include: false
 
 
 ma_accidents_16_21 <- readRDS("ma_accidents_16_21.rds")
@@ -428,6 +432,8 @@ ma_accidents_16_21 <- readRDS("ma_accidents_16_21.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 dim(ma_accidents_16_21)
@@ -463,7 +469,7 @@ saveRDS(ma_accidents_22, "ma_accidents_22.rds")
 ```
 
 ```{r}
-#| echo: false
+#| include: false
 
 
 ma_accidents_22 <- readRDS("ma_accidents_22.rds")
@@ -564,7 +570,7 @@ saveRDS(ma_accidents_16_21_2, "ma_accidents_16_21_2.rds")
 
 
 ```{r}
-#| echo: false
+#| include: false
 
 
  ma_accidents_16_21_2 <- readRDS("ma_accidents_16_21_2.rds")
@@ -606,81 +612,19 @@ Our output shows the two new featurres.
 ## US Census Data
 
 
-```{r}
 
 
 
 
 
-long_lat_1 <- ma_accidents_16_21_3 |> 
-    filter(id <=5000) |> 
-    select(LATITUDE, LONGITUDE)
 
 
-
-```
-
-
-```{r}
-
-
-long_lat_2 <- ma_accidents_16_21_3 |> 
-    filter(id > 5000 & id <=15000) |> 
-    select(LATITUDE, LONGITUDE)
-
-
-
-```
-
-
-```{r}
-
-
-
-
-long_lat_3 <- ma_accidents_16_21_3 |> 
-    filter(id > 15000 & id <=25000) |> 
-    select(LATITUDE, LONGITUDE)
-
-```
-
-
-```{r}
-
-
-long_lat_4 <- ma_accidents_16_21_3 |> 
-    filter(id > 25000 & id <=35000) |> 
-    select(LATITUDE, LONGITUDE)
-
-
-```
-
-```{r}
-
-
-long_lat_5 <- ma_accidents_16_21_3 |> 
-    filter(id > 35000 & id <=45000) |> 
-    select(LATITUDE, LONGITUDE)
-
-
-
-```
-
-```{r}
-
-
-long_lat_6 <- ma_accidents_16_21_3 |> 
-    filter(id > 45000 & id <=55587) |> 
-    select(LATITUDE, LONGITUDE)
-
-
-
-```
 
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| include: false
 
 
 
@@ -690,15 +634,7 @@ Sys.getenv("CENSUS_API_KEY")
 ```
 
 
-```{r}
 
-
-long_lat_1$census_code <- apply(long_lat_1, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
-
-
-
-
-```
 
 
 ```{r}
@@ -713,7 +649,9 @@ saveRDS(long_lat_1 , "long_lat_1.rds")
 ```
 
 ```{r}
-
+#| echo: false
+#| include: false
+#| eval: false
 
 long_lat_1  <- readRDS("long_lat_1.rds")
 
@@ -721,12 +659,6 @@ long_lat_1  <- readRDS("long_lat_1.rds")
 ```
 
 
-```{r}
-
-long_lat_2$census_code <- apply(long_lat_2, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
-
-
-```
 
 ```{r}
 #| echo: false
@@ -738,6 +670,9 @@ saveRDS(long_lat_2, "long_lat_2.rds")
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 long_lat_2 <- readRDS("long_lat_2.rds")
@@ -746,14 +681,7 @@ long_lat_2 <- readRDS("long_lat_2.rds")
 ```
 
 
-```{r}
 
-
-
-long_lat_3$census_code <- apply(long_lat_3, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
-
-
-```
 
 
 
@@ -770,6 +698,9 @@ saveRDS(long_lat_3, "long_lat_3.rds")
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 long_lat_3 <- readRDS("long_lat_3.rds")
@@ -779,13 +710,6 @@ long_lat_3 <- readRDS("long_lat_3.rds")
 ```
 
 
-```{r}
-
-
-long_lat_4$census_code <- apply(long_lat_4, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
-
-
-```
 
 
 ```{r}
@@ -803,6 +727,9 @@ saveRDS(long_lat_4, "long_lat_4.rds")
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 long_lat_4 <- readRDS("long_lat_4.rds")
@@ -810,13 +737,6 @@ long_lat_4 <- readRDS("long_lat_4.rds")
 
 ```
 
-
-```{r}
-
-long_lat_5$census_code <- apply(long_lat_5, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
-
-
-```
 
 
 ```{r}
@@ -833,6 +753,9 @@ saveRDS(long_lat_5, "long_lat_5.rds")
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -842,15 +765,7 @@ long_lat_5 <- readRDS("long_lat_5.rds")
 ```
 
 
-```{r}
 
-
-long_lat_6$census_code <- apply(long_lat_6, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
-
-
-
-
-```
 
 
 
@@ -867,6 +782,9 @@ saveRDS(long_lat_6, "long_lat_6.rds")
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 long_lat_6 <- readRDS("long_lat_6.rds")
 
@@ -874,32 +792,28 @@ long_lat_6 <- readRDS("long_lat_6.rds")
 ```
 
 
-```{r}
 
-
-
-
-long_lat_7$census_code <- apply(long_lat_7, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
-
-
-
-```
 
 
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
-long_lat <- rbind(long_lat_1, long_lat_2, long_lat_3, long_lat_4, long_lat_5, long_lat_6)
-
+long_lat$census_code <- apply(long_lat_, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
 
 
 ```
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -921,6 +835,7 @@ saveRDS(long_lat, "long_lat.rds")
 
 
 ```{r}
+#| include: false
 
 
 long_lat <- readRDS("long_lat.rds")
@@ -929,6 +844,8 @@ long_lat <- readRDS("long_lat.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 long_lat |>  head()
@@ -938,6 +855,9 @@ long_lat |>  head()
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 census_geo <- long_lat |> 
@@ -958,6 +878,7 @@ saveRDS(census_geo, "census_geo.rds")
 
 
 ```{r}
+#| include: false
 
 census_geo <- readRDS("census_geo.rds")
 
@@ -967,6 +888,8 @@ census_geo <- readRDS("census_geo.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -976,6 +899,9 @@ census_geo |> head()
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -999,6 +925,7 @@ saveRDS(ma_accidents_16_21_3, "ma_accidents_16_21_3.rds")
 
 
 ```{r}
+#| include: false
 
 
 ma_accidents_16_21_3 <- readRDS("ma_accidents_16_21_3.rds")
@@ -1106,15 +1033,7 @@ ma_accidents_16_21_4|>
 
 ```
 
-```{r}
 
-
-ma_accidents_16_21_4 |> 
-    select(id, Description) |> 
-    filter(id == "51113") 
-
-
-```
 
 ```{r}
 
@@ -1161,7 +1080,7 @@ saveRDS(ma_accidents_16_21_4, "ma_accidents_16_21_4.rds")
 ```
 
 ```{r}
-#| echo: false
+#| include: false
 
 
 ma_accidents_16_21_4 <- readRDS("ma_accidents_16_21_4.rds")
@@ -1252,7 +1171,7 @@ saveRDS(ma_accidents_16_21_5, "ma_accidents_16_21_5.rds")
 
 
 ```{r}
-#| echo: false
+#| include: false
 
 
 ma_accidents_16_21_5  <- readRDS("ma_accidents_16_21_5.rds")
@@ -1262,6 +1181,8 @@ ma_accidents_16_21_5  <- readRDS("ma_accidents_16_21_5.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 ma_accidents_16_21_5 |> 
     count(County)
@@ -1271,6 +1192,8 @@ ma_accidents_16_21_5 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -1283,6 +1206,8 @@ ma_accidents_16_21_5 |> select(accident_duration, Severity, Start_Time,End_Time,
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -1295,6 +1220,8 @@ ma_accidents_16_21_5  |> select(accident_duration, Severity, Start_Time,End_Time
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -1306,6 +1233,8 @@ ma_accidents_16_21_5  |> select(accident_duration, Severity, Start_Time,End_Time
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -1334,6 +1263,8 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_5 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 
@@ -1346,6 +1277,10 @@ ma_accidents_16_21_5 |>
 
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
  
 
 ma_accidents_16_21_6$Wind_Direction[trimws(ma_accidents_16_21_6$Wind_Direction) == ""] <- "NR"
@@ -1354,6 +1289,10 @@ ma_accidents_16_21_6$Wind_Direction[trimws(ma_accidents_16_21_6$Wind_Direction) 
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
  
 
 
@@ -1364,6 +1303,9 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
  
 
 
@@ -1433,7 +1375,7 @@ saveRDS(ma_accidents_16_21_6 , "ma_accidents_16_21_6.rds")
  ```
 
  ```{r}
- #| echo: false 
+ #| include: false 
  
 
 ma_accidents_16_21_6  <- readRDS("ma_accidents_16_21_6.rds")
@@ -1443,6 +1385,9 @@ ma_accidents_16_21_6  <- readRDS("ma_accidents_16_21_6.rds")
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
  
 
 ma_accidents_16_21_6 |> 
@@ -1454,6 +1399,8 @@ ma_accidents_16_21_6 |>
 
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 
@@ -1466,6 +1413,8 @@ ma_accidents_16_21_6 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 ma_accidents_16_21_6 |> 
@@ -1480,6 +1429,8 @@ ma_accidents_16_21_6 |>
 
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 ma_accidents_16_21_6 |> 
@@ -1557,6 +1508,8 @@ ma_accidents_16_21_7$road_category[grepl("\\b(Tunl|Tunnel)\\b", col_to_check, ig
  
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code" 
  
 ma_accidents_16_21_6 |> count(Weather_Condition)
 
@@ -1564,6 +1517,8 @@ ma_accidents_16_21_6 |> count(Weather_Condition)
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code" 
  
 
 ma_accidents_16_21_6 |> select(Weather_Condition, City) |> 
@@ -1608,7 +1563,7 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7 |>
  ```
 
  ```{r}
- #| code-fold: true
+#| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
  
@@ -1630,6 +1585,9 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7 |>
 
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
  
 
 
@@ -1652,6 +1610,9 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7|>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
  
 
 
@@ -1662,6 +1623,9 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
  
 
 ma_accidents_16_21_7 <- ma_accidents_16_21_7 |> 
@@ -1684,7 +1648,7 @@ saveRDS(ma_accidents_16_21_7, "ma_accidents_16_21_7.rds")
 
 
  ```{r}
-#| echo: false
+#| include: false
  
 
 ma_accidents_16_21_7 <- readRDS("ma_accidents_16_21_7.rds")
@@ -1692,12 +1656,15 @@ ma_accidents_16_21_7 <- readRDS("ma_accidents_16_21_7.rds")
 
  ```
 
-
+We now have eight categories of different parts of the day. 
 
  ```{r}
  
 
-
+ma_accidents_16_21_7 |> 
+    count(hour_day_sections) |> 
+    mutate(perc = round(n/sum(n),3)*100) |> 
+    arrange(desc(perc))
 
 
 
@@ -1706,6 +1673,9 @@ ma_accidents_16_21_7 <- readRDS("ma_accidents_16_21_7.rds")
 
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
  
 
 ma_accidents_16_21_7 |> 
@@ -1715,6 +1685,9 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
  
 
 ma_accidents_16_21_7 |> 
@@ -1725,6 +1698,9 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
  
 
 ma_accidents_16_21_7 |> 
@@ -1735,6 +1711,8 @@ ma_accidents_16_21_7 |>
 
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 ma_accidents_16_21_7 |> 
@@ -1746,6 +1724,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 ma_accidents_16_21_7 |> 
     count(County, No_Exit)
@@ -1754,6 +1734,8 @@ ma_accidents_16_21_7 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 ma_accidents_16_21_7|> 
@@ -1763,6 +1745,8 @@ ma_accidents_16_21_7|>
 ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 ma_accidents_16_21_7 |> 
@@ -1774,6 +1758,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 ma_accidents_16_21_7 |> 
     count(Railway) |> 
@@ -1785,6 +1771,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 
@@ -1794,6 +1782,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 ma_accidents_16_21_7 |> 
     count(Give_Way) |> 
@@ -1804,6 +1794,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 
@@ -1814,6 +1806,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 ma_accidents_16_21_7 |> 
@@ -1825,6 +1819,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 ma_accidents_16_21_7 |> 
     count(County, Amenity)
@@ -1833,6 +1829,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 ma_accidents_16_21_7 |> 
@@ -1844,6 +1842,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 ma_accidents_16_21_7 |> 
@@ -1853,6 +1853,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 ma_accidents_16_21_7 |> 
@@ -1863,6 +1865,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 
@@ -1872,6 +1876,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 ma_accidents_16_21_7 |> 
@@ -1883,6 +1889,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
  ma_accidents_16_21_7 |> 
@@ -1890,6 +1898,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 ma_accidents_16_21_7 |> 
@@ -1900,6 +1910,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 ma_accidents_16_21_7|> 
@@ -1911,6 +1923,8 @@ ma_accidents_16_21_7|>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 ma_accidents_16_21_7 |> 
@@ -1922,6 +1936,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 ma_accidents_16_21_7 |> 
@@ -1933,6 +1949,8 @@ ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
  ma_accidents_16_21_7 |> 
@@ -1943,6 +1961,8 @@ ma_accidents_16_21_7 |>
 
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 
@@ -1979,7 +1999,7 @@ saveRDS(ma_accidents_16_21_8, "ma_accidents_16_21_8.rds")
  ```
 
  ```{r}
- #| echo: false
+ #| include: false
  
 
 
@@ -1988,6 +2008,8 @@ ma_accidents_16_21_8 <- readRDS("ma_accidents_16_21_8.rds")
  ```
 
  ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
  
 
 ma_accidents_16_21_8 |> 
@@ -2007,7 +2029,7 @@ ma_accidents_16_21_8 |>
 
  ```{r}
  
-class(ma_accidents_16_21_9$hour_of_day)
+class(ma_accidents_16_21_8$hour_of_day)
 
 
  ```
@@ -2041,6 +2063,7 @@ saveRDS(ma_accidents_16_21_9, "ma_accidents_16_21_9.rds")
   ```
 
   ```{r}
+#| include: false
   
 
 ma_accidents_16_21_9 <- readRDS("ma_accidents_16_21_9.rds")
@@ -2053,23 +2076,10 @@ ma_accidents_16_21_9 <- readRDS("ma_accidents_16_21_9.rds")
 
 
 
-```{r}
-
-
-ma_accidents_16_21_9 |> 
-    count(hour_day_sections) |> 
-    mutate(perc = round(n/sum(n),3)*100) |> 
-    arrange(desc(perc))
-
-
-```
 
   <br><br>
 
 
-We now have eight categories of different parts of the day. 
-
-  <br><br>
 
 
 
@@ -2104,6 +2114,9 @@ ma_accidents_16_21_3  <- ma_accidents_16_21_2  |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_county <- counties("MA", year = 2024)
@@ -2111,6 +2124,10 @@ ma_county <- counties("MA", year = 2024)
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
 
 saveRDS(ma_county, "ma_county.rds")
 
@@ -2118,6 +2135,7 @@ saveRDS(ma_county, "ma_county.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 ma_county <- readRDS("ma_county.rds")
@@ -2126,6 +2144,8 @@ ma_county <- readRDS("ma_county.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 ma_county |> 
@@ -2135,6 +2155,8 @@ ma_county |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 ma_county |> 
@@ -2144,6 +2166,8 @@ ma_county |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 print(ma_county |> select(NAME), n=14)
@@ -2153,6 +2177,9 @@ print(ma_county |> select(NAME), n=14)
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_county_shape <- ma_county |> 
@@ -2163,6 +2190,9 @@ ma_county_shape <- ma_county |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(ma_county_shape , "ma_county_shape.rds")
 
@@ -2171,6 +2201,7 @@ saveRDS(ma_county_shape , "ma_county_shape.rds")
 
 
 ```{r}
+#| include: false
 
 
 ma_county_shape  <- readRDS("ma_county_shape.rds")
@@ -2180,6 +2211,8 @@ ma_county_shape  <- readRDS("ma_county_shape.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -2189,6 +2222,9 @@ print(ma_county_shape |> select(NAME), n=14)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -2199,6 +2235,9 @@ ma_county_shape_2 <- ma_county_shape |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 ma_county_shape_2 <- ma_county_shape_2 |> 
     rename("GEOID_COUNTY" = "GEOID")
@@ -2207,6 +2246,9 @@ ma_county_shape_2 <- ma_county_shape_2 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -2215,6 +2257,7 @@ saveRDS(ma_county_shape_2, "ma_county_shape_2.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 
@@ -2224,6 +2267,8 @@ ma_county_shape_2 <- readRDS("ma_county_shape_2.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 ma_county_shape_2 |> glimpse()
@@ -2232,22 +2277,7 @@ ma_county_shape_2 |> glimpse()
 
 ```
 
-```{r}
 
-
-
-
-
-```
-
-
-```{r}
-
-
-census_county_urban <- readxl::read_xlsx("/Users/francislauder/Documents/census/2020_UA_COUNTY.xlsx")
-
-
-```
 
 ```{r}
 #| echo: false
@@ -2261,7 +2291,7 @@ saveRDS(census_county_urban, "census_county_urban.rds")
 ```
 
 ```{r}
-#| echo: false
+#| include: false
 
 census_county_urban <- readRDS("census_county_urban.rds")
 
@@ -2270,6 +2300,8 @@ census_county_urban <- readRDS("census_county_urban.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 census_county_urban |> glimpse()
@@ -2278,6 +2310,8 @@ census_county_urban |> glimpse()
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 census_county_urban |> 
@@ -2288,6 +2322,9 @@ census_county_urban |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_county_urban <- census_county_urban |> 
@@ -2308,7 +2345,7 @@ saveRDS(ma_county_urban , "ma_county_urban.rds")
 ```
 
 ```{r}
-#| echo: false
+#| include: false
 
 
 ma_county_urban  <- readRDS("ma_county_urban.rds")
@@ -2316,6 +2353,9 @@ ma_county_urban  <- readRDS("ma_county_urban.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_county_urban |> summary()
@@ -2324,6 +2364,9 @@ ma_county_urban |> summary()
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 print(ma_county_urban |> select(COUNTY_NAME), n=14 )
@@ -2332,6 +2375,9 @@ print(ma_county_urban |> select(COUNTY_NAME), n=14 )
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_county_urban_2 <- ma_county_urban |> 
@@ -2342,6 +2388,9 @@ ma_county_urban_2 <- ma_county_urban |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_county_urban_2 <- ma_county_urban_2 |> 
@@ -2352,6 +2401,9 @@ ma_county_urban_2 <- ma_county_urban_2 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_county_urban_2 <- ma_county_urban_2 |> 
@@ -2360,6 +2412,9 @@ ma_county_urban_2 <- ma_county_urban_2 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(ma_county_urban_2, "ma_county_urban_2.rds")
@@ -2369,6 +2424,7 @@ saveRDS(ma_county_urban_2, "ma_county_urban_2.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 ma_county_urban_2 <- readRDS("ma_county_urban_2.rds")
@@ -2377,6 +2433,8 @@ ma_county_urban_2 <- readRDS("ma_county_urban_2.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 ma_county_urban_2 |> glimpse()
@@ -2385,6 +2443,8 @@ ma_county_urban_2 |> glimpse()
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -2396,6 +2456,9 @@ print(ma_county_urban_2 |> select(COUNTYFP), n=14)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -2406,6 +2469,9 @@ ma_county_urban_3 <- ma_county_urban_2 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(ma_county_urban_3, "ma_county_urban_3.rds")
 
@@ -2413,6 +2479,7 @@ saveRDS(ma_county_urban_3, "ma_county_urban_3.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 ma_county_urban_3 <- readRDS("ma_county_urban_3.rds")
@@ -2421,6 +2488,8 @@ ma_county_urban_3 <- readRDS("ma_county_urban_3.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 print(ma_county_urban_3 |> select(county_house_density, county_pop_density),n=14)
@@ -2432,6 +2501,9 @@ print(ma_county_urban_3 |> select(county_house_density, county_pop_density),n=14
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 county_geo <- ma_county_shape_2 |> 
@@ -2442,6 +2514,9 @@ county_geo <- ma_county_shape_2 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(county_geo , "county_geo.rds")
@@ -2450,6 +2525,7 @@ saveRDS(county_geo , "county_geo.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 
@@ -2460,6 +2536,8 @@ county_geo  <- readRDS("county_geo.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -2469,6 +2547,9 @@ county_geo |> glimpse()
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 county_geo_2 <- county_geo |> 
@@ -2479,6 +2560,9 @@ county_geo_2 <- county_geo |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 county_geo_2 <- county_geo_2 |> 
     rename("County" = "NAME", "Cou_POPPCT_URB" = "POPPCT_URB", "COU_HOU_URB" = "HOU_URB")
@@ -2487,6 +2571,9 @@ county_geo_2 <- county_geo_2 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 county_geo_2 |> glimpse()
@@ -2494,6 +2581,9 @@ county_geo_2 |> glimpse()
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(county_geo_2, "county_geo_2.rds")
@@ -2501,6 +2591,7 @@ saveRDS(county_geo_2, "county_geo_2.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 county_geo_2 <- readRDS("county_geo_2.rds")
@@ -2511,6 +2602,8 @@ county_geo_2 <- readRDS("county_geo_2.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 ma_county_urban |> 
@@ -2522,6 +2615,9 @@ ma_county_urban |>
 ## Tracts
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tracts <- tracts("MA", year = 2024)
@@ -2541,6 +2637,7 @@ saveRDS(ma_tracts, "ma_tracts.rds")
 ```
 
 ```{r}
+#| include: false
 
 ma_tracts <- readRDS("ma_tracts.rds")
 
@@ -2548,6 +2645,9 @@ ma_tracts <- readRDS("ma_tracts.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 ma_tracts
 
@@ -2558,6 +2658,9 @@ ma_tracts
 Define the census tract variables we want to retrieve from the acs. 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 variables_to_get <- c(
@@ -2575,6 +2678,9 @@ variables_to_get <- c(
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data <- get_acs(
@@ -2591,6 +2697,9 @@ ma_tract_data <- get_acs(
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_tract_data |> 
@@ -2600,6 +2709,9 @@ ma_tract_data |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_tract_data |> summary()
@@ -2610,6 +2722,9 @@ ma_tract_data |> summary()
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_geometry <- ma_tract_data |> 
@@ -2620,6 +2735,9 @@ ma_tract_geometry <- ma_tract_data |>
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(ma_tract_geometry, "ma_tract_geometry.rds")
@@ -2627,6 +2745,7 @@ saveRDS(ma_tract_geometry, "ma_tract_geometry.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 ma_tract_geometry <- readRDS("ma_tract_geometry.rds")
@@ -2635,6 +2754,9 @@ ma_tract_geometry <- readRDS("ma_tract_geometry.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -2645,6 +2767,9 @@ ma_tract_cls <- ma_tract_geometry |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(ma_tract_cls, "ma_tract_cls.rds")
 
@@ -2652,6 +2777,7 @@ saveRDS(ma_tract_cls, "ma_tract_cls.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 ma_tract_cls <- readRDS("ma_tract_cls.rds")
@@ -2660,6 +2786,8 @@ ma_tract_cls <- readRDS("ma_tract_cls.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 ma_tract_data |> 
@@ -2677,6 +2805,9 @@ The output of the NAME column shows it contains Census Tract, Coumty, and State.
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 ma_tract_data_2 <- ma_tract_data |> 
     separate(NAME, into=c("census_tract", "County", "state"), sep=", ") |> 
@@ -2689,6 +2820,9 @@ ma_tract_data_2 <- ma_tract_data |>
 Remove State
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data_2 <- ma_tract_data_2 |> 
@@ -2699,6 +2833,9 @@ ma_tract_data_2 <- ma_tract_data_2 |>
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(ma_tract_data_2 , "ma_tract_data_2.rds")
@@ -2707,6 +2844,7 @@ saveRDS(ma_tract_data_2 , "ma_tract_data_2.rds")
 
 
 ```{r}
+#| include: false
 
 ma_tract_data_2  <- readRDS("ma_tract_data_2.rds")
 
@@ -2714,6 +2852,9 @@ ma_tract_data_2  <- readRDS("ma_tract_data_2.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data_3 <- ma_tract_geometry |> 
@@ -2723,11 +2864,17 @@ ma_tract_data_3 <- ma_tract_geometry |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
 saveRDS(ma_tract_data_3 , "ma_tract_data_3.rds")
 
 ```
 
 ```{r}
+#| include: false
 
 
 ma_tract_data_3  <- readRDS("ma_tract_data_3.rds")
@@ -2740,6 +2887,8 @@ ma_tract_data_3  <- readRDS("ma_tract_data_3.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -2752,6 +2901,9 @@ ma_tract_data_3 |> summary()
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data_4 <- ma_tract_data_3 |> 
@@ -2764,6 +2916,9 @@ ma_tract_data_4 <- ma_tract_data_3 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_tract_data_4 |> 
@@ -2774,6 +2929,8 @@ ma_tract_data_4 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 ma_tract_data_4 |> 
     filter(GEOID == "25001990000") |> 
@@ -2783,6 +2940,8 @@ ma_tract_data_4 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 ma_tract_data_3 |> 
@@ -2797,6 +2956,8 @@ ma_tract_data_3 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -2811,6 +2972,8 @@ ma_tract_data_3 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -2828,6 +2991,9 @@ ma_tract_data_3 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data_4 <- ma_tract_data_4 |> 
@@ -2841,6 +3007,8 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -2854,6 +3022,9 @@ ma_tract_data_3 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -2865,6 +3036,9 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -2879,6 +3053,9 @@ ma_tract_data_3 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -2889,6 +3066,9 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_tract_data_3 |> 
@@ -2901,6 +3081,9 @@ ma_tract_data_3 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -2911,6 +3094,9 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_tract_data_3 |> 
@@ -2923,6 +3109,9 @@ ma_tract_data_3 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -2932,6 +3121,11 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+
 
 ma_tract_data_3 |> 
     filter(County == "Plymouth County") |> 
@@ -2942,6 +3136,9 @@ ma_tract_data_3 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -2953,6 +3150,9 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -2966,6 +3166,9 @@ ma_tract_data_3 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data_4 <- ma_tract_data_4 |> 
@@ -2976,6 +3179,9 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_tract_data_3 |> 
@@ -2987,6 +3193,9 @@ ma_tract_data_3 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data_4 <- ma_tract_data_4 |> 
@@ -2996,6 +3205,9 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 ma_tract_data_3 |> 
     filter(County == "Hampden County") |> 
@@ -3007,6 +3219,9 @@ ma_tract_data_3 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data_4 <- ma_tract_data_4 |> 
@@ -3016,6 +3231,9 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_tract_data_3 |> 
@@ -3028,6 +3246,9 @@ ma_tract_data_3 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data_4 <- ma_tract_data_4 |> 
@@ -3037,6 +3258,9 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 ma_tract_data_3 |> 
     filter(County == "Norfolk County") |> 
@@ -3052,6 +3276,9 @@ ma_tract_data_3 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data_4 <- ma_tract_data_4 |> 
@@ -3064,6 +3291,9 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -3079,6 +3309,9 @@ ma_tract_data_3 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(ma_tract_data_4, "ma_tract_data_4.rds")
@@ -3086,6 +3319,7 @@ saveRDS(ma_tract_data_4, "ma_tract_data_4.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 ma_tract_data_4 <- readRDS("ma_tract_data_4.rds")
@@ -3095,6 +3329,8 @@ ma_tract_data_4 <- readRDS("ma_tract_data_4.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 ma_tract_data_4 |> 
@@ -3105,6 +3341,9 @@ ma_tract_data_4 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data_5 <- ma_tract_data_4 |> 
@@ -3115,6 +3354,9 @@ ma_tract_data_5 <- ma_tract_data_4 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data_5 <- ma_tract_data_5 |> 
@@ -3125,6 +3367,9 @@ ma_tract_data_5 <- ma_tract_data_5 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data_5 <- ma_tract_data_5 |> 
@@ -3137,6 +3382,9 @@ ma_tract_data_5 <- ma_tract_data_5 |>
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(ma_tract_data_5, "ma_tract_data_5.rds")
@@ -3145,6 +3393,7 @@ saveRDS(ma_tract_data_5, "ma_tract_data_5.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 ma_tract_data_5 <- readRDS("ma_tract_data_5.rds")
@@ -3161,6 +3410,8 @@ ma_tract_data_5 |> count(County)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 ma_tract_data_5 |> 
     filter(is.na(total_vehicles_tractE)) |> 
@@ -3172,6 +3423,8 @@ ma_tract_data_5 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 ma_tract_data_5 |> 
@@ -3196,6 +3449,11 @@ From our retrieved census tract variables, we will create new variables for hous
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
 ma_tract_data_6 <- ma_tract_data_5 |> 
     mutate(
         tract_house_density_sqmi = round(as.numeric(set_units(total_tract_housing_unitsE/ st_area(geometry),"1/mi2")),2),
@@ -3214,6 +3472,9 @@ ma_tract_data_6 <- ma_tract_data_5 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -3229,6 +3490,9 @@ print(ma_tract_data_5 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data_6 <- ma_tract_data_6 |> 
@@ -3238,6 +3502,9 @@ ma_tract_data_6 <- ma_tract_data_6 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data_6 <- ma_tract_data_6 |> 
@@ -3248,6 +3515,10 @@ ma_tract_data_6 <- ma_tract_data_6 |>
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
 
 saveRDS(ma_tract_data_6 , "ma_tract_data_6.rds")
 
@@ -3255,6 +3526,7 @@ saveRDS(ma_tract_data_6 , "ma_tract_data_6.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 ma_tract_data_6 <- readRDS("ma_tract_data_6.rds")
@@ -3265,6 +3537,9 @@ ma_tract_data_6 <- readRDS("ma_tract_data_6.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -3276,6 +3551,9 @@ ma_tract_data_6|> glimpse()
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_tract_data_6 |> summary()
@@ -3284,6 +3562,9 @@ ma_tract_data_6 |> summary()
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_data_7 <- ma_tract_data_6 |> 
@@ -3296,6 +3577,9 @@ ma_tract_data_7 <- ma_tract_data_6 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(ma_tract_data_7, "ma_tract_data_7.rds")
@@ -3304,6 +3588,7 @@ saveRDS(ma_tract_data_7, "ma_tract_data_7.rds")
 ```
 
 ```{r}
+#| include: false
 
 ma_tract_data_7 <- readRDS("ma_tract_data_7.rds")
 
@@ -3312,6 +3597,9 @@ ma_tract_data_7 <- readRDS("ma_tract_data_7.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_tract_data_7|> 
@@ -3335,6 +3623,9 @@ ma_tract_data_7|>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_accidents_16_21_6 |> 
@@ -3346,6 +3637,9 @@ ma_accidents_16_21_6 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -3362,6 +3656,9 @@ ma_accidents_16_21_6 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 county_map <- ggplot()+
@@ -3375,6 +3672,9 @@ county_map <- ggplot()+
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_county_geo_4326 <- county_geo |> 
@@ -3384,6 +3684,9 @@ ma_county_geo_4326 <- county_geo |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_county_stcrs <- st_crs(ma_county_geo_4326)
@@ -3393,6 +3696,9 @@ ma_county_stcrs <- st_crs(ma_county_geo_4326)
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_county_stcrs$input
@@ -3410,6 +3716,9 @@ ma_county_stcrs$input
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 bins<-c(0,71029,129026,162308,228996,465825,530819,579200,725981,797936,809829,862111,Inf)
@@ -3418,6 +3727,9 @@ bins<-c(0,71029,129026,162308,228996,465825,530819,579200,725981,797936,809829,8
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -3426,6 +3738,9 @@ pal<-colorBin(palette="RdYlBu",
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -3437,6 +3752,9 @@ ma_county_formated <- ma_county_geo_4326 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -3454,6 +3772,9 @@ mytext <- paste(
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 map_county_pop_density_plt<- ma_county_geo_4326 |> leaflet(options = leafletOptions(minZoom = 9.4, maxZoom = 18)) |> 
@@ -3484,6 +3805,9 @@ map_county_pop_density_plt<- ma_county_geo_4326 |> leaflet(options = leafletOpti
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 county_map_pop_density<-map_county_pop_density_plt %>% 
   addLegend(pal = pal, values = ~county_pop_density, opacity = 0.6, title = "Massachusetts County Population Density",
@@ -3506,6 +3830,9 @@ map_county_pop_density_plt
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -3527,6 +3854,9 @@ ma_tracts_plot
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 tract_accident_count <- ma_accidents_16_21_8 |> 
     count(GEOID, name = "tract_accident_count")
@@ -3535,12 +3865,16 @@ tract_accident_count <- ma_accidents_16_21_8 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(tract_accident_count, "tract_accident_count.rds")
 
 ```
 
 ```{r}
+#| include: false
 
 
 tract_accident_count <- readRDS("tract_accident_count.rds")
@@ -3550,6 +3884,10 @@ tract_accident_count <- readRDS("tract_accident_count.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
 
 
 
@@ -3559,6 +3897,9 @@ tract_accident_count |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 ma_accidents_16_21_8 |> 
     filter(GEOID == "25017334100")
@@ -3568,6 +3909,9 @@ ma_accidents_16_21_8 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_accidents_16_21_8 |> 
@@ -3577,6 +3921,10 @@ ma_accidents_16_21_8 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 ma_accidents_16_21_10 <- ma_accidents_16_21_8 |> 
@@ -3587,6 +3935,9 @@ ma_accidents_16_21_10 <- ma_accidents_16_21_8 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(ma_accidents_16_21_10, "ma_accidents_16_21_10.rds")
@@ -3595,6 +3946,7 @@ saveRDS(ma_accidents_16_21_10, "ma_accidents_16_21_10.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 
@@ -3604,6 +3956,9 @@ ma_accidents_16_21_10 <- readRDS("ma_accidents_16_21_10.rds")
 ```
 
  ```{r}
+ #| code-fold: true
+#| code-summary: "Show Code"
+
  
 ma_accidents_16_21_10 |> 
  count(GEOID) |> 
@@ -3620,6 +3975,9 @@ ma_accidents_16_21_10 |>
  ```
 
  ```{r}
+ #| code-fold: true
+#| code-summary: "Show Code"
+
  
 
 ma_accidents_16_21_10 |> 
@@ -3630,6 +3988,9 @@ ma_accidents_16_21_10 |>
  ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -3640,6 +4001,9 @@ ma_tract_accident <- ma_tract_data_6 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -3649,6 +4013,7 @@ saveRDS(ma_tract_accident, "ma_tract_accident.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 ma_tract_accident <- readRDS("ma_tract_accident.rds")
@@ -3657,6 +4022,9 @@ ma_tract_accident <- readRDS("ma_tract_accident.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -3668,6 +4036,9 @@ ma_tract_accident |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_tract_accident |> 
@@ -3678,6 +4049,9 @@ ma_tract_accident |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -3690,6 +4064,9 @@ ma_tract_accident |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 ma_tract_accident |> 
     filter(is.na(total_households_tractE)) |> 
@@ -3700,6 +4077,9 @@ ma_tract_accident |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_tract_accident_2 <- ma_tract_accident |> 
@@ -3714,12 +4094,16 @@ ma_tract_accident_2 <- ma_tract_accident |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(ma_tract_accident_2, "ma_tract_accident_2.rds")
 
 ```
 
 ```{r}
+#| include: false
 
 
 ma_tract_accident_2 <- readRDS("ma_tract_accident_2.rds")
@@ -3727,6 +4111,9 @@ ma_tract_accident_2 <- readRDS("ma_tract_accident_2.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 ma_tract_accident_2 |> 
     summary()
@@ -3734,6 +4121,9 @@ ma_tract_accident_2 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -3743,12 +4133,16 @@ ma_tract_accident_3 <- ma_tract_accident_2 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(ma_tract_accident_3, "ma_tract_accident_3.rds")
 
 ```
 
 ```{r}
+#| include: false
 
 ma_tract_accident_3 <- readRDS("ma_tract_accident_3.rds")
 
@@ -3756,6 +4150,9 @@ ma_tract_accident_3 <- readRDS("ma_tract_accident_3.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 ma_tract_accident_3 |> 
     summary()
@@ -3764,6 +4161,9 @@ ma_tract_accident_3 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 ma_tract_cls <- st_crs(ma_tract_accident_3)
 
@@ -3771,14 +4171,20 @@ ma_tract_cls <- st_crs(ma_tract_accident_3)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
-
+ma_tract_cls
 
 
 ```
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 ma_census4326 <- ma_tract_accident_3 |> 
     st_transform(crs=4326)
@@ -3787,6 +4193,9 @@ ma_census4326 <- ma_tract_accident_3 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(ma_census4326, "ma_census4326.rds")
@@ -3795,6 +4204,7 @@ saveRDS(ma_census4326, "ma_census4326.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 
@@ -3804,6 +4214,9 @@ ma_census4326 <- readRDS("ma_census4326.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_tract_cls_2 <- st_crs(ma_census4326)
@@ -3812,6 +4225,9 @@ ma_tract_cls_2 <- st_crs(ma_census4326)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 ma_tract_cls_2$input
 
@@ -3819,6 +4235,9 @@ ma_tract_cls_2$input
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 bins<-c(0,500,2000,3000,4000,5000,6500,8500,9500,10500,Inf)
 
@@ -3826,6 +4245,9 @@ bins<-c(0,500,2000,3000,4000,5000,6500,8500,9500,10500,Inf)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 pal<-colorBin(palette="RdYlBu",
@@ -3836,6 +4258,9 @@ pal<-colorBin(palette="RdYlBu",
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
        
        
@@ -3848,6 +4273,9 @@ ma_tract_formated <- ma_tract_accident_3 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 mytext <- paste(
@@ -3863,6 +4291,9 @@ mytext <- paste(
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -3888,6 +4319,9 @@ map_tract_population_plt<- ma_census4326 |> leaflet(options = leafletOptions(min
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -3907,6 +4341,9 @@ tract_map_population
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_census4326 |> 
@@ -3918,98 +4355,17 @@ ma_census4326 |>
 ```{r}
 
 
-ma_census_middle <- ma_census4326 |> 
-    filter(County == "Middlesex")
 
-
-
-```
-
-```{r}
-
-
-saveRDS(ma_census_middle, "ma_census_middle.rds")
-
-```
-
-```{r}
-
-
-ma_census_middle <- readRDS("ma_census_middle.rds")
 
 
 
 ```
 
-```{r}
 
-
-pal_2<-colorBin(palette="RdYlBu",
-            domain=ma_census_middle$total_population_tractE,bins=bins)
-
-
-```
 
 ```{r}
 
 
-ma_tract_middle_formated <- ma_census_middle |> 
-    mutate(total_tract_housing_unitsE = format(total_tract_housing_unitsE, big.mark = ",", big.interval = 3, digits=12) ) |> 
-    mutate(total_vehicles_tractE = format(total_vehicles_tractE, big.mark = ",", big.interval = 3, digits=12) ) 
-
-
-```
-
-```{r}
-
-saveRDS(ma_tract_middle_formated, "ma_tract_middle_formated.rds")
-
-```
-
-```{r}
-
-ma_tract_middle_formated <- readRDS("ma_tract_middle_formated.rds")
-
-
-```
-
-```{r}
-
-
-
-mytext_2 <- paste(
-  "County: ", ma_tract_middle_formated$County,"<br/>",
-  "Census Tract: ", ma_tract_middle_formated$GEOID, "<br/>",
-  "Total Vehicles Census Tract: ", ma_tract_middle_formated$total_vehicles_tractE, "<br/>",
-  "Total Housing Census Tract: ", ma_tract_middle_formated$total_tract_housing_unitsE,"<br/>", 
-  "Census Tract Accident County: ", ma_tract_middle_formated$tract_accident_count,"<br/>",
-    sep="") %>%
-  lapply(htmltools::HTML)
-
-
-```
-
-```{r}
-
-
-
-map_middle_tract_population_plt<- ma_census_middle |> leaflet(options = leafletOptions(minZoom = 11, maxZoom = 18)) |> 
-  addProviderTiles(providers$Esri.WorldStreetMap) |> 
-  setView(lng = -071.23928, lat = 42.38980, zoom = 11.5) |> 
-  addPolygons(
- fillColor=~pal_2(total_population_tractE),
- weight=2,
- opacity=0.8,
- color= "white",
- label=~mytext_2,
- dashArray = "3",
- fillOpacity=0.3,
- highlightOptions = highlightOptions(
-    weight = 5,
-    color = "#666",
-    dashArray = "",
-    fillOpacity = 0.5,
-    bringToFront = FALSE)) 
 
 
 
@@ -4020,9 +4376,6 @@ map_middle_tract_population_plt<- ma_census_middle |> leaflet(options = leafletO
 
 
 
-tract_middle_map_population<-map_middle_tract_population_plt %>% 
-  addLegend(pal = pal_2, values = ~total_population_tractE, opacity = 0.6, title = "Middlesex County  Census Tract Population",
-  position = "bottomright")
 
 
 ```
@@ -4030,10 +4383,19 @@ tract_middle_map_population<-map_middle_tract_population_plt %>%
 ```{r}
 
 
-tract_middle_map_population
+
 
 
 ```
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4054,6 +4416,9 @@ You should have at least 10 rows of data for every 1 column (feature) in your da
 `
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 census_tract_df <- ma_accidents_16_21_8 |> 
@@ -4062,6 +4427,10 @@ census_tract_df <- ma_accidents_16_21_8 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
 
 
 saveRDS(census_tract_df, "census_tract_df.rds")
@@ -4071,6 +4440,7 @@ saveRDS(census_tract_df, "census_tract_df.rds")
 
 
 ```{r}
+#| include: false
 
 
 census_tract_df <- readRDS("census_tract_df.rds")
@@ -4079,6 +4449,9 @@ census_tract_df <- readRDS("census_tract_df.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -4103,6 +4476,9 @@ census_tract_df |> filter(total_tract_housing_unitsE == 0) |> head(10)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 census_tract_county_df <- census_tract_df |> 
@@ -4112,6 +4488,9 @@ census_tract_county_df <- census_tract_df |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 census_tract_df_2 <- census_tract_df |> 
@@ -4121,6 +4500,10 @@ census_tract_df_2 <- census_tract_df |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
 
 
 saveRDS(census_tract_df_2, "census_tract_df_2.rds")
@@ -4129,6 +4512,7 @@ saveRDS(census_tract_df_2, "census_tract_df_2.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 census_tract_df_2 <- readRDS("census_tract_df_2.rds")
@@ -4157,12 +4541,7 @@ census_tract_df_3 |> summary()
 
 ```
 
-```{r}
 
-census_tract_df_2 |> count(Weather_Condition)
-
-
-```
 
 ```{r}
 
@@ -4174,6 +4553,9 @@ census_tract_df_2 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -4181,15 +4563,12 @@ census_tract_df |> select(GEOID, County, total_households_tractE, total_populati
 
 ```
 
-```{r}
 
-census_tract_df_2 |> 
-    summary()
-
-
-```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 census_tract_df_4 <- census_tract_df_3 |> 
@@ -4199,6 +4578,9 @@ census_tract_df_4 <- census_tract_df_3 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 census_tract_df_2 <- census_tract_df_2 |> 
     filter(total_tract_housing_unitsE != 0)
@@ -4208,6 +4590,9 @@ census_tract_df_2 <- census_tract_df_2 |>
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 census_tract_county_df_2 <- census_tract_county_df |> 
@@ -4219,6 +4604,9 @@ census_tract_county_df_2 <- census_tract_county_df |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 census_tract_county_df_2 |> summary()
@@ -4229,6 +4617,9 @@ census_tract_county_df_2 |> summary()
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -4240,6 +4631,9 @@ census_tract_df_2 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 census_tract_df_2 |> 
@@ -4251,16 +4645,23 @@ census_tract_df_2 |>
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 census_tract_df_2 |> 
-    ggplot(aes(log(accident_duration),log(wind_speed)))) +
+    filter(accident_duration < 5000) |> 
+    ggplot(aes(accident_duration,log(temperature))) +
     geom_point()
 
 
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -4274,35 +4675,15 @@ census_tract_df_2 |>
 ```
 
 
-```{r}
 
-census_tract_df_2 |> 
-    summary()
-
-
-```
-
-
-
-
-
-
-
-
-
-
-```{r}
-
-test_df <- test_df |> 
-    rename(COUNTY_NAME = County)
-
-
-```
 
 
 ## Train/Test Split
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 acci_census_df <- initial_split(census_tract_df_2, prop = 0.80)
 
@@ -4310,6 +4691,19 @@ acci_census_df <- initial_split(census_tract_df_2, prop = 0.80)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+print(acci_census_df)
+
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 acci_census_df_2 <- initial_split(census_tract_df_3, prop = 0.80)
@@ -4318,6 +4712,9 @@ acci_census_df_2 <- initial_split(census_tract_df_3, prop = 0.80)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 acci_count_tract_df <- initial_split(census_tract_county_df_2, prop = 0.80)
@@ -4326,16 +4723,14 @@ acci_count_tract_df <- initial_split(census_tract_county_df_2, prop = 0.80)
 ```
 
 
-```{r}
 
 
-print(acci_count_tract_df)
-
-
-```
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 train_census_data <- training(acci_census_df)
@@ -4344,6 +4739,18 @@ train_census_data <- training(acci_census_df)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+dim(train_census_data)
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 test_census_data <- testing(acci_census_df)
 
@@ -4351,6 +4758,17 @@ test_census_data <- testing(acci_census_df)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+dim(test_census_data)
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 train_census_data_2 <- training(acci_census_df_2)
 
@@ -4386,6 +4804,9 @@ test_tract_coun <- testing(acci_count_tract_df)
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 census_rec <- recipe(accident_duration ~ ., data = train_census_data) |> 
@@ -4419,6 +4840,9 @@ census_cou_rec <- recipe(accident_duration ~ ., data = train_tract_cou) |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 train_census_rec <- prep(census_rec, training= train_census_data)
 scaled_census_train <- bake(train_census_rec, new_data = train_census_data)
@@ -4450,6 +4874,9 @@ scaled_tract_cou_train <- bake(train_tract_cou_rec, new_data = train_tract_cou)
 ## Linear Regression
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -4460,6 +4887,9 @@ lr <- lm(log(accident_duration) ~ . -GEOID, data = train_census_data)
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(lr, "lr.rds")
@@ -4467,6 +4897,7 @@ saveRDS(lr, "lr.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 lr <- readRDS("lr.rds")
@@ -4475,6 +4906,9 @@ lr <- readRDS("lr.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 summary(lr)
@@ -4483,7 +4917,70 @@ summary(lr)
 
 ```
 
+
 ```{r}
+
+
+lr_resid <- data.frame(residuals = residuals(lr))
+
+```
+
+
+
+```{r}
+
+
+lr_qq <- ggplot(lr_resid, aes(sample = residuals)) +
+  stat_qq() +
+  stat_qq_line(color = "red") +
+  labs(
+    title = "LR Model Normal Q-Q Plot of Residuals",
+    x = "Theoretical Quantiles",
+    y = "Sample Quantiles"
+  )
+```
+
+```{r}
+
+
+lr_qq
+
+```
+
+```{r}
+
+
+
+lr_resid_data <- data.frame(
+    Fitted = fitted(lr),
+    Residuals = resid(lr)
+)
+
+
+```
+
+```{r}
+
+
+lr_residual_plot <- ggplot(lr_resid_data, aes(x = Fitted, y = Residuals)) +
+    geom_point(color = "steelblue", size =2) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+    labs(title = "lr Model Residual Plot", x = "Fitted Values", y = "Residuals" ) +
+    theme_minimal()
+
+```
+
+```{r}
+
+
+lr_residual_plot
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 lr_2 <- lm(log(accident_duration) ~ . -GEOID, data = train_census_data_2)
@@ -4491,15 +4988,12 @@ lr_2 <- lm(log(accident_duration) ~ . -GEOID, data = train_census_data_2)
 
 ```
 
-```{r}
 
-
-summary(lr_2)
-
-
-```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(lr_2, "lr_2.rds")
 
@@ -4508,11 +5002,72 @@ saveRDS(lr_2, "lr_2.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 lr_2 <- readRDS("lr_2.rds")
 
 ```
+
+```{r}
+
+summary(lr_2)
+
+```
+
+```{r}
+
+
+lr_2_resid <- data.frame(residuals = residuals(lr_2))
+
+
+```
+
+```{r}
+
+lr_2_qq <- ggplot(lr_2_resid, aes(sample = residuals)) +
+  stat_qq() +
+  stat_qq_line(color = "red") +
+  labs(
+    title = "LR_2 Model Normal Q-Q Plot of Residuals",
+    x = "Theoretical Quantiles",
+    y = "Sample Quantiles"
+  )
+
+```
+
+```{r}
+
+lr_2_qq
+
+```
+
+```{r}
+
+lr_2_resid_data <- data.frame(
+    Fitted = fitted(lr_2),
+    Residuals = resid(lr_2)
+)
+
+```
+
+```{r}
+
+lr_2_residual_plot <- ggplot(lr_2_resid_data, aes(x = Fitted, y = Residuals)) +
+    geom_point(color = "steelblue", size =2) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+    labs(title = "lr Model Residual Plot", x = "Fitted Values", y = "Residuals" ) +
+    theme_minimal()
+
+```
+
+```{r}
+
+lr_2_residual_plot 
+
+```
+
+
 
 
 
@@ -4522,16 +5077,12 @@ lr_2 <- readRDS("lr_2.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
-model_lme_1 <- lmer(log(accident_duration) ~ . -GEOID + (temperature | GEOID), data = scaled_census_train)
-
-
-
-```
-
-```{r}
-
+model_lme_1 <- lmer(log(accident_duration) ~ . + temperature*Month -GEOID -Wind_Direction -Weather_Condition + (temperature | GEOID), data = scaled_census_train)
 
 
 
@@ -4542,10 +5093,20 @@ model_lme_1 <- lmer(log(accident_duration) ~ . -GEOID + (temperature | GEOID), d
 
 
 
+```
+
+```{r}
+
+
+
+
 
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -4555,6 +5116,9 @@ summary(model_lme_1)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 performance::check_singularity(model_lme_1)
@@ -4564,6 +5128,9 @@ performance::check_singularity(model_lme_1)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 model_lme_2 <- lmer(log(accident_duration) ~ . -GEOID  + (1 | GEOID), data = scaled_census_train)
 
@@ -4571,6 +5138,9 @@ model_lme_2 <- lmer(log(accident_duration) ~ . -GEOID  + (1 | GEOID), data = sca
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 summary(model_lme_2)
@@ -4587,6 +5157,9 @@ icc(model_lme_2)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -4598,6 +5171,8 @@ performance::check_singularity(model_lme_2)
 The result of TRUE from the check_singularity function informs us that the  lme4 model has some variance components that equal zero and thus random effect variances can not be computed. 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -4607,6 +5182,9 @@ performance::check_heteroscedasticity(model_lme_2)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 performance::check_heteroskedasticity(model_lme_2)
@@ -4615,6 +5193,9 @@ performance::check_heteroskedasticity(model_lme_2)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 summary(model_lme_1)
@@ -4627,6 +5208,9 @@ summary(model_lme_1)
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 stan_model_1 <- stan_lmer(
@@ -4644,6 +5228,9 @@ stan_model_1 <- stan_lmer(
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -4670,6 +5257,9 @@ brms_model <- brm(
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(brms_model, "brms_model.rds")
 
@@ -4678,6 +5268,7 @@ saveRDS(brms_model, "brms_model.rds")
 
 
 ```{r}
+#| include: false
 
 
 brms_model <- readRDS("brms_model.rds")
@@ -4690,6 +5281,9 @@ brms_model <- readRDS("brms_model.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 summary(brms_model)
 
@@ -4698,6 +5292,9 @@ summary(brms_model)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -4707,6 +5304,9 @@ performance::check_singularity(brms_model)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 performance::check_collinearity(brms_model)
 
@@ -4725,6 +5325,9 @@ icc(brms_model, nrep=50)
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 brms_model_2 <- brm(
@@ -4742,6 +5345,9 @@ brms_model_2 <- brm(
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(brms_model_2, "brms_model_2.rds")
 
@@ -4749,6 +5355,7 @@ saveRDS(brms_model_2, "brms_model_2.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 brms_model_2 <- readRDS("brms_model_2.rds")
@@ -4757,6 +5364,9 @@ brms_model_2 <- readRDS("brms_model_2.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 summary(brms_model_2)
@@ -4765,9 +5375,234 @@ summary(brms_model_2)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 performance::check_collinearity(brms_model_2)
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+
+brms_model_3 <- brm(
+  log(accident_duration) ~ . -GEOID -Wind_Direction -Weather_Condition + temperature * Month + (temperature | GEOID),
+  data = scaled_census_train,
+  chains = 4,
+  iter = 8000,
+  family = student(),
+  cores = 16, 
+  seed = 42
+)
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(brms_model_3, "brms_model_3.rds")
+
+
+```
+
+```{r}
+#| include: false
+
+
+brms_model_3 <- readRDS("brms_model_3.rds")
+
+
+
+```
+
+```{r}
+
+
+summary(brms_model_3)
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+
+dp <- default_prior(
+    log(accident_duration) ~ temperature + day_type + road_category + hour_day_sections + (temperature|GEOID),
+    data = scaled_census_train,
+    family=student()
+)
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+dp |> 
+    filter(coef == "" | is.na(coef)) |> 
+    select(class, group, resp, dpar, prior)
+
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+prior_b <- prior(normal(0.3, 0.2), class = "b")
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+prior_sim_model <- brm(
+    formula = log(accident_duration) ~ temperature + day_type + road_category + hour_day_sections + (temperature|GEOID),
+               data = scaled_census_train,
+               family=student(), 
+               prior = prior_b,
+               sample_prior = "only",
+               chains = 2,
+               iter = 1000)
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+pp_check(prior_sim_model, type = "dens_overlay", ndraws = 50)
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+
+tamed_priors <- c(
+  # Baseline log-price around 13.5 (~$700k) with room to range from ~10 to 17
+  prior(normal(3.81, 1.0), class = "Intercept"),
+  
+  # Slopes on standardized predictors: 
+  # A normal(0, 0.5) prior says a 1-SD change rarely alters price by more than +/- 100%
+  prior(normal(0, 0.5), class = "b"),
+  
+  # Group-level variability across census tracts
+  prior(exponential(2), class = "sd"),
+  
+  # Student-t residual variance and degrees of freedom
+  prior(exponential(2), class = "sigma"),
+  prior(gamma(2, 0.1), class = "nu")
+)
+
+
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+
+prior_sim_model_2 <- brm(
+    formula = log(accident_duration) ~ temperature + day_type + road_category + hour_day_sections + (temperature|GEOID),
+               data = scaled_census_train,
+               family=student(), 
+               prior = tamed_priors,
+               sample_prior = "only",
+               chains = 2,
+               iter = 1000)
+
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+pp_check(prior_sim_model_2, type = "dens_overlay", ndraws = 50)
+
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+brms_model_3 <- brm(
+  log(accident_duration) ~ . -GEOID -Wind_Direction -Weather_Condition + temperature * Month + hour_day_sections * day_type + (temperature | GEOID),
+  data = scaled_census_train,
+  chains = 4,
+  iter = 8000,
+  family = student(),
+  cores = 16, 
+  seed = 42
+)
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+summary(brms_model_3)
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+
+summary(brms_model_4)
 
 
 ```
@@ -4887,6 +5722,32 @@ ma_census4326 |>
 
 ```
 
+
+```{r}
+
+ma_census_middle <- ma_census4326 |> 
+    filter(County == "Middlesex")
+
+
+```
+
+```{r}
+
+
+saveRDS(ma_census_middle, "ma_census_middle.rds")
+
+
+```
+
+```{r}
+#| include: false
+
+
+ma_census_middle <- readRDS("ma_census_middle.rds")
+
+
+```
+
 ```{r}
 
 ma_extreme_middle_higher <- ma_census_middle |> 
@@ -4905,6 +5766,7 @@ saveRDS(ma_extreme_middle_higher, "ma_extreme_middle_higher.rds")
 ```
 
 ```{r}
+#| include: false
 
 ma_extreme_middle_higher <- readRDS("ma_extreme_middle_higher.rds")
 
@@ -5055,6 +5917,7 @@ saveRDS(ma_census_norfolk, "ma_census_norfolk.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 ma_census_norfolk <- readRDS("ma_census_norfolk.rds")
@@ -5081,6 +5944,7 @@ saveRDS(ma_extreme_norfolk_higher, "ma_extreme_norfolk_higher.rds")
 ```
 
 ```{r}
+#| include: false
 
 ma_extreme_norfolk_higher <- readRDS("ma_extreme_norfolk_higher.rds")
 
@@ -5112,6 +5976,7 @@ saveRDS(ma_tract_norfolk_extreme_formatted, "ma_tract_norfolk_extreme_formatted.
 ```
 
 ```{r}
+#| include: false
 
 
 ma_tract_norfolk_extreme_formatted <- readRDS("ma_tract_norfolk_extreme_formatted.rds")
@@ -5235,52 +6100,7 @@ brms_model_2 <- brm(
 
 ```
 
-```{r}
 
-saveRDS(brms_model_2, "brms_model_2.rds")
-
-
-```
-
-```{r}
-
-
-brms_model_2  <- readRDS("brms_model_2.rds")
-
-```
-
-```{r}
-
-summary(brms_model_2)
-
-
-```
-
-```{r}
-
-
-
-
-brms_model_2 <- brm(
-  log(accident_duration) ~ . -GEOID -COUNTYFP + (temperature | COUNTYFP),
-  data = scaled_tract_cou_train,
-  chains = 4,
-  iter = 8000,
-  family = student(),
-  cores = 30, 
-  seed = 42
-)
-
-
-```
-
-```{r}
-
-
-summary(brms_model_2)
-
-
-```
 
 ```{r}
 
