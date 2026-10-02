@@ -199,6 +199,10 @@ dim(MA_accidents)
 
 ```
 
+<br><br>
+
+Our dataset has 61,996 rows and 46 columns. 
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -210,15 +214,21 @@ MA_accidents |> glimpse()
 
 ```
 
+<br><br>
+
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
 
 
 summary(MA_accidents)
 
 
 ```
+
+<br><br>
+
 
 
 
@@ -237,13 +247,25 @@ MA_accidents |>
 
 ```
 
+<br><br>
+
+Glimpsing our dataset we find some features do not have the correct data types for use in our analysis.  We will transform them to the required data types. 
 
 
-Some features are not in the correct data types for use in our analysis.  We will tranform them to the required data types. 
+
+<br><br>
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
+class(MA_accidents$Severity)
 
-First, Sverity,  will be transformed to a factor from an integer data type. 
+
+```
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -259,6 +281,9 @@ MA_accidents_2 <- MA_accidents |>
 ```
 
 
+<br><br>
+
+
 
 ```{r}
 #| code-fold: true
@@ -270,14 +295,14 @@ class(MA_accidents_2$Severity)
 
 ```
 
+<br><br>
+
+
+ Our analysis we will require year, month, day, and hour of an accident.  Since our dataset does not have these features, we will create them from the Start_Time feature. 
 
 
 
-We will now extract the year, month,day, and hourm of the day from the Start_Time feature. 
-
-
-
-
+<br><br>
 
 ```{r}
 #| code-fold: true
@@ -294,6 +319,8 @@ MA_accidents_2 <- MA_accidents_2 |>
 
 
 ```
+
+<br><br>
 
 
 ```{r}
@@ -313,6 +340,7 @@ Day of week starts with Sunday (1) and ends with Saturday (7)
 Hour of day starts at 1:00 am (1) and ends at 12:00 am (24)
 
 
+<br><br>
 
 
 ```{r}
@@ -321,12 +349,18 @@ Hour of day starts at 1:00 am (1) and ends at 12:00 am (24)
 
 
 MA_accidents_2 |> 
-    select(Year, Month, day_of_week, hour_of_day) |> 
+    select(Year, Month, day_of_week, hour_of_day, day_type) |> 
     glimpse()
 
 
 
 ```
+
+<br><br>
+
+The new features Year, Month, day_of_week, and day_type have a  data types of dbl or chr.  These will need to be transformed to a factor data type. 
+
+<br><br>
 
 
 
@@ -345,6 +379,11 @@ MA_accidents_2 <- MA_accidents_2 |>
 
 
 ```
+
+<br><br>
+
+
+
 
 
 
@@ -374,11 +413,14 @@ MA_accidents_2 <- readRDS("MA_accidents_2.rds")
 #| code-summary: "Show Code"
 
 MA_accidents_2 |> 
-    select(Year, Month, day_of_week, hour_of_day) |> 
+    select(Year, Month, day_of_week, day_type) |> 
     glimpse()
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -392,7 +434,10 @@ MA_accidents_2 |>
 ```
 
 
-Before continuing, we will filter our data into the years 2016-2021 for training and testing, and the year 2022 for predicting on unseen data.  Since the year 2023 appears to be incomplete, we will omit it from our analysis. 
+<br><br>
+
+
+Before continuing, we will filter our data into two datasets,  the years 2016-2021 will be for training and testing, and the year 2022 for predicting on unseen data.  Since the year 2023 appears to be incomplete, we will omit it from our analysis
 
 <br>
 
@@ -441,7 +486,11 @@ dim(ma_accidents_16_21)
 
 ```
 
+<br><br>
+
 Year 2022
+
+<br><br>
 
 
 ```{r}
@@ -456,6 +505,8 @@ ma_accidents_22 <- MA_accidents_2 |>
 
 
 ```
+
+<br><br>
 
 ```{r}
 #| echo: false
@@ -488,7 +539,17 @@ dim(ma_accidents_22)
 ```
 
 
-For us to be able to calculate the time duration of accidents we'll first need to convert the start and endtimes to a date time object that includes year, month, day, hours, minutes, and seconds. 
+<br><br>
+
+
+Our dataset has the feature Severity which is the target for prediction.  We were unable to access the definition of this feature and how it was determined, as such we will create a new feature for our target.  The time duration will be calculated from the Start_Time and End_Time features.  
+
+<br>
+
+
+Before we can  calculate the time duration of accidents, we'll first need to convert the start and end times to a date time object that includes year, month, day, hours, minutes, and seconds. 
+
+<br><br>
 
 
 ```{r}
@@ -500,6 +561,8 @@ ma_accidents_16_21_2 <- ma_accidents_16_21 |>
     mutate(End_Time = ymd_hms(End_Time))
 ```
 
+Before we can calculate the time duration of accidents, we'll first need to convert the start and end times to a date time object that includes year, month, day, hours, minutes, and seconds. 
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -510,6 +573,8 @@ ma_accidents_16_21_2 |>
 
 
 ```
+
+<br><br>
 
 
 ```{r}
@@ -524,7 +589,12 @@ ma_accidents_16_21_2 |>
 
 ```
 
-Next, we'll create a new feature accident_duration, which will calcualte the duration of an accident in minutes. 
+<br><br>
+
+
+Next, we'll create the new feature accident_duration, which will calcualte the duration of an accident in minutes. 
+
+<br><br>
 
 
 ```{r}
@@ -538,7 +608,12 @@ ma_accidents_16_21_2 <- ma_accidents_16_21_2 |>
 
 ```
 
- We also will create LATTITUDE and LONGITUDE features from Start_Lat and Start_Lng. These features will be useful for retieving US Census data and mapping. 
+<br><br>
+
+We will also create LATTITUDE and LONGITUDE features from Start_Lat and Start_Lng. These features will be useful for retrieving US Census data and mapping.
+
+<br><br>
+
 
 
 
@@ -590,7 +665,13 @@ ma_accidents_16_21_2 |> select(accident_duration) |>  head()
 
 ```
 
-From the output, we see the accident duration is in minutes. 
+<br><br>
+
+
+From the output, we observe the accident duration is in minutes. 
+
+<br><br>
+
 
 
 ```{r}
@@ -603,19 +684,21 @@ ma_accidents_16_21_2 |> select(LATITUDE, LONGITUDE) |> head()
 
 ```
 
+<br><br>
+
 Our output shows the two new featurres. 
 
 
+<br><br>
+
+
+## Census Tract GEOID
 
 
 
-## US Census Data
 
 
-
-
-
-
+<br><br>
 
 
 
@@ -794,6 +877,21 @@ long_lat_6 <- readRDS("long_lat_6.rds")
 
 
 
+<br><br>
+
+
+For our analysis we will require the GEOID for each census tract.  GEOID is a unique code for each US census tract.
+
+<br>
+
+The GEOID can be retrieved from the US Census API by submitting a data frame of the longitude and latitude for each observation of our dataset.  
+<br>
+
+This will be acomplished by using the call_geolocator_latlon function from the tigris library. 
+
+<br><br>
+
+
 
 
 
@@ -809,6 +907,10 @@ long_lat$census_code <- apply(long_lat_, 1, function(row) call_geolocator_latlon
 
 ```
 
+<br>
+
+
+The GEOID returned includes the block extension.  Using the substr() function from the stringr library, we will extract the first 11 digits, which is our census trac GEOID.  
 
 ```{r}
 #| code-fold: true
@@ -843,6 +945,9 @@ long_lat <- readRDS("long_lat.rds")
 
 ```
 
+<br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -852,6 +957,12 @@ long_lat |>  head()
 
 
 ```
+
+<br><br>
+
+We observe the GEOID for each associated Latitude and longitude corrdinates.  
+
+<br><br>
 
 
 ```{r}
@@ -886,6 +997,8 @@ census_geo <- readRDS("census_geo.rds")
 
 ```
 
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -896,6 +1009,12 @@ census_geo <- readRDS("census_geo.rds")
 
 census_geo |> head()
 ```
+
+<br><br>
+
+We will combine the ma_accidents_10_21_2 and census_geo datasets. 
+
+<br><br>
 
 
 ```{r}
@@ -934,9 +1053,11 @@ ma_accidents_16_21_3 <- readRDS("ma_accidents_16_21_3.rds")
 ```
 
 
-
+<br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -949,8 +1070,14 @@ ma_accidents_16_21_3 |>
 
 There are five mssing values in the newly created GEOID.  These missing values (NAs) will be removed. 
 
+<br><br>
+
+
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 ma_accidents_16_21_4 <- ma_accidents_16_21_3 |> 
@@ -959,111 +1086,29 @@ ma_accidents_16_21_4 <- ma_accidents_16_21_3 |>
 
 ```
 
-```{r}
+<br><br>
 
 
-ma_accidents_16_21_4 |> 
-    select(GEOID, census_code) |> 
-    summary()
 
 
-```
 
 
-```{r}
+
+The Wind_Speed.mph featues has 3,324 missinf values.  We will drop this feature from our dataset. 
 
 
-ma_accidents_16_21_3 |> 
-    select(GEOID,County, Wind_Speed.mph.) |> 
-    filter(is.na(Wind_Speed.mph.)) |> 
-    head(72)
 
 
-```
-
-```{r}
-
-
-ma_accidents_16_21_4 |> 
-    filter(!is.na(Wind_Speed.mph.)) |> 
-    group_by(Severity) |> 
-    summarise(median_wind_speed = median(Wind_Speed.mph.))
-
-
-```
+<br><br>
 
 
 ```{r}
-#| eval: false
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 ma_accidents_16_21_4 <- ma_accidents_16_21_4 |> 
-    filter(!is.na(Wind_Speed.mph.))
-
-
-```
-
-```{r}
-
-ma_accidents_16_21_4 |> 
-    summary()
-
-
-```
-
-```{r}
-
-
-ma_accidents_16_21_4 |> 
-    filter(!is.na(Visibility.mi.)) |> 
-    group_by(Severity) |> 
-    summarise(median_visibility = median(Visibility.mi.))
-
-
-```
-
-```{r}
-
-
-ma_accidents_16_21_4|> 
-    filter(!is.na(Precipitation.in.)) |> 
-    group_by(Severity) |> 
-    summarise(median_visibility = median(Precipitation.in.))
-
-
-```
-
-
-
-```{r}
-
-
-ma_accidents_16_21_4  |> filter(accident_duration > 1000)  |> head()
-
-
-```
-
-```{r}
-
-ma_accidents_16_21_4  |> filter(accident_duration > 1000)  |> tail()
-
-
-```
-
-```{r}
-
-
-ma_accidents_16_21_4  |> filter(accident_duration <=1000) |> dim()
-
-
-```
-
-
-```{r}
-
-
-ma_accidents_16_21_4 <- ma_accidents_16_21_4 |> 
-    select(-Start_Lat, -End_Lat, -Start_Lng, -End_Lng, -State, -Zipcode, -Country, -Timezone, -Airport_Code, -Weather_Timestamp, -Wind_Chill.F., -Visibility.mi., -Precipitation.in., -Wind_Speed.mph.)
+    select(-Start_Lat, -End_Lat, -Start_Lng, -End_Lng, -State, -Zipcode, -Country, -Timezone, -Airport_Code, -Weather_Timestamp, -Wind_Chill.F., -Visibility.mi., -Precipitation.in., -Wind_Speed.mph., -Humidity...)
 
 
 ```
@@ -1088,7 +1133,12 @@ ma_accidents_16_21_4 <- readRDS("ma_accidents_16_21_4.rds")
 
 ```
 
+
+<br><br>
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 ma_accidents_16_21_4 |> 
@@ -1097,9 +1147,16 @@ ma_accidents_16_21_4 |>
 
 ```
 
+
+<br><br>
+
 Remove NAs fron Temperature feature.
 
+<br><br>
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 ma_accidents_16_21_5 <- ma_accidents_16_21_4|>
@@ -1108,21 +1165,16 @@ ma_accidents_16_21_5 <- ma_accidents_16_21_4|>
 
 ```
 
-Remove NAs from Humidity feature. 
+
+<br><br>
+
+The accident_duration feature has mins at the end.  We will drop this by transforming  accident_duration from a difftime  data type to a numeric data type. 
+
+<br><br>
 
 ```{r}
-
-
-ma_accidents_16_21_5 <- ma_accidents_16_21_5 |> 
-    filter(!is.na(Humidity...))
-
-
-```
-
-
-Transform accident_duration from difftime to numeric. 
-
-```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -1131,8 +1183,12 @@ ma_accidents_16_21_5$accident_duration <- as.numeric(ma_accidents_16_21_5$accide
 
 ```
 
+<br><br>
+
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 ma_accidents_16_21_5 |> 
@@ -1143,11 +1199,17 @@ ma_accidents_16_21_5 |>
 
 ```
 
+<br><br>
 
-Remove Dukes and Nantucket levels from Counties. 
+
+The Dukes and Nantucket counties have single digits counts, thus we will remove them from the dataset. 
+
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 ma_accidents_16_21_5 <- ma_accidents_16_21_5 |> 
@@ -1180,6 +1242,9 @@ ma_accidents_16_21_5  <- readRDS("ma_accidents_16_21_5.rds")
 ```
 
 
+
+<br><br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1189,6 +1254,9 @@ ma_accidents_16_21_5 |>
 
 
 ```
+
+<br><br>
+
 
 
 ```{r}
@@ -1205,9 +1273,13 @@ ma_accidents_16_21_5 |> select(accident_duration, Severity, Start_Time,End_Time,
 
 ```
 
+<br><br>
+
+
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -1220,8 +1292,9 @@ ma_accidents_16_21_5  |> select(accident_duration, Severity, Start_Time,End_Time
 
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -1229,6 +1302,7 @@ ma_accidents_16_21_5  |> select(accident_duration, Severity, Start_Time,End_Time
   filter(Year == "2021" & Month == "4" & day_of_week == "4")  |> tail()
 
 ```
+
 
 
 
@@ -1247,7 +1321,7 @@ ma_accidents_16_21_5 |>
 ```
 
 
-
+<br><br>
 
 
  ```{r}
@@ -1262,6 +1336,9 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_5 |>
 
  ```
 
+ <br><br>
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1274,6 +1351,8 @@ ma_accidents_16_21_5 |>
 
 
  ```
+
+ <br><br>
 
 
  ```{r}
@@ -1288,6 +1367,8 @@ ma_accidents_16_21_6$Wind_Direction[trimws(ma_accidents_16_21_6$Wind_Direction) 
 
  ```
 
+ <br><br>
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1301,6 +1382,12 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
 
 
  ```
+
+ <br><br>
+
+ Wind_Direction has 25 categories.  We will consoladte these categories into 6. 
+
+ <br><br>
 
  ```{r}
 #| code-fold: true
@@ -1319,6 +1406,8 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
 
  ```
 
+ <br><br>
+
 
 
  ```{r}
@@ -1328,10 +1417,12 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
  
 
 ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
-    select(-Source, -Start_Time, -End_Time, -Distance.mi., -Pressure.in.,-Humidity... )
+    select(-Source, -Start_Time, -End_Time, -Distance.mi., -Pressure.in.)
 
 
  ```
+
+ <br><br>
 
  ```{r}
 #| code-fold: true
@@ -1384,6 +1475,9 @@ ma_accidents_16_21_6  <- readRDS("ma_accidents_16_21_6.rds")
 
  ```
 
+ <br><br>
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1396,6 +1490,9 @@ ma_accidents_16_21_6 |>
 
 
  ```
+
+
+<br><br>
 
 
  ```{r}
@@ -1412,6 +1509,9 @@ ma_accidents_16_21_6 |>
 
  ```
 
+ <br><br>
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1424,6 +1524,23 @@ ma_accidents_16_21_6 |>
 
 
  ```
+
+ ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+ 
+
+ ma_accidents_16_21_6 |> 
+    group_by(Wind_Direction) |> 
+    summarise(median_accident_duration_by_wind_direction = median(accident_duration)) 
+   
+
+
+ ```
+
+ 
+ <br><br>
+
 
  
 
@@ -1443,6 +1560,9 @@ ma_accidents_16_21_6 |>
 
 
 
+ <br><br>
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1456,8 +1576,11 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_6 |>
 
  ```
 
- 
+  <br><br>
 
+ 
+We will create a new feature which will include the types of road categories, such as interstate, Route, etc. To accomplish this, we will use the grep function and regular expressions to extract roads and highways and then consolidate them into categories.  An example is extracting I-90 and I-95 and consolidating them into an interstate category. 
+  <br><br>
  
 
  ```{r}
@@ -1505,6 +1628,10 @@ ma_accidents_16_21_7$road_category[grepl("\\b(Tunl|Tunnel)\\b", col_to_check, ig
 
  ```
 
+   <br><br>
+
+
+
  
 
  ```{r}
@@ -1515,6 +1642,14 @@ ma_accidents_16_21_6 |> count(Weather_Condition)
 
 
  ```
+
+   <br><br>
+
+
+   Next, we will reudce the numbre of Weawther_Condition categories through consolidation. 
+
+     <br><br>
+
 
  ```{r}
 #| code-fold: true
@@ -1528,6 +1663,9 @@ ma_accidents_16_21_6 |> select(Weather_Condition, City) |>
 
  ```
 
+   <br><br>
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1538,6 +1676,9 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7 |>
 
 
  ```
+
+   <br><br>
+
 
  ```{r}
 #| code-fold: true
@@ -1550,6 +1691,10 @@ ma_accidents_16_21_7$Weather_Condition[trimws(ma_accidents_16_21_7$Weather_Condi
 
  ```
 
+   <br><br>
+
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1561,6 +1706,9 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7 |>
 
 
  ```
+
+   <br><br>
+
 
  ```{r}
 #| code-fold: true
@@ -1577,12 +1725,12 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7 |>
  ```
 
 
+  <br><br>
+
+Next, we create a new feature hour_day_sextion.  This will be done by binning an hour of day into specific periods of the day such as afternoon, night. 
 
 
-   Now we can perform our binning.  Essentiall we will place hour of day into eight ranges.
-
-
-
+  <br><br>
 
  ```{r}
 #| code-fold: true
@@ -1609,6 +1757,9 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7|>
 
  ```
 
+   <br><br>
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1622,6 +1773,10 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7 |>
 
  ```
 
+   <br><br>
+
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1633,6 +1788,9 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7 |>
 
 
  ```
+
+   <br><br>
+
 
  ```{r}
 #| echo: false
@@ -1656,9 +1814,14 @@ ma_accidents_16_21_7 <- readRDS("ma_accidents_16_21_7.rds")
 
  ```
 
-We now have eight categories of different parts of the day. 
+   <br><br>
+
+
+
 
  ```{r}
+ #| code-fold: true
+#| code-summary: "Show Code"
  
 
 ma_accidents_16_21_7 |> 
@@ -1669,6 +1832,13 @@ ma_accidents_16_21_7 |>
 
 
  ```
+
+ <br><br>
+
+
+ We now have eight categories of different parts of the day. 
+
+<br><br>
 
 
 
@@ -1684,6 +1854,25 @@ ma_accidents_16_21_7 |>
 
  ```
 
+ 27 road categories. 
+
+ <br><br>
+
+ ```{r}
+ #| code-fold: true
+#| code-summary: "Show Code"
+ 
+
+print(ma_accidents_16_21_7 |> 
+    group_by(road_category) |> 
+    summarise(median_acc_duration_road = median(accident_duration)) |> 
+    arrange(desc(median_acc_duration_road)), n=27)
+
+
+ ```
+
+ <br><br>
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1697,6 +1886,27 @@ ma_accidents_16_21_7 |>
 
  ```
 
+  <br><br>
+
+
+ ```{r}
+ #| code-fold: true
+#| code-summary: "Show Code"
+ 
+
+print(ma_accidents_16_21_7 |> 
+    group_by(Weather_Condition) |> 
+    summarise(median_acc_duration_weather = median(accident_duration)) |> 
+    arrange(desc(median_acc_duration_weather)), n=11)
+
+
+ ```
+
+
+  <br><br>
+
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1708,6 +1918,9 @@ ma_accidents_16_21_7 |>
     summary()
 
  ```
+
+  <br><br>
+
 
 
  ```{r}
@@ -1723,6 +1936,8 @@ ma_accidents_16_21_7 |>
 
  ```
 
+  <br><br>
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1732,6 +1947,8 @@ ma_accidents_16_21_7 |>
 
  ```
 
+  <br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -1740,9 +1957,13 @@ ma_accidents_16_21_7 |>
 
 ma_accidents_16_21_7|> 
     group_by(No_Exit ) |> 
-    summarise(median_acc_dur = median(accident_duration))
+    summarise(median_acc_dur_exit = median(accident_duration)) |> 
+    arrange(desc(median_acc_dur_exit))
 
 ```
+
+ <br><br>
+
 
  ```{r}
 #| code-fold: true
@@ -1757,6 +1978,9 @@ ma_accidents_16_21_7 |>
 
  ```
 
+  <br><br>
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1770,6 +1994,9 @@ ma_accidents_16_21_7 |>
 
  ```
 
+  <br><br>
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1780,6 +2007,9 @@ ma_accidents_16_21_7 |>
     count(County, Railway)
 
  ```
+
+  <br><br>
+
 
  ```{r}
 #| code-fold: true
@@ -1793,6 +2023,9 @@ ma_accidents_16_21_7 |>
 
  ```
 
+  <br><br>
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1804,6 +2037,9 @@ ma_accidents_16_21_7 |>
 
 
  ```
+
+  <br><br>
+
 
  ```{r}
 #| code-fold: true
@@ -1818,6 +2054,9 @@ ma_accidents_16_21_7 |>
 
  ```
 
+  <br><br>
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1827,6 +2066,9 @@ ma_accidents_16_21_7 |>
 
 
  ```
+
+  <br><br>
+
 
  ```{r}
 #| code-fold: true
@@ -1841,6 +2083,9 @@ ma_accidents_16_21_7 |>
 
  ```
 
+  <br><br>
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1851,6 +2096,9 @@ ma_accidents_16_21_7 |>
 
 
  ```
+
+  <br><br>
+
 
  ```{r}
 #| code-fold: true
@@ -1864,6 +2112,9 @@ ma_accidents_16_21_7 |>
 
  ```
 
+  <br><br>
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1874,6 +2125,9 @@ ma_accidents_16_21_7 |>
     count(County, Station)
 
  ```
+
+  <br><br>
+
 
  ```{r}
 #| code-fold: true
@@ -1887,6 +2141,8 @@ ma_accidents_16_21_7 |>
 
 
  ```
+  <br><br>
+
 
  ```{r}
 #| code-fold: true
@@ -1909,6 +2165,9 @@ ma_accidents_16_21_7 |>
 
  ```
 
+  <br><br>
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1921,6 +2180,9 @@ ma_accidents_16_21_7|>
 
 
  ```
+
+  <br><br>
+
 
  ```{r}
 #| code-fold: true
@@ -1935,6 +2197,9 @@ ma_accidents_16_21_7 |>
 
  ```
 
+  <br><br>
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1948,6 +2213,9 @@ ma_accidents_16_21_7 |>
 
  ```
 
+  <br><br>
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1959,20 +2227,10 @@ ma_accidents_16_21_7 |>
 
  ```
 
-
- ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
- 
-
-
-ma_accidents_16_21_7 |> 
-    count(Wind_Direction)
+  <br><br>
 
 
 
-
- ```
 
 
 
@@ -2027,35 +2285,13 @@ ma_accidents_16_21_8 |>
   <br><br>
 
 
- ```{r}
- 
-class(ma_accidents_16_21_8$hour_of_day)
 
-
- ```
-
-  <br><br>
-
- 
-
-
-
-  <br><br>
-
-
-
-
-Main Sections of the DayMorning (5:00 AM – 12:00 PM):Dawn / Sunrise: First light and when the sun comes up (approx. 5:00 AM – 6:00 AM).Early Morning: The start of typical morning routines (approx. 6:00 AM – 9:00 AM).Late Morning: Approaching midday (approx. 10:00 AM – 12:00 PM).Midday / Noon (12:00 PM): The exact middle of the day when the sun is highest.Afternoon (12:00 PM – 5:00 PM / 6:00 PM):Early Afternoon: Right after lunch (1:00 PM – 3:00 PM).Late Afternoon: Leading toward sunset (4:00 PM – 6:00 PM).Evening (5:00 PM / 6:00 PM – 9:00 PM):Sunset / Dusk: The sun goes down and twilight begins.Early/Late Evening: Transition time for relaxation and dinner.Night (9:00 PM – 4:00 AM / 5:00 AM):Late Night: Hours leading up to midnight (10:00 PM – 12:00 AM).Midnight: 12:00 AM, the middle of the night.Predawn / Middle of the Night: The quiet hours before the new day starts (1:00 AM – 4:00 AM).
-
- <br><br>
-
-
-
-
-  <br><br>
 
 
   ```{r}
+  #| echo: false
+#| include: false
+#| eval: false
   
 saveRDS(ma_accidents_16_21_9, "ma_accidents_16_21_9.rds")
 
@@ -2063,7 +2299,9 @@ saveRDS(ma_accidents_16_21_9, "ma_accidents_16_21_9.rds")
   ```
 
   ```{r}
+#| echo: false
 #| include: false
+#| eval: false
   
 
 ma_accidents_16_21_9 <- readRDS("ma_accidents_16_21_9.rds")
@@ -2093,6 +2331,9 @@ ma_accidents_16_21_9 <- readRDS("ma_accidents_16_21_9.rds")
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -2123,6 +2364,8 @@ ma_county <- counties("MA", year = 2024)
 
 ```
 
+  <br><br>
+
 ```{r}
 #| echo: false
 #| include: false
@@ -2143,6 +2386,9 @@ ma_county <- readRDS("ma_county.rds")
 
 ```
 
+  <br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2154,6 +2400,9 @@ ma_county |>
 
 ```
 
+  <br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2164,6 +2413,8 @@ ma_county |>
 
 
 ```
+  <br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -2174,6 +2425,9 @@ print(ma_county |> select(NAME), n=14)
 
 
 ```
+
+
+  <br><br>
 
 
 ```{r}
@@ -2210,6 +2464,9 @@ ma_county_shape  <- readRDS("ma_county_shape.rds")
 
 ```
 
+  <br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2220,6 +2477,9 @@ print(ma_county_shape |> select(NAME), n=14)
 
 
 ```
+
+  <br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -2266,6 +2526,9 @@ ma_county_shape_2 <- readRDS("ma_county_shape_2.rds")
 
 ```
 
+  <br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2298,6 +2561,9 @@ census_county_urban <- readRDS("census_county_urban.rds")
 
 ```
 
+  <br><br>
+
+
 
 ```{r}
 #| code-fold: true
@@ -2309,6 +2575,9 @@ census_county_urban |> glimpse()
 
 ```
 
+  <br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2319,6 +2588,9 @@ census_county_urban |>
 
 
 ```
+
+  <br><br>
+
 
 
 ```{r}
@@ -2352,6 +2624,9 @@ ma_county_urban  <- readRDS("ma_county_urban.rds")
 
 ```
 
+  <br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2363,6 +2638,9 @@ ma_county_urban |> summary()
 
 ```
 
+  <br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2373,6 +2651,10 @@ print(ma_county_urban |> select(COUNTY_NAME), n=14 )
 
 
 ```
+
+
+  <br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -2387,6 +2669,9 @@ ma_county_urban_2 <- ma_county_urban |>
 
 ```
 
+  <br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2399,6 +2684,9 @@ ma_county_urban_2 <- ma_county_urban_2 |>
 
 
 ```
+
+  <br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -2432,6 +2720,9 @@ ma_county_urban_2 <- readRDS("ma_county_urban_2.rds")
 
 ```
 
+  <br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2441,6 +2732,9 @@ ma_county_urban_2 |> glimpse()
 
 
 ```
+
+  <br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -2455,6 +2749,9 @@ print(ma_county_urban_2 |> select(COUNTYFP), n=14)
 
 ```
 
+  <br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2467,6 +2764,9 @@ ma_county_urban_3 <- ma_county_urban_2 |>
 
 
 ```
+
+
+  <br><br>
 
 ```{r}
 #| echo: false
@@ -2487,6 +2787,9 @@ ma_county_urban_3 <- readRDS("ma_county_urban_3.rds")
 
 ```
 
+  <br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2498,7 +2801,7 @@ print(ma_county_urban_3 |> select(county_house_density, county_pop_density),n=14
 
 ```
 
-
+  <br><br>
 
 ```{r}
 #| code-fold: true
@@ -2546,6 +2849,10 @@ county_geo |> glimpse()
 
 ```
 
+  <br><br>
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2559,6 +2866,9 @@ county_geo_2 <- county_geo |>
 
 ```
 
+  <br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2568,17 +2878,14 @@ county_geo_2 <- county_geo_2 |>
     rename("County" = "NAME", "Cou_POPPCT_URB" = "POPPCT_URB", "COU_HOU_URB" = "HOU_URB")
 
 
+
+
 ```
 
-```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
 
 
+  <br><br>
 
-county_geo_2 |> glimpse()
-
-```
 
 ```{r}
 #| echo: false
@@ -2600,6 +2907,20 @@ county_geo_2 <- readRDS("county_geo_2.rds")
 ```
 
 
+  <br><br>
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+county_geo_2 |> glimpse()
+
+
+```
+
+
+  <br><br>
 
 ```{r}
 #| code-fold: true
@@ -2611,6 +2932,9 @@ ma_county_urban |>
 
 
 ```
+
+
+  <br><br>
 
 ## Tracts
 
@@ -2644,6 +2968,9 @@ ma_tracts <- readRDS("ma_tracts.rds")
 
 ```
 
+
+  <br><br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2654,8 +2981,12 @@ ma_tracts
 
 ```
 
+  <br><br>
 
-Define the census tract variables we want to retrieve from the acs. 
+
+We will define the census tract variables we want to retrieve from the US Census American Communities Survey (acs).
+ <br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -2674,6 +3005,9 @@ variables_to_get <- c(
 
 
 ```
+
+ <br><br>
+
 
 
 
@@ -2697,6 +3031,33 @@ ma_tract_data <- get_acs(
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(ma_tract_data, "ma_tract_data.rds")
+
+
+```
+
+
+```{r}
+#| include: false
+
+ma_tract_data <- readRDS("ma_tract_data.rds")
+
+
+
+```
+
+
+
+
+ <br><br>
+
+
+```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 
@@ -2708,6 +3069,8 @@ ma_tract_data |>
 
 ```
 
+<br><br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2718,6 +3081,10 @@ ma_tract_data |> summary()
 
 
 ```
+
+
+<br><br>
+
 
 
 
@@ -2732,6 +3099,9 @@ ma_tract_geometry <- ma_tract_data |>
 
 
 ```
+
+<br><br>
+
 
 
 ```{r}
@@ -2753,6 +3123,9 @@ ma_tract_geometry <- readRDS("ma_tract_geometry.rds")
 
 ```
 
+
+<br><br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2765,6 +3138,9 @@ ma_tract_cls <- ma_tract_geometry |>
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 #| echo: false
@@ -2785,6 +3161,9 @@ ma_tract_cls <- readRDS("ma_tract_cls.rds")
 
 ```
 
+<br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2798,9 +3177,15 @@ ma_tract_data |>
 
 ```
 
+<br><br>
 
 
-The output of the NAME column shows it contains Census Tract, Coumty, and State. Will will use the separate function to split the NAME column into three new columns.
+
+
+The output of the NAME column shows it contains Census Tract, Coumty, and State. Will will use the separate() function to split the NAME column into three new columns.
+
+
+<br><br>
 
 
 
@@ -2817,7 +3202,13 @@ ma_tract_data_2 <- ma_tract_data |>
 
 ```
 
+<br><br>
+
+
 Remove State
+
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -2851,6 +3242,8 @@ ma_tract_data_2  <- readRDS("ma_tract_data_2.rds")
 
 ```
 
+<br><br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2862,6 +3255,8 @@ ma_tract_data_3 <- ma_tract_geometry |>
 
 
 ```
+
+
 
 ```{r}
 #| echo: false
@@ -2883,7 +3278,7 @@ ma_tract_data_3  <- readRDS("ma_tract_data_3.rds")
 ```
 
 
-
+<br><br>
 
 
 ```{r}
@@ -2899,10 +3294,13 @@ ma_tract_data_3 |> summary()
 
 ```
 
+<br><br>
+
+
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
 #| eval: false
 
 
@@ -2915,22 +3313,19 @@ ma_tract_data_4 <- ma_tract_data_3 |>
 ```
 
 
-```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+
+<br><br>
 
 
 
-ma_tract_data_4 |> 
-    filter(GEOID == "25001990000" | GEOID == "25023990003") |> 
-    head()
 
 
-```
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
+
 
 ma_tract_data_4 |> 
     filter(GEOID == "25001990000") |> 
@@ -2938,6 +3333,15 @@ ma_tract_data_4 |>
 
 
 ```
+
+
+<br><br>
+
+### Missing Values
+
+<br><br>
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -2955,9 +3359,13 @@ ma_tract_data_3 |>
 ```
 
 
+<br><br>
+
+
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -2970,6 +3378,14 @@ ma_tract_data_3 |>
 
 ```
 
+
+
+<br><br>
+
+Certain tract variables we retrieved from ACS have missing values.  We will replace these values with the median of the county the census tract is located in. 
+
+
+<br><br>
 
 ```{r}
 #| code-fold: true
@@ -2990,6 +3406,8 @@ ma_tract_data_3 |>
 
 ```
 
+<br><br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -3003,6 +3421,14 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 
 
 ```
+
+<br><br>
+
+
+<br><br>
+
+
+
 
 
 
@@ -3021,6 +3447,9 @@ ma_tract_data_3 |>
 
 ```
 
+<br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -3034,6 +3463,9 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -3052,6 +3484,9 @@ ma_tract_data_3 |>
 
 ```
 
+<br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -3064,6 +3499,9 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -3080,6 +3518,9 @@ ma_tract_data_3 |>
 
 ```
 
+<br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -3092,6 +3533,9 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -3108,6 +3552,9 @@ ma_tract_data_3 |>
 
 ```
 
+<br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -3118,6 +3565,10 @@ ma_tract_data_3 |>
 ma_tract_data_4 <- ma_tract_data_4 |> 
     mutate(total_vehicles_tractE = ifelse(County == "Middlesex County" & is.na(total_vehicles_tractE), 2828,total_vehicles_tractE))
 ```
+
+<br><br>
+
+
 
 
 ```{r}
@@ -3135,6 +3586,10 @@ ma_tract_data_3 |>
 
 ```
 
+<br><br>
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -3148,6 +3603,10 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 
 
 ```
+
+<br><br>
+
+
 
 ```{r}
 #| code-fold: true
@@ -3165,6 +3624,10 @@ ma_tract_data_3 |>
 
 ```
 
+<br><br>
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -3177,6 +3640,9 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -3192,6 +3658,10 @@ ma_tract_data_3 |>
 
 ```
 
+<br><br>
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -3203,6 +3673,10 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 
 
 ```
+
+<br><br>
+
+
 
 ```{r}
 #| code-fold: true
@@ -3218,6 +3692,10 @@ ma_tract_data_3 |>
 
 ```
 
+
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -3229,6 +3707,10 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 
 
 ```
+
+<br><br>
+
+
 
 ```{r}
 #| code-fold: true
@@ -3245,6 +3727,10 @@ ma_tract_data_3 |>
 
 ```
 
+<br><br>
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -3256,6 +3742,9 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -3272,7 +3761,7 @@ ma_tract_data_3 |>
 ```
 
 
-
+<br><br>
 
 
 ```{r}
@@ -3290,23 +3779,11 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 
 
 
-```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+<br><br>
 
 
 
 
-
-
-ma_tract_data_3 |> 
-    select(GEOID, census_tract,County, total_vehicles_tractE) |> 
-    filter(is.na(total_vehicles_tractE)) |> 
-    st_drop_geometry() |> 
-    head(72)
-
-
-```
 
 ```{r}
 #| echo: false
@@ -3328,6 +3805,10 @@ ma_tract_data_4 <- readRDS("ma_tract_data_4.rds")
 
 ```
 
+<br><br>
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -3341,8 +3822,8 @@ ma_tract_data_4 |>
 
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
 #| eval: false
 
 
@@ -3359,12 +3840,15 @@ ma_tract_data_5 <- ma_tract_data_4 |>
 #| eval: false
 
 
-ma_tract_data_5 <- ma_tract_data_5 |> 
+ma_tract_data_5 <- ma_tract_data_4 |> 
     filter(County != "Nantucket County") |> 
     filter(County != "Dukes County")
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -3373,11 +3857,13 @@ ma_tract_data_5 <- ma_tract_data_5 |>
 
 
 ma_tract_data_5 <- ma_tract_data_5 |> 
-    filter(total_households_tractE != 0)
+    filter(!is.na(total_households_tractE))
 
 
 
 ```
+
+<br><br>
 
 
 
@@ -3402,12 +3888,21 @@ ma_tract_data_5 <- readRDS("ma_tract_data_5.rds")
 
 ```
 
+<br><br>
+
+
+
 ```{r}
 
 ma_tract_data_5 |> count(County)
 
 
 ```
+
+<br><br>
+
+
+
 
 ```{r}
 #| code-fold: true
@@ -3420,6 +3915,7 @@ ma_tract_data_5 |>
 
 ```
 
+<br><br>
 
 
 ```{r}
@@ -3433,18 +3929,26 @@ ma_tract_data_5 |>
 
 ```
 
+<br><br>
+
+<br><br>
+
+
+
 
 
 
 ### Feature Engineering
+<br><br>
+<br><br>
 
 
 
-From our retrieved census tract variables, we will create new variables for housing density of census tract, population density of census tract, and average cars per houshold of census tract. 
+From our retrieved census tract variables, we will create new variables for housing density , population density , and average cars per houshold. 
 
 
 
-
+<br><br>
 
 
 
@@ -3469,11 +3973,15 @@ ma_tract_data_6 <- ma_tract_data_5 |>
 
 ```
 
+<br><br>
+
+
 
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -3513,6 +4021,9 @@ ma_tract_data_6 <- ma_tract_data_6 |>
 
 ```
 
+<br><br>
+
+
 
 ```{r}
 #| echo: false
@@ -3534,7 +4045,7 @@ ma_tract_data_6 <- readRDS("ma_tract_data_6.rds")
 
 ```
 
-
+<br><br>
 
 ```{r}
 #| code-fold: true
@@ -3550,6 +4061,10 @@ ma_tract_data_6|> glimpse()
 
 ```
 
+<br><br>
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -3561,6 +4076,10 @@ ma_tract_data_6 |> summary()
 
 ```
 
+<br><br>
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -3568,13 +4087,16 @@ ma_tract_data_6 |> summary()
 
 
 ma_tract_data_7 <- ma_tract_data_6 |> 
-    select(-census_tract, -County) |> 
+    select(-census_tract) |> 
     st_drop_geometry()
 
 
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 #| echo: false
@@ -3618,10 +4140,17 @@ ma_tract_data_7|>
 
 # Exploratory Data Analysis
 
+<br><br>
+
+
+
 
 ## Features
 
 
+<br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -3629,7 +4158,7 @@ ma_tract_data_7|>
 
 
 ma_accidents_16_21_6 |> 
-    ggplot(aes(x=accident_duration, y=Temperature.F.)) +
+    ggplot(aes(x=accident_duration, y=temperature)) +
     geom_point()
 
 
@@ -3644,31 +4173,28 @@ ma_accidents_16_21_6 |>
 
 
 ma_accidents_16_21_6 |> 
-    ggplot(aes(x=log(accident_duration), y=Temperature.F.)) +
+    ggplot(aes(x=log(accident_duration), y=temperature)) +
     geom_point()
 
 
 ```
+
+<br><br>
+
+
 
 ## Maps
 
+<br><br>
+
+
+
 ### County
 
-
-```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
-#| eval: false
+<br><br>
 
 
-county_map <- ggplot()+
-    geom_sf(data=ma_county, fill=NA)+
-    ggtitle("Counties of Massachusetts") +
-    theme(legend.position = "none",plot.title = element_text(color="blue", size=14, face="bold.italic", hjust=0.5)) +
-    theme_bw()
 
-
-```
 
 
 ```{r}
@@ -3718,10 +4244,11 @@ ma_county_stcrs$input
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
-bins<-c(0,71029,129026,162308,228996,465825,530819,579200,725981,797936,809829,862111,Inf)
+bins<-c(0,71029,150000,400000,600000,800000,1000000,1300000,Inf)
 
 
 ```
@@ -3729,6 +4256,7 @@ bins<-c(0,71029,129026,162308,228996,465825,530819,579200,725981,797936,809829,8
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -3740,6 +4268,7 @@ pal<-colorBin(palette="RdYlBu",
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -3751,9 +4280,34 @@ ma_county_formated <- ma_county_geo_4326 |>
 
 ```
 
+ma_county_formated 
+
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(ma_county_formated , "ma_county_formated.rds")
+
+
+```
+
+```{r}
+#| include: false
+
+
+ma_county_formated  <- readRDS("ma_county_formated.rds")
+
+
+```
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -3774,6 +4328,7 @@ mytext <- paste(
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -3802,11 +4357,32 @@ map_county_pop_density_plt<- ma_county_geo_4326 |> leaflet(options = leafletOpti
 
 ```
 
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(map_county_pop_density_plt, "map_county_pop_density_plt.rds")
+
+```
+
+```{r}
+#| include: false
+
+
+
+
+map_county_pop_density_plt <- readRDS("map_county_pop_density_plt.rds")
+
+```
+
 
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 county_map_pop_density<-map_county_pop_density_plt %>% 
@@ -3817,8 +4393,27 @@ county_map_pop_density<-map_county_pop_density_plt %>%
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
-map_county_pop_density_plt
+
+saveRDS(county_map_pop_density, "county_map_pop_density.rds")
+
+```
+
+```{r}
+#| include: false
+
+
+county_map_pop_density <- readRDS("county_map_pop_density.rds")
+
+
+```
+
+```{r}
+
+county_map_pop_density
 
 
 
@@ -3829,29 +4424,7 @@ map_county_pop_density_plt
 ### Census Tracts
 
 
-```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
 
-
-
-
-ma_tracts_plot <- ggplot(ma_tracts_2) +
-    geom_sf()+
-    ggtitle("Census Tracts of Massachusetts") +
-    theme(legend.position = "none",plot.title = element_text(color="blue", size=14, face="bold.italic", hjust=0.5)) +
-    theme_void()
-
-
-
-```
-
-```{r}
-
-ma_tracts_plot
-
-
-```
 
 ```{r}
 #| code-fold: true
@@ -3956,8 +4529,9 @@ ma_accidents_16_21_10 <- readRDS("ma_accidents_16_21_10.rds")
 ```
 
  ```{r}
- #| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
 
  
 ma_accidents_16_21_10 |> 
@@ -4237,6 +4811,7 @@ ma_tract_cls_2$input
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 bins<-c(0,500,2000,3000,4000,5000,6500,8500,9500,10500,Inf)
@@ -4247,6 +4822,7 @@ bins<-c(0,500,2000,3000,4000,5000,6500,8500,9500,10500,Inf)
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -4273,8 +4849,27 @@ ma_tract_formated <- ma_tract_accident_3 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(ma_tract_formated , "ma_tract_formated.rds")
+
+
+```
+
+```{r}
+#| include: false
+
+ma_tract_formated  <- readRDS("ma_tract_formated.rds")
+
+
+```
+
+```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -4293,6 +4888,7 @@ mytext <- paste(
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -4303,11 +4899,11 @@ map_tract_population_plt<- ma_census4326 |> leaflet(options = leafletOptions(min
   addPolygons(
  fillColor=~pal(total_population_tractE),
  weight=2,
- opacity=0.8,
+ opacity=0.5,
  color= "white",
  label=~mytext,
  dashArray = "3",
- fillOpacity=0.3,
+ fillOpacity=0.05,
  highlightOptions = highlightOptions(
     weight = 5,
     color = "#666",
@@ -4318,9 +4914,29 @@ map_tract_population_plt<- ma_census4326 |> leaflet(options = leafletOptions(min
 
 ```
 
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(map_tract_population_plt, "map_tract_population_plt.rds")
+
+```
+
+```{r}
+#| include: false
+
+map_tract_population_plt <- readRDS("map_tract_population_plt.rds")
+
+
+```
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -4328,6 +4944,26 @@ map_tract_population_plt<- ma_census4326 |> leaflet(options = leafletOptions(min
 tract_map_population<-map_tract_population_plt %>% 
   addLegend(pal = pal, values = ~total_population_tractE, opacity = 0.6, title = "Massachusetts Census Tract Population",
   position = "bottomright")
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+
+saveRDS(tract_map_population, "tract_map_population.rds")
+
+```
+
+```{r}
+#| include: false
+
+
+tract_map_population <- readRDS("tract_map_population.rds")
+
 
 ```
 
@@ -4363,30 +4999,7 @@ ma_census4326 |>
 
 
 
-```{r}
 
-
-
-
-
-
-```
-
-```{r}
-
-
-
-
-
-```
-
-```{r}
-
-
-
-
-
-```
 
 
 
@@ -5594,7 +6207,7 @@ summary(brms_model_3)
 ```{r}
 
 
-
+library(nlme)
 
 ```
 
@@ -5602,8 +6215,7 @@ summary(brms_model_3)
 
 
 
-summary(brms_model_4)
-
+nl_model <- nlme::nlme(log(accident_duration) ~ temperature + Month + day_type + road_category + hour_day_sections, random ~temperature | GEOID, data = scaled_census_train)
 
 ```
 
