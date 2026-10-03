@@ -902,7 +902,7 @@ This will be acomplished by using the call_geolocator_latlon function from the t
 
 
 
-long_lat$census_code <- apply(long_lat_, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
+long_lat$census_code <- apply(long_lat, 1, function(row) call_geolocator_latlon(row['LATITUDE'], row['LONGITUDE']))
 
 
 ```
@@ -4878,7 +4878,7 @@ mytext <- paste(
   "Census Tract: ", ma_tract_formated$GEOID, "<br/>",
   "Total Vehicles Census Tract: ", ma_tract_formated$total_vehicles_tractE, "<br/>",
   "Total Housing Census Tract: ", ma_tract_formated$total_tract_housing_unitsE,"<br/>", 
-  "Census Tract Accident County: ", ma_tract_formated$tract_accident_count,"<br/>",
+  "Census Tract Accident Count: ", ma_tract_formated$tract_accident_count,"<br/>",
     sep="") %>%
   lapply(htmltools::HTML)
 
@@ -5026,7 +5026,7 @@ ma_census4326 |>
 10:1 rule 
 You should have at least 10 rows of data for every 1 column (feature) in your dataset. 
 
-`
+
 
 ```{r}
 #| code-fold: true
@@ -5134,11 +5134,28 @@ census_tract_df_2 <- readRDS("census_tract_df_2.rds")
 
 ```
 
+## Data Possion Regression
+
 ```{r}
 
 
 census_tract_df_3 <- census_tract_df |> 
-    select(-ID, -Severity, -City, -Year, -LATITUDE, -LONGITUDE, -census_code, -tract_house_density_sqmi, -Stop,-Amenity, -Crossing,-Junction ,-Station,-Traffic_Signal,-Sunrise_Sunset,-Civil_Twilight, -day_of_week, -total_tract_housing_unitsE, -total_vehicles_tractE, -avg_cars_per_household, -total_households_tractE, -tract_pop_density_sqmi, -total_population_tractE)
+    select(-ID, -Severity, -City, -County, -Year, -LATITUDE, -LONGITUDE, -census_code, -tract_house_density_sqmi, -Stop,-Amenity, -Crossing,-Junction ,-Station,-Traffic_Signal,-Sunrise_Sunset,-Civil_Twilight, -day_of_week, -total_tract_housing_unitsE, -total_vehicles_tractE, -avg_cars_per_household, -total_households_tractE, -tract_pop_density_sqmi)
+
+
+
+```
+
+```{r}
+
+saveRDS(census_tract_df_3 , "census_tract_df_3.rds")
+
+
+```
+
+```{r}
+
+census_tract_df_3  <- readRDS("census_tract_df_3.rds")
 
 
 
@@ -5159,8 +5176,8 @@ census_tract_df_3 |> summary()
 ```{r}
 
 
-census_tract_df_2 |> 
-    glimpse()
+
+
 
 
 ```
@@ -5172,7 +5189,7 @@ census_tract_df_2 |>
 
 
 
-census_tract_df |> select(GEOID, County, total_households_tractE, total_population_tractE, total_vehicles_tractE) |> filter(is.na(total_households_tractE)) |> head()
+
 
 ```
 
@@ -5191,15 +5208,225 @@ census_tract_df_4 <- census_tract_df_3 |>
 ```
 
 ```{r}
+
+saveRDS(census_tract_df_4, "census_tract_df_4.rds")
+
+
+```
+
+```{r}
+
+census_tract_df_4 <- readRDS("census_tract_df_4.rds")
+
+
+
+```
+
+```{r}
 #| echo: false
 #| include: false
 #| eval: false
 
-census_tract_df_2 <- census_tract_df_2 |> 
-    filter(total_tract_housing_unitsE != 0)
+
+census_tract_df_4 |> summary()
 
 
 ```
+
+```{r}
+
+
+tract_pop <- census_tract_df_4 |> 
+    select(GEOID, total_population_tractE )
+
+
+```
+
+```{r}
+
+
+tract_pop <- tract_pop |> 
+    distinct(GEOID, .keep_all = TRUE)
+
+
+```
+
+```{r}
+
+saveRDS(tract_pop , "tract_pop.rds")
+
+
+```
+
+```{r}
+
+
+tract_pop <- readRDS("tract_pop.rds")
+
+
+```
+
+```{r}
+
+
+
+any(duplicated(tract_pop$GEOID))
+
+
+```
+
+```{r}
+
+
+
+agg_observed <- census_tract_df_4 |> 
+    group_by(GEOID, Month, day_type) |> 
+    summarize(
+        accident_count = n(),
+        mean_temp = mean(temperature, na.rm =TRUE),
+        .groups = "drop"
+    )
+
+
+```
+
+```{r}
+
+saveRDS(agg_observed, "agg_observed.rds")
+
+
+```
+
+```{r}
+
+
+
+agg_observed <- readRDS("agg_observed.rds")
+
+```
+
+```{r}
+
+
+
+census_poi_df <- agg_observed |> 
+    complete(
+        GEOID, Month, day_type, 
+        fill = list(accident_count = 0)
+    ) |> 
+    group_by(Month) |> 
+    mutate(mean_temp = if_else(is.na(mean_temp), mean(mean_temp, na.rm = TRUE), mean_temp)) |> 
+    ungroup() |> 
+    mutate(temp_z = as.numeric(scale(mean_temp)))
+
+
+```
+
+```{r}
+
+saveRDS(census_poi_df, "census_poi_df.rds")
+
+
+```
+
+```{r}
+
+
+
+census_poi_df <- readRDS("census_poi_df.rds")
+
+```
+
+```{r}
+
+
+census_poi_df_2 <- census_poi_df |> 
+    left_join(tract_pop, by = "GEOID", relationship = "many-to-one") |> 
+    filter(!is.na(total_population_tractE) & total_population_tractE > 0)
+
+
+
+```
+
+```{r}
+
+
+saveRDS(census_poi_df_2, "census_poi_df_2.rds")
+
+```
+
+```{r}
+
+
+census_poi_df_2 <- readRDS("census_poi_df_2.rds")
+
+
+```
+
+```{r}
+
+
+cat("Rows before join:", nrow(census_poi_df), "\n")
+cat("Rows after join: ", nrow(census_poi_df_2), "\n")
+stopifnot(nrow(census_poi_df) == nrow(census_poi_df_2))
+
+# 2. Check total accident count
+accidents_before <- sum(census_poi_df$accident_count, na.rm = TRUE)
+accidents_after  <- sum(census_poi_df_2$accident_count, na.rm = TRUE)
+
+cat("Accidents before join:", accidents_before, "\n")
+cat("Accidents after join: ", accidents_after, "\n")
+stopifnot(accidents_before == accidents_after)
+
+
+
+```
+
+```{r}
+
+
+
+census_poi_df_2 %>%
+  summarize(
+    missing_pop = sum(is.na(total_population_tractE)),
+    zero_pop    = sum(total_population_tractE == 0, na.rm = TRUE),
+    min_pop     = min(total_population_tractE, na.rm = TRUE),
+    median_pop  = median(total_population_tractE, na.rm = TRUE)
+  )
+
+
+```
+
+
+
+
+
+```{r}
+
+
+
+sample_geoid <- census_poi_df_2$GEOID[1546]
+
+census_poi_df_2 %>%
+  filter(GEOID == sample_geoid) %>%
+  select(GEOID, Month, day_type, accident_count, total_population_tractE) %>%
+  print(n = 20)
+
+
+```
+
+```{r}
+
+
+table(table(census_poi_df_2$GEOID))
+
+
+
+```
+
+
+
+## County Data
 
 
 ```{r}
@@ -5293,6 +5520,8 @@ census_tract_df_2 |>
 
 ## Train/Test Split
 
+### Linear and Linear Mized Effect Split
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -5313,16 +5542,7 @@ print(acci_census_df)
 
 ```
 
-```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
-#| eval: false
-
-
-acci_census_df_2 <- initial_split(census_tract_df_3, prop = 0.80)
-
-
-```
+### Poisson Split
 
 ```{r}
 #| code-fold: true
@@ -5330,7 +5550,35 @@ acci_census_df_2 <- initial_split(census_tract_df_3, prop = 0.80)
 #| eval: false
 
 
-acci_count_tract_df <- initial_split(census_tract_county_df_2, prop = 0.80)
+acci_census_df_2 <- initial_split(census_poi_df_2, prop = 0.80)
+
+
+```
+
+```{r}
+
+saveRDS(acci_census_df_2, "acci_census_df_2.rds")
+
+
+```
+
+```{r}
+
+
+acci_census_df_2 <- readRDS("acci_census_df_2.rds")
+
+
+```
+
+## County
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+acci_county_tract_df <- initial_split(census_tract_county_df_2, prop = 0.80)
 
 
 ```
@@ -5338,7 +5586,7 @@ acci_count_tract_df <- initial_split(census_tract_county_df_2, prop = 0.80)
 
 
 
-
+### Linear train/test
 
 ```{r}
 #| code-fold: true
@@ -5379,11 +5627,30 @@ dim(test_census_data)
 
 ```
 
+
+
+### Poisson Split
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 
 train_census_data_2 <- training(acci_census_df_2)
+
+
+```
+
+
+```{r}
+
+saveRDS(train_census_data_2, "train_census_data_2.rds")
+
+```
+
+```{r}
+
+train_census_data_2 <- readRDSD("train_census_data_2.rds")
+
 
 
 ```
@@ -5395,6 +5662,22 @@ test_census_data_2 <- testing(acci_census_df_2)
 
 
 ```
+
+```{r}
+
+saveRDS(test_census_data_2, "test_census_data_2.rds")
+
+```
+
+```{r}
+
+
+test_census_data_2 <- readRDS("test_census_data_2.rds")
+
+
+```
+
+### County
 
 ```{r}
 
@@ -5416,6 +5699,7 @@ test_tract_coun <- testing(acci_count_tract_df)
 
 
 
+### Linear scale and center
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -5429,28 +5713,33 @@ census_rec <- recipe(accident_duration ~ ., data = train_census_data) |>
 
 ```
 
+
+### poison
+
 ```{r}
 
 
-census_rec_2<- recipe(accident_duration ~ ., data = train_census_data_2) |> 
+census_rec_2<- recipe(accident_count ~ ., data = train_census_data_2) |> 
     step_center(all_numeric_predictors()) |> 
     step_scale(all_numeric_predictors())
 
 
 ```
 
+### County
+
 ```{r}
 
 
 
-census_cou_rec <- recipe(accident_duration ~ ., data = train_tract_cou) |> 
+census_cou_rec <- recipe(acc ~ ., data = train_tract_cou) |> 
     step_center(all_numeric_predictors()) |> 
     step_scale(all_numeric_predictors())
 
 ```
 
 
-
+### Linear
 
 ```{r}
 #| code-fold: true
@@ -5462,6 +5751,8 @@ scaled_census_train <- bake(train_census_rec, new_data = train_census_data)
 
 
 ```
+
+### Poisson
 
 ```{r}
 
@@ -5685,7 +5976,7 @@ lr_2_residual_plot
 
 
 
-## Fixed Effects
+## Linear Fixed Effects
 
 
 
@@ -5818,7 +6109,7 @@ summary(model_lme_1)
 
 
 
-
+## Bayesian Linear Mixed Effects
 
 ```{r}
 #| code-fold: true
@@ -6694,23 +6985,68 @@ print(brms_extreme_df_2, n=100)
 ```
 
 
+
+
+
+
+
+
+## Bayesian Possion Mixed Effect Regression (Count Data)
+
+
+
+
+prior(normal(0,0.5), class = "b") regularizes prior for fixed effects.
+
+prior(exponential(1), class = "sd") Prior for census tract varying intercept. 
+
+
 ```{r}
 
 
-brms_model_2 <- brm(
-  log(accident_duration) ~ . -GEOID + (temperature | GEOID),
-  data = scaled_census_train_2,
-  chains = 4,
-  iter = 12000,
-  family = student(),
-  cores = 40, 
-  seed = 42
+
+brms_poisson <- brm(
+    formula = accident_count ~ offset(log(total_population_tractE)) + mean_temp + Month + day_type + (1|GEOID),
+    data = train_census_data_2,
+    family = poisson(link = "log"),
+    prior = c(
+        prior(normal(0, 0.5), class = "b"),
+        prior(exponential(1), class = "sd")
+    ),
+    chains = 4,
+    cores = 12,
+    iter = 12000
+
 )
 
 
 
+```
+
+```{r}
+
+saveRDS(brms_poisson , "brms_poisson.rds")
+
 
 ```
+
+```{r}
+
+
+brms_poisson  <- readRDS("brms_poisson.rds")
+
+```
+
+```{r}
+
+
+pp_check(brms_poisson, type = "dens_overlay", ndraws = 50)
+
+
+```
+
+
+
 
 
 
@@ -6718,12 +7054,20 @@ brms_model_2 <- brm(
 
 
 
-# Extract fixed-effect formula without random effects
-ff <- nobars(formula(your_model)
-X <- model.matrix(ff, data = your_data)
+brms_poisson_2 <- brm(
+    formula = accident_count ~ offset(log(total_population_tractE)) + mean_temp + Month + day_type + (1|GEOID),
+    data = train_census_data_2,
+    family = negbinomial(link = "log"),
+    prior = c(
+        prior(normal(0, 0.5), class = "b"),
+        prior(exponential(1), class = "sd"),
+        prior(gamma(0.01, 0.01), class = "shape")
+    ),
+    chains = 4,
+    cores = 12,
+    iter = 12000
+
 )
-# Check for linear combinations
-caret::findLinearCombos(X)
 
 
 ```
@@ -6731,19 +7075,7 @@ caret::findLinearCombos(X)
 ```{r}
 
 
-library(caret)
-```
-
-```{r}
-
-# Extract fixed-effect formula without random effects
-ff <- nobars(formula(model_lme_1))
-X <- model.matrix(ff, data = train_data) 
-
-
-# Check for linear combinations
-caret::findLinearCombos(X)
-
+saveRDS(brms_poisson_2, "brms_poisson_2.rds")
 
 
 ```
@@ -6751,8 +7083,7 @@ caret::findLinearCombos(X)
 ```{r}
 
 
-summary(model_lme_1)
-
+brms_poisson_2 <- readRDS("brms_poisson_2.rds")
 
 
 ```
@@ -6760,8 +7091,51 @@ summary(model_lme_1)
 ```{r}
 
 
-icc(model_lme_1, nrep=50)
+pp_check(brms_poisson_2, type = "dens_overlay", ndraws = 50)
+
 
 ```
+
+
+
+
+```{r}
+
+
+fixef_summary <- fixef(brms_poisson_2)
+
+
+```
+
+```{r}
+
+irr_table <- exp(fixef_summary[, c("Estimate", "Q2.5", "Q97.5")])
+
+
+
+```
+
+```{r}
+round(irr_table, 3)
+
+
+```
+
+```{r}
+
+
+summary(brms_poisson_2)
+
+
+```
+
+```{r}
+
+
+rstan::check_divergences(brms_poisson_2$fit)
+
+
+```
+
 
 
