@@ -67,6 +67,8 @@ library(collapse)
 library(ggfortify)
 library(bayesplot)
 library(tidyr)
+library(tibble)
+library(spdep)
 
 
 
@@ -5363,66 +5365,8 @@ census_poi_df_2 <- readRDS("census_poi_df_2.rds")
 
 ```
 
-```{r}
 
 
-cat("Rows before join:", nrow(census_poi_df), "\n")
-cat("Rows after join: ", nrow(census_poi_df_2), "\n")
-stopifnot(nrow(census_poi_df) == nrow(census_poi_df_2))
-
-# 2. Check total accident count
-accidents_before <- sum(census_poi_df$accident_count, na.rm = TRUE)
-accidents_after  <- sum(census_poi_df_2$accident_count, na.rm = TRUE)
-
-cat("Accidents before join:", accidents_before, "\n")
-cat("Accidents after join: ", accidents_after, "\n")
-stopifnot(accidents_before == accidents_after)
-
-
-
-```
-
-```{r}
-
-
-
-census_poi_df_2 %>%
-  summarize(
-    missing_pop = sum(is.na(total_population_tractE)),
-    zero_pop    = sum(total_population_tractE == 0, na.rm = TRUE),
-    min_pop     = min(total_population_tractE, na.rm = TRUE),
-    median_pop  = median(total_population_tractE, na.rm = TRUE)
-  )
-
-
-```
-
-
-
-
-
-```{r}
-
-
-
-sample_geoid <- census_poi_df_2$GEOID[1546]
-
-census_poi_df_2 %>%
-  filter(GEOID == sample_geoid) %>%
-  select(GEOID, Month, day_type, accident_count, total_population_tractE) %>%
-  print(n = 20)
-
-
-```
-
-```{r}
-
-
-table(table(census_poi_df_2$GEOID))
-
-
-
-```
 
 
 
@@ -5649,7 +5593,7 @@ saveRDS(train_census_data_2, "train_census_data_2.rds")
 
 ```{r}
 
-train_census_data_2 <- readRDSD("train_census_data_2.rds")
+train_census_data_2 <- readRDS("train_census_data_2.rds")
 
 
 
@@ -5714,17 +5658,7 @@ census_rec <- recipe(accident_duration ~ ., data = train_census_data) |>
 ```
 
 
-### poison
 
-```{r}
-
-
-census_rec_2<- recipe(accident_count ~ ., data = train_census_data_2) |> 
-    step_center(all_numeric_predictors()) |> 
-    step_scale(all_numeric_predictors())
-
-
-```
 
 ### County
 
@@ -5752,17 +5686,8 @@ scaled_census_train <- bake(train_census_rec, new_data = train_census_data)
 
 ```
 
-### Poisson
 
-```{r}
-
-train_census_rec_2 <- prep(census_rec_2, training= train_census_data_2)
-scaled_census_train_2 <- bake(train_census_rec_2, new_data = train_census_data_2)
-
-
-
-```
-
+### county
 
 ```{r}
 
@@ -7040,7 +6965,16 @@ brms_poisson  <- readRDS("brms_poisson.rds")
 ```{r}
 
 
-pp_check(brms_poisson, type = "dens_overlay", ndraws = 50)
+ppcheck_poi_1 <- pp_check(brms_poisson, type = "dens_overlay", ndraws = 50)
+
+
+```
+
+
+```{r}
+
+
+ppcheck_poi_1
 
 
 ```
@@ -7055,7 +6989,7 @@ pp_check(brms_poisson, type = "dens_overlay", ndraws = 50)
 
 
 brms_poisson_2 <- brm(
-    formula = accident_count ~ offset(log(total_population_tractE)) + mean_temp + Month + day_type + (1|GEOID),
+    formula = accident_count ~ offset(log(total_population_tractE)) + temp_z + Month + day_type + (1|GEOID),
     data = train_census_data_2,
     family = negbinomial(link = "log"),
     prior = c(
@@ -7070,6 +7004,30 @@ brms_poisson_2 <- brm(
 )
 
 
+```
+
+```{r}
+
+
+statewide_car_fit <- brm(
+  formula = accident_count ~ offset(log(population)) + temp_z + factor(Month) + day_type + 
+            car(W_bin, gr = GEOID, type = "escar"),
+  data = model_data_spatial,
+  data2 = list(W_bin = W_bin),
+  family = negbinomial(link = "log"),
+  prior = c(
+    prior(normal(0, 0.5), class = "b"),
+    prior(exponential(1), class = "sdcar")
+  ),
+  chains = 4,
+  cores = 4,
+  iter = 2500,
+  warmup = 1000,
+  control = list(
+    adapt_delta = 0.98,
+    max_treedepth = 12
+  )
+)
 ```
 
 ```{r}
@@ -7091,10 +7049,633 @@ brms_poisson_2 <- readRDS("brms_poisson_2.rds")
 ```{r}
 
 
-pp_check(brms_poisson_2, type = "dens_overlay", ndraws = 50)
+ppcheck_poi_2 <- pp_check(brms_poisson_2, type = "dens_overlay", ndraws = 50)
 
 
 ```
+
+```{r}
+
+
+
+brms_poisson_3 <- brm(
+    formula = accident_count ~ offset(log(total_population_tractE)) + temp_z + Month + day_type + car(W_bin, gr = GEOID, type = "escar"),
+    data = train_census_df_3,
+    data2 = list(W_bin = W_bin),
+    family = negbinomial(link = "log"),
+    prior = c(
+        prior(normal(0, 0.5), class = "b"),
+        prior(exponential(1), class = "sdcar")
+    ),
+    chains = 4,
+    cores = 14,
+    iter = 12000,
+    warmup = 6000,
+    control = list(
+      adapt_delta = 0.98,
+      max_treedepth = 12)
+
+)
+
+
+```
+
+```{r}
+
+
+summary(brms_poisson_3)
+
+
+
+
+```
+
+
+
+
+
+```{r}
+
+
+ppcheck_poi_2
+
+
+```
+
+### Evaluation
+
+
+```{r}
+
+
+
+
+tract_ranef <- ranef(brms_poisson_2)$GEOID[, , "Intercept"] |> 
+    as.data.frame() |> 
+    rownames_to_column(var = "GEOID") |> 
+    rename(
+        ranef_log = Estimate,
+        se_log = Est.Error,
+        lower_95 = Q2.5,
+        upper_95 = Q97.5
+    ) |> 
+    mutate(
+        rate_ratio = exp(ranef_log),
+        rate_ratio_lower = exp(lower_95),
+        rate_ratio_upper = exp(upper_95)
+    )    
+
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+
+head(tract_ranef)
+
+
+```
+
+```{r}
+
+
+tract_coef <- coef(brms_poisson_2)$GEOID[, , "Intercept"] |> 
+    as.data.frame() |> 
+    rownames_to_column(var = "GEOID") |> 
+    mutate(
+        baseline_rate = exp(Estimate),
+        baseline_rate_lower = exp(Q2.5),
+        baseline_rate_upper = exp(Q97.5)
+    )
+
+
+```
+
+```{r}
+
+
+
+
+
+
+```
+
+
+```{r}
+
+
+
+
+
+
+
+```
+
+```{r}
+
+
+
+tract_coef |> head()
+
+
+
+```
+
+```{r}
+
+
+high_risk_tracts <- tract_ranef |> 
+    filter(rate_ratio_lower > 1.0) |> 
+    arrange(desc(rate_ratio))
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+
+```
+
+```{r}
+
+
+head(high_risk_tracts)
+
+
+
+```
+
+```{r}
+
+
+
+low_risk_tracts <- tract_ranef |> 
+    filter(rate_ratio_upper < 1.0) |> 
+    arrange(rate_ratio)
+
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+
+```
+
+```{r}
+
+
+
+low_risk_tracts |> head()
+
+
+```
+
+```{r}
+
+
+cat("Significantly higher risk tracts: ", nrow(high_risk_tracts), "\n")
+
+cat("Significantly lower risk tracts: ", nrow(low_risk_tracts), "\n")
+
+
+
+
+```
+
+```{r}
+
+
+poi_cat_plot <- tract_ranef |> 
+    arrange(rate_ratio) |> 
+    mutate(rank = row_number()) |> 
+    ggplot(aes(x = rank, y = rate_ratio)) +
+    geom_hline(yintercept = 1, linetype = "dashed", color = "red") +
+    geom_pointrange(aes(ymin = rate_ratio_lower, ymax = rate_ratio_upper), size = 0.2, alpha = 0.4) +
+    scale_y_log10() +
+    labs(
+        x = "Tract Rank",
+        y = "Rate Multiplier (vs Average Tract, log scale)",
+        title = "Census Tract Ramdom Effects (Rate Multiplication)"
+    ) +
+    theme_minimal()    
+
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+poi_cat_plot
+
+
+
+```
+
+
+```{r}
+
+
+
+map_sf <- ma_tract_data_6 |> 
+    left_join(tract_ranef, by = "GEOID")
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+census_tract_risk_plot <- ggplot(map_sf) +
+    geom_sf(aes(fill = rate_ratio), color = "grey80", size = 0.05) +
+    scale_fill_gradient2(
+        low = "#2166ac",
+        mid = "#f7f7f7",
+        high = "#b2182b",
+        midpoint = 1,
+        trans = "log",
+        breaks = c(0.25, 0.5, 1.0,2.0,4.0),
+        na.value = "grey90",
+        name = "Rate Ratio\n(vs Average Tract)"
+    ) +
+    coord_sf(datum = NA) +
+    theme_void() +
+    labs(
+        title = "Baseline Accident Risk by Census Tract",
+        subtitle = "Posterior Mean Rate Multipliers (Contolling for population, month, and day type)"
+    ) +
+    theme(
+        legend.position = "right",
+        plot.title = element_text(face = "bold", size = 14),
+        plot.subtitle = element_text(size = 10, color = "grey30", margin = margin(b = 10))
+    )       
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+census_tract_risk_plot
+
+
+
+```
+
+```{r}
+
+
+
+map_leaflet_sf <- st_transform(map_sf, 4326)
+
+
+```
+
+```{r}
+
+pal <- colorNumeric(
+  palette = "RdYlBu",
+  domain = log(c(min(map_leaflet_sf$rate_ratio, na.rm = TRUE), 
+                 max(map_leaflet_sf$rate_ratio, na.rm = TRUE))),
+  reverse = TRUE
+)
+
+
+
+```
+
+```{r}
+
+
+
+labels <- sprintf(
+  "<strong>Tract GEOID:</strong> %s<br/>
+   <strong>Tract Population:</strong> %s<br/>
+   <strong>Rate Multiplier:</strong> %.2fx<br/>
+   <strong>95%% CrI:</strong> [%.2f, %.2f]",
+  map_leaflet_sf$GEOID,
+  map_leaflet_sf$total_population_tractE,
+  map_leaflet_sf$rate_ratio,
+  map_leaflet_sf$rate_ratio_lower,
+  map_leaflet_sf$rate_ratio_upper
+) |> 
+lapply(htmltools::HTML)
+
+
+
+```
+
+
+
+
+
+
+```{r}
+
+poi_tracts_leaf_plt <- map_leaflet_sf |> leaflet(options = leafletOptions(minZoom = 7, maxZoom = 18)) |> 
+  addProviderTiles(providers$Esri.WorldStreetMap) |> 
+  setView(lng = -71.73822, lat = 42.16122, zoom = 9.5) |> 
+  addPolygons(
+    fillColor = ~pal(log(rate_ratio)),
+    weight = 0.5,
+    opacity = 1,
+    color = "white",
+    dashArray = "1",
+    fillOpacity = 0.7,
+    highlightOptions = highlightOptions(
+      weight = 2,
+      color = "#666",
+      fillOpacity = 0.9,
+      bringToFront = TRUE
+    ),
+    label = labels,
+    labelOptions = labelOptions(
+      style = list("font-weight" = "normal", padding = "3px 8px"),
+      textsize = "13px",
+      direction = "auto"
+    )
+  ) |> 
+  addLegend(
+    pal = pal,
+    values = ~log(rate_ratio),
+    opacity = 0.7,
+    title = "Log Rate Ratio",
+    position = "bottomright"
+  )
+
+
+```
+
+```{r}
+
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+
+poi_tracts_leaf_plt 
+
+
+```
+
+
+
+
+```{r}
+
+
+
+boundaries = ma_tract_data_6 |> 
+    select(GEOID, census_tract, geometry)
+
+
+```
+
+
+```{r}
+
+
+
+saveRDS(boundaries, "boundaries.rds")
+
+```
+
+```{r}
+
+
+
+boundaries <- readRDS("boundaries.rds")
+
+```
+
+```{r}
+
+
+boundaries_clean <- boundaries %>%
+  mutate(GEOID = as.character(GEOID)) %>%
+  st_make_valid()
+
+
+
+```
+
+```{r}
+
+saveRDS(boundaries_clean, "boundaries_clean.rds")
+
+
+```
+
+```{r}
+
+
+boundaries_clean <- readRDS("boundaries_clean.rds")
+
+
+```
+
+```{r}
+
+
+commin_geoids <- sort(intersect(unique(boundaries_clean$GEOID), unique(train_census_data_2$GEOID)))
+
+
+```
+
+Subset spartial polygons strictly to common GEOIDs
+
+```{r}
+
+
+map_statewide <- boundaries_clean |> 
+    filter(GEOID %in% common_geoids) |> 
+    arrange(GEOID)
+
+
+```
+
+
+```{r}
+
+nb_statewide <-m poly2nb(map_statewide, queen = TRUE)
+
+
+```
+
+
+
+
+```{r}
+
+islands <- which(card(nb_statewide) == 0)
+
+
+
+```
+
+
+First, remove islands forn the spartial ploygons.
+
+Next, we recaluculate neighbors withoout islands
+
+```{r}
+
+if (length(islands) > 0) {
+    island_geoids <- map_statewide$GEOID[islands]
+    cat("Dropping", length(islands), "island tract(s) with 0 neighbors:\n", paste)island_geoids, collapse = ", "), "\n")
+
+    map_statewide <- map_statewide[-islands, ]
+
+    nb_statewide <- poly2nb(map_statewide, queen = TRUE)
+}
+
+
+
+```
+
+```{r}
+
+
+
+W_bin <- nb2mat(nb_statewide, style = "B", zero.policy = TRUE)
+rownames(W_bin)
+
+
+```
+
+```{r}
+
+rownames(W_bin) <- map_statewide$GEOID
+
+colnames(W_bin) <- map_statewide$GEOID
+
+
+```
+
+
+
+```{r}
+
+
+train_census_df_3 <- train_census_data_2 |> 
+    filter(GEOID %in% rownames(W_bin)) |> 
+    mutate(GEOID = factor(GEOID, levels = rownames(W_bin)))
+
+
+```
+
+
+```{r}
+
+
+
+stopifnot(identical(levels(train_census_df_3$GEOID), rownames(W_bin)))
+
+cat("Total connected tracts:", length(rownames(W_bin)), "\n")
+
+cat("Total modeling rows: ", nrow(train_census_df_3), "\n")
+
+
+
+
+```
+
 
 
 
@@ -7132,7 +7713,7 @@ summary(brms_poisson_2)
 ```{r}
 
 
-rstan::check_divergences(brms_poisson_2$fit)
+
 
 
 ```
