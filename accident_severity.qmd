@@ -70,6 +70,7 @@ library(bayesplot)
 library(tidyr)
 library(tibble)
 library(spdep)
+library(matrix)
 
 
 
@@ -5739,7 +5740,7 @@ dim(test_census_data)
 
 
 
-### Poisson Split
+### Poisson train/test
 
 ```{r}
 #| code-fold: true
@@ -6774,73 +6775,13 @@ print(brms_extreme_df_2, n=100)
 
 
 
-prior(normal(0,0.5), class = "b") regularizes prior for fixed effects.
+In our model, the prior argument includes:
+prior(normal(0,0.5), class = "b" - this  regularizes prior for fixed effects.
 
-prior(exponential(1), class = "sd") Prior for census tract varying intercept. 
-
-
-```{r}
+prior(exponential(1), class = "sd") - This is the prior for census tract varying intercept. 
 
 
-
-brms_poisson <- brm(
-    formula = accident_count ~ offset(log(total_population_tractE)) + mean_temp + Month + day_type + (1|GEOID),
-    data = train_census_data_2,
-    family = poisson(link = "log"),
-    prior = c(
-        prior(normal(0, 0.5), class = "b"),
-        prior(exponential(1), class = "sd")
-    ),
-    chains = 4,
-    cores = 12,
-    iter = 12000
-
-)
-
-
-
-```
-
-```{r}
-
-saveRDS(brms_poisson , "brms_poisson.rds")
-
-
-```
-
-```{r}
-
-
-brms_poisson  <- readRDS("brms_poisson.rds")
-
-```
-
-```{r}
-
-
-
-summary(brms_poisson)
-
-
-```
-
-```{r}
-
-
-ppcheck_poi_1 <- pp_check(brms_poisson, type = "dens_overlay", ndraws = 50)
-
-
-```
-
-
-```{r}
-
-
-ppcheck_poi_1
-
-
-```
-
+prior(gamma(0.01, 0.01), class = "shape") - The negative binomial distribution estimates an additional parameter (shape) that allows the conditioinal variance to scale quadratically. 
 
 
 
@@ -6913,14 +6854,325 @@ summary(brms_poisson_2)
 
 
 
+```{r}
+
+tract_ranef <- ranef(brms_poisson_2)$GEOID[, , "Intercept"] |> 
+    as.data.frame() |> 
+    rownames_to_column(var = "GEOID") |> 
+    rename(
+        ranef_log = Estimate,
+        se_log = Est.Error,
+        lower_95 = Q2.5,
+        upper_95 = Q97.5
+    ) |> 
+    mutate(
+        rate_ratio = exp(ranef_log),
+        rate_ratio_lower = exp(lower_95),
+        rate_ratio_upper = exp(upper_95)
+    )   
+
+
+
+
+
+```
+
+```{r}
+
+
+
+head(tract_ranef)
+
+```
+
+
+```{r}
+
+boundaries = ma_tract_data_6 |> 
+    select(GEOID, census_tract, geometry)
+
+```
+
+```{r}
+
+saveRDS(boundaries, "boundaries.rds")
+
+```
+
+```{r}
+
+boundaries <- readRDS("boundaries.rds")
+
+
+```
+
+```{r}
+
+boundaries_clean <- boundaries %>%
+  mutate(GEOID = as.character(GEOID)) %>%
+  st_make_valid()
+
+```
+
+```{r}
+
+
+saveRDS(boundaries_clean, "boundaries_clean.rds")
+
+```
+
+```{r}
+
+
+boundaries_clean <- readRDS("boundaries_clean.rds")
+
+
+```
+
+
+Joining spatial polygons with random effect rate ratios. 
+
+```{r}
+
+
+
+map_sf <- boundaries_clean |> 
+    left_join(tract_ranef, by = "GEOID")
+
+
+``` 
+
 
 
 ```{r}
 
 
 
-map_sf <- ma_tract_data_6 |> 
-    left_join(tract_ranef, by = "GEOID")
+
+```
+
+```{r}
+
+
+
+
+
+
+```
+
+```{r}
+
+
+map_sf
+
+
+
+```
+
+
+
+We'kll filterthe map_sf dataset to tracts that have estimated random effects. 
+
+```{r}
+
+
+
+map_analysis <- map_sf |> 
+    filter(!is.na(ranef_log))
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+map_analysis
+
+
+
+```
+
+
+
+We'll use the poly2nb function from the spdep library to build a adjacency list (Queen contiguity: sharing a border or corner point)
+
+```{r}
+
+
+neighbors <- poly2nb(map_analysis, queen = TRUE)
+
+
+```
+
+```{r}
+
+
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+neighbors
+
+
+```
+
+
+
+We have observations with no neighbors. To handle these islands/isolated tracts (tracts with 0 neighbors). We will use the nb2listw function from the spdep library to allow tracts without neighbors to remain without crashing. 
+
+
+```{r}
+
+weights_list <- nb2listw(neighbors, style = "W", zero.policy = TRUE)
+
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+weights_list
+
+
+```
+
+
+```{r}
+
+
+
+moran_analytical <- moran.test(
+    map_analysis$ranef_log,
+    weights_list,
+    zero.policy = TRUE
+)
+
+
+```
+
+```{r}
+
+
+
+
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+
+
+moran_analytical
+
+```
+
+Analyzing the Moran's I test on log-scale random effects:
+
+The p-valueis less than 0.05 and I is greater than 0: This means there is a statisrically signficant spatital splillover between neighboring census tracts. An independent random  intercept treates all tracts as exhangeable (assuming trac A shares no more similarity with its immediate neighbour tha with a tract 50 miles away). 
+
+
+
+
+
+
+
+
+## Conditional Autoregressive Model (CAR)
+
+
+
+The Moran's I test detected residual spatial clustering in our first Bayesian mixed effects poisson model.  As such, we will build a conditional autoregressive (CAR) Our first bayesian mixed effect model
+
+
+### CAR data preparation
+
+
+
+The st_make_valid function is from the sf library. 
+
+```{r}
+
+
+
+map_clean <- map_analysis |> 
+    st_make_valid() |> 
+    mutate(GEOID == as.character(GEOID))
+
+
+```
+
+Quen continguity neighbors list
+
+```{r}
+
+
+nb <- poly2nb(map_analysis, queen = TRUE)
+
+
+```
+
+
+
+Creating a standardized row weights (zero.ploicy handles islands like peninsulas etc..)
+
+```{r}
+
+
+lw <- nb2listw(nb, style = "W", zero.policy = TRUE)
 
 
 ```
@@ -6929,7 +7181,192 @@ map_sf <- ma_tract_data_6 |>
 
 
 
+Check for osland polygons (0 neighbors)i
+card() function is fron the spdep library
 
+
+```{r}
+
+
+island_indices <- which(card(nb) == 0)
+
+
+```
+
+Next, we will identify and remove any islands. 
+
+```{r}
+
+
+if(length(island_indices) > 0) {
+    cat("Dropping", length(island_indices), "islands with zero neighbors. \n")
+    map_clean <- map_clean[-island_indices, ]
+    nb <- poly2nb(map_clean, queen = TRUE)
+}
+
+
+
+```
+
+```{r}
+
+
+W_bin <- nb2mat(nb_statewide, style = "B", zero.policy = TRUE)
+rownames(W_bin)
+
+
+```
+
+Our output show that one island with zero neighbors was dropped. 
+
+<br><br>
+
+Next, we'll create a strictly binary matrix (style = "B") using the nb2mat function from spdep. 
+
+
+style = "B" is used for binary 1/0 adjacency, which is required by brms CAR models. 
+
+
+```{r}
+
+W_bin <- nb2mat(nb, style = "B", zero.policy = TRUE)
+
+
+
+```
+```{r}
+
+rownames(W_bin) <- map_clean$GEOID
+colnames(W_bin) <- map_clean$GEOID
+
+
+```
+
+```{r}
+
+rownames(W_bin) <- map_statewide$GEOID
+
+colnames(W_bin) <- map_statewide$GEOID
+
+
+```
+
+
+
+
+Verify symmetry and diagonal is 0. 
+
+stopifnot() and all() are functions from base R
+isSymmetric() and diag() are functions from the matrix library. 
+
+```{r}
+
+
+stopifnot(isSymmetric(W_bin))
+stopifnot(all(diag(W_bin) == 0))
+
+
+```
+
+
+```{r}
+
+
+common_geoids <- sort(intersect(unique(boundaries_clean$GEOID), unique(train_census_df_3$GEOID)))
+
+```
+
+```{r}
+
+
+map_statewide <- boundaries_clean |> 
+    filter(GEOID %in% common_geoids) |> 
+    arrange(GEOID)
+
+
+```
+
+```{r}
+
+
+nb_statewide <- poly2nb(map_statewide, queen = TRUE)
+
+
+```
+
+```{r}
+
+
+main_component_id <- which.max(table(comp$comp.id))
+mainland_indices <- which(comp$comp.id == main_component_id)
+
+map_mainland <- map_statewide[mainland_indices, ]
+nb_mainland  <- poly2nb(map_mainland, queen = TRUE)
+W_mainland   <- nb2mat(nb_mainland, style = "B")
+
+
+```
+
+```{r}
+
+
+islands <- which(card(nb_statewide) == 0)
+
+```
+
+```{r}
+
+
+
+
+if (length(islands) > 0) {
+    island_geoids <- map_statewide$GEOID[islands]
+    cat("Dropping", length(islands), "island tract(s) with 0 neighbors:\n", paste)island_geoids, collapse = ", "), "\n")
+
+    map_statewide <- map_statewide[-islands, ]
+
+    nb_statewide <- poly2nb(map_statewide, queen = TRUE)
+
+
+```
+
+```{r}
+
+
+train_census_df_3 <- train_census_data_2 |> 
+    filter(GEOID %in% rownames(W_bin)) |> 
+    mutate(GEOID = factor(GEOID, levels = rownames(W_bin)))
+
+```
+
+```{r}
+
+
+saveRDS(train_census_df_3, "train_census_df_3.rds")
+
+```
+
+```{r}
+
+
+train_census_df_3 <- readRDS("train_census_df_3.rds")
+
+
+```
+
+```{r}
+
+
+
+
+
+
+
+```
+
+
+
+we'll 
 
 
 ```{r}
@@ -7239,55 +7676,8 @@ head(icar_summary)
 
 ```
 
-```{r}
 
 
-boundaries = ma_tract_data_6 |> 
-    select(GEOID, census_tract, geometry)
-
-```
-
-```{r}
-
-
-saveRDS(boundaries, "boundaries.rds")
-
-
-```
-
-```{r}
-
-
-boundaries <- readRDS("boundaries.rds")
-
-
-```
-
-```{r}
-
-
-
-boundaries_clean <- boundaries %>%
-  mutate(GEOID = as.character(GEOID)) %>%
-  st_make_valid()
-
-```
-
-```{r}
-
-
-saveRDS(boundaries_clean, "boundaries_clean.rds")
-
-
-```
-
-```{r}
-
-
-boundaries_clean <- readRDS("boundaries_clean.rds")
-
-
-```
 
 ```{r}
 
