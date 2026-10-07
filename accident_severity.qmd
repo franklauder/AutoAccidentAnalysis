@@ -70,7 +70,7 @@ library(bayesplot)
 library(tidyr)
 library(tibble)
 library(spdep)
-library(matrix)
+library(posterior)
 
 
 
@@ -5428,7 +5428,7 @@ any(duplicated(tract_pop$GEOID))
 
 <br><br>
 
-We must now group and aggregate our categorical features (GEOID, Month, day_type) and calculate the mean of our numeric feature (temperature). This will create an accident count grouped by the categorical features.   The summarize() function from dplyr library will be used to accomplish this
+We must now group and aggregate our observed counts for categorical features (GEOID, Month, day_type) and average temperature.    
 
 <br><br>
 
@@ -5470,9 +5470,9 @@ agg_observed <- readRDS("agg_observed.rds")
 <br><br>
 
 
-Next, we want to ensure that all rows of the combination GEOID, Month, and day_type, for accident_count, have no NAs but an actual value.  The complete() function from tidyr will be used for this task.  We will call complete() with the names of our combination of features and fill in the missing values of accident_count. 
+Next, we want to ensure that all rows of the combination GEOID, Month, and day_type, for accident_count, have no NAs but an actual value.  The complete() function from tidyr will be used for this task.  We will call complete() with the names of our combination of features and fill in the missing values of accident_count with 0. 
 
-Additionally, we will also ensure that the mean_temperature feature has not missing values.  We will then scale the mean_temperature using the scale() function from base R. 
+Additionally, we will fill missing temperatures for zero-accident months with mean temperature. .  We will then scale the mean_temperature using the scale() function from base R. 
 
 
 
@@ -6879,6 +6879,22 @@ tract_ranef <- ranef(brms_poisson_2)$GEOID[, , "Intercept"] |>
 
 ```{r}
 
+saveRDS(tract_ranef, "tract_ranef.rds")
+
+
+```
+
+```{r}
+
+
+tract_ranef <- rreadRDS("tract_ranef.rds")
+
+
+
+```
+
+```{r}
+
 
 
 head(tract_ranef)
@@ -6946,7 +6962,7 @@ map_sf <- boundaries_clean |>
 
 ```{r}
 
-
+saveRDS(map_sf, "map_sf.rds")
 
 
 ```
@@ -6954,7 +6970,7 @@ map_sf <- boundaries_clean |>
 ```{r}
 
 
-
+map_sf <- readRDS("map_sf.rds")
 
 
 
@@ -6971,7 +6987,7 @@ map_sf
 
 
 
-We'kll filterthe map_sf dataset to tracts that have estimated random effects. 
+We'll filterthe map_sf dataset to tracts that have estimated random effects. 
 
 ```{r}
 
@@ -6986,14 +7002,14 @@ map_analysis <- map_sf |>
 ```{r}
 
 
-
+saveRDS(map_analysis, "map_analysis.rds")
 
 ```
 
 ```{r}
 
 
-
+map_analysis <- readRDS("map_analysis.rds")
 
 
 ```
@@ -7023,7 +7039,7 @@ neighbors <- poly2nb(map_analysis, queen = TRUE)
 
 
 
-
+saveRDS(neighbors, "neighbors.rds")
 
 
 ```
@@ -7031,7 +7047,7 @@ neighbors <- poly2nb(map_analysis, queen = TRUE)
 ```{r}
 
 
-
+neighbors <- readRDS("neighbors.rds")
 
 
 ```
@@ -7060,7 +7076,7 @@ weights_list <- nb2listw(neighbors, style = "W", zero.policy = TRUE)
 ```{r}
 
 
-
+saveRDS(weights_list, "weights_list.rds")
 
 
 ```
@@ -7068,7 +7084,7 @@ weights_list <- nb2listw(neighbors, style = "W", zero.policy = TRUE)
 ```{r}
 
 
-
+weights_list <- readeRDS("weights_list.rds")
 
 
 ```
@@ -7098,7 +7114,7 @@ moran_analytical <- moran.test(
 ```{r}
 
 
-
+saveRDS(moran_analytical, "moran_analytical.rds")
 
 
 
@@ -7106,7 +7122,7 @@ moran_analytical <- moran.test(
 
 ```{r}
 
-
+moran_analytical <- readRDS("moran_analytical.rds")
 
 
 ```
@@ -7119,6 +7135,8 @@ moran_analytical <- moran.test(
 moran_analytical
 
 ```
+
+
 
 Analyzing the Moran's I test on log-scale random effects:
 
@@ -7134,147 +7152,38 @@ The p-valueis less than 0.05 and I is greater than 0: This means there is a stat
 ## Conditional Autoregressive Model (CAR)
 
 
+<br><br>
 
 The Moran's I test detected residual spatial clustering in our first Bayesian mixed effects poisson model.  As such, we will build a conditional autoregressive (CAR) Our first bayesian mixed effect model
 
 
 ### CAR data preparation
 
+<br><br>
+
+Data will be prepared for the CAR model. 
+
+<br>
 
 
-The st_make_valid function is from the sf library. 
-
-```{r}
-
-
-
-map_clean <- map_analysis |> 
-    st_make_valid() |> 
-    mutate(GEOID == as.character(GEOID))
-
-
-```
-
-Quen continguity neighbors list
-
-```{r}
-
-
-nb <- poly2nb(map_analysis, queen = TRUE)
-
-
-```
-
-
-
-Creating a standardized row weights (zero.ploicy handles islands like peninsulas etc..)
-
-```{r}
-
-
-lw <- nb2listw(nb, style = "W", zero.policy = TRUE)
-
-
-```
-
-
-
-
-
-Check for osland polygons (0 neighbors)i
-card() function is fron the spdep library
-
-
-```{r}
-
-
-island_indices <- which(card(nb) == 0)
-
-
-```
-
-Next, we will identify and remove any islands. 
-
-```{r}
-
-
-if(length(island_indices) > 0) {
-    cat("Dropping", length(island_indices), "islands with zero neighbors. \n")
-    map_clean <- map_clean[-island_indices, ]
-    nb <- poly2nb(map_clean, queen = TRUE)
-}
-
-
-
-```
-
-```{r}
-
-
-W_bin <- nb2mat(nb_statewide, style = "B", zero.policy = TRUE)
-rownames(W_bin)
-
-
-```
-
-Our output show that one island with zero neighbors was dropped. 
+First we'll find common census tracts across boundaries clean and train_cenusus_data_2
 
 <br><br>
 
-Next, we'll create a strictly binary matrix (style = "B") using the nb2mat function from spdep. 
-
-
-style = "B" is used for binary 1/0 adjacency, which is required by brms CAR models. 
-
-
-```{r}
-
-W_bin <- nb2mat(nb, style = "B", zero.policy = TRUE)
-
-
-
-```
-```{r}
-
-rownames(W_bin) <- map_clean$GEOID
-colnames(W_bin) <- map_clean$GEOID
-
-
-```
-
-```{r}
-
-rownames(W_bin) <- map_statewide$GEOID
-
-colnames(W_bin) <- map_statewide$GEOID
-
-
-```
-
-
-
-
-Verify symmetry and diagonal is 0. 
-
-stopifnot() and all() are functions from base R
-isSymmetric() and diag() are functions from the matrix library. 
-
 ```{r}
 
 
-stopifnot(isSymmetric(W_bin))
-stopifnot(all(diag(W_bin) == 0))
 
 
-```
-
-
-```{r}
-
-
-common_geoids <- sort(intersect(unique(boundaries_clean$GEOID), unique(train_census_df_3$GEOID)))
+common_geoids <- sort(intersect(unique(boundaries_clean$GEOID), unique(train_census_data_2$GEOID)))
 
 ```
+
+<br><br>
+
+Next, we'll subset spattial polygons strictly to common GEOIDs. 
+
+<br><br>
 
 ```{r}
 
@@ -7284,7 +7193,14 @@ map_statewide <- boundaries_clean |>
     arrange(GEOID)
 
 
+
 ```
+
+<br><br>
+
+Spatial neighbor graph will be contructed. 
+<br><br>
+
 
 ```{r}
 
@@ -7294,71 +7210,108 @@ nb_statewide <- poly2nb(map_statewide, queen = TRUE)
 
 ```
 
-```{r}
+<br><br>
 
 
-main_component_id <- which.max(table(comp$comp.id))
-mainland_indices <- which(comp$comp.id == main_component_id)
+CAR matrices canno include disconnected islands (0 neighbors). A check will be performed to identify any census tracts with no neigbors with the card() function from spdep. 
 
-map_mainland <- map_statewide[mainland_indices, ]
-nb_mainland  <- poly2nb(map_mainland, queen = TRUE)
-W_mainland   <- nb2mat(nb_mainland, style = "B")
+<br><br>
 
-
-```
 
 ```{r}
-
 
 islands <- which(card(nb_statewide) == 0)
 
+
+
 ```
+
+<br><br>
+
+map_statewide[-islands, ] - Removes islands from spatial polygon
+
+<br>
+
 
 ```{r}
 
-
-
-
 if (length(islands) > 0) {
     island_geoids <- map_statewide$GEOID[islands]
-    cat("Dropping", length(islands), "island tract(s) with 0 neighbors:\n", paste)island_geoids, collapse = ", "), "\n")
+    cat("Dropping", length(islands), "island tract(s) with 0 neighbors:\n", paste(island_geoids, collapse = ", "), "\n")
 
     map_statewide <- map_statewide[-islands, ]
 
     nb_statewide <- poly2nb(map_statewide, queen = TRUE)
 
+}
+
+
+
+
+```
+
+
+
+<br><br>
+
+A strictly binary W matrix will be built. nb2mat() function is from spdep library. style = "B" must be used for brms CAR models. 
+
+<br><br>
+
+
+
+```{r}
+
+
+
+W_bin <- nb2mat(nb_statewide, style = "B", zero.policy = TRUE)
+
+
 
 ```
 
 ```{r}
 
 
-train_census_df_3 <- train_census_data_2 |> 
+rownames(W_bin) <- map_statewide$GEOID
+
+colnames(W_bin) <- map_statewide$GEOID
+
+
+```
+
+
+<br><br>
+
+The model data will subsetted to strictly to the final connected tracts in W_bin.  GEOID factor levels will be forced to match W_bin row order exactly.  
+
+
+<br><br>
+
+
+```{r}
+
+
+
+
+train_census_data_3 <- train_census_data_2 |> 
     filter(GEOID %in% rownames(W_bin)) |> 
     mutate(GEOID = factor(GEOID, levels = rownames(W_bin)))
 
-```
-
-```{r}
-
-
-saveRDS(train_census_df_3, "train_census_df_3.rds")
 
 ```
 
 ```{r}
 
 
-train_census_df_3 <- readRDS("train_census_df_3.rds")
-
+saveRDS(train_census_data_3, "train_census_data_3.rds")
 
 ```
 
 ```{r}
 
 
-
-
+train_census_data_3 <- readRDS("train_census_data_3.rds")
 
 
 
@@ -7366,7 +7319,43 @@ train_census_df_3 <- readRDS("train_census_df_3.rds")
 
 
 
-we'll 
+<br><br>
+
+Final check to verify strict alignment. 
+
+<br><br>
+
+```{r}
+
+
+stopifnot(identical(levels(train_census_data_3$GEOID), rownames(W_bin)))
+cat("Total connected tracts: ", length(rownames(W_bin)), "\n")
+cat("Total modeling rows:  ", nrow(train_census_data_3), "\n")
+
+
+```
+
+<br><br>
+
+Results displayed, thus our data passed verification of strict alignment. 
+
+<br><br>
+
+
+
+
+
+
+## Fit CAR model
+
+<br><br>
+
+
+Now that our data is prepared, we can fit the CAR model. 
+
+<br><br>
+
+
 
 
 ```{r}
@@ -7667,70 +7656,9 @@ ggplot(extremes_df, aes(x = GEOID, y = spatial_RR, color = significance)) +
 
 ```
 
-```{r}
 
 
 
-head(icar_summary)
-
-
-```
-
-
-
-
-```{r}
-
-
-common_geoids <- sort(intersect(unique(boundaries_clean$GEOID), unique(train_census_df_3$GEOID)))
-
-
-```
-
-```{r}
-
-
-saveRDS(common_geoids, "common_geoids.rds")
-
-```
-
-```{r}
-
-
-common_geoids <- saveRDS("common_geoids.rds")
-
-
-```
-
-```{r}
-
-
-
-map_statewide <- boundaries_clean |> 
-    filter(GEOID %in% common_geoids) |> 
-    arrange(GEOID)
-
-
-```
-
-Subset spartial polygons strictly to common GEOIDs
-
-
-
-```{r}
-
-
-nb_statewide <- poly2nb(map_statewide, queen = TRUE)
-
-
-```
-
-```{r}
-
-saveRDS(nb_statewide, "nb_statewide.rds")
-
-
-```
 
 ```{r}
 
@@ -7746,103 +7674,25 @@ W_mainland   <- nb2mat(nb_mainland, style = "B")
 
 ```
 
-```{r}
 
-
-islands <- which(card(nb_statewide) == 0)
-
-
-```
-
-
-First, remove islands forn the spartial ploygons.
-
-Next, we recaluculate neighbors withoout islands
-
-```{r}
-
-
-
-if (length(islands) > 0) {
-    island_geoids <- map_statewide$GEOID[islands]
-    cat("Dropping", length(islands), "island tract(s) with 0 neighbors:\n", paste)island_geoids, collapse = ", "), "\n")
-
-    map_statewide <- map_statewide[-islands, ]
-
-    nb_statewide <- poly2nb(map_statewide, queen = TRUE)
-
-```
-
-```{r}
-
-saveRDS( map_statewide, " map_statewide.rds")
-
-```
-
-```{r}
-
-
-saveRDS(nb_statewide,"nb_statewide.rds")
-
-
-```
-
-```{r}
-
-
-
-W_bin <- nb2mat(nb_statewide, style = "B", zero.policy = TRUE)
-rownames(W_bin)
-
-```
-
-
-```{r}
-
-
-rownames(W_bin) <- map_statewide$GEOID
-
-colnames(W_bin) <- map_statewide$GEOID
-
-
-
-```
-
-
-```{r}
-
-saveRDS(W_bin,"W_bin.rds")
-
-
-```
-
-```{r}
-
-train_census_df_3 <- train_census_data_2 |> 
-    filter(GEOID %in% rownames(W_bin)) |> 
-    mutate(GEOID = factor(GEOID, levels = rownames(W_bin)))
-
-
-
-
-```
 
 
 
 ```{r}
 
 
-saveRDS(train_census_df_3, "train_census_df_3.rds")
+
+main_component_id <- which.max(table(comp$comp.id))
+mainland_indices <- which(comp$comp.id == main_component_id)
+
+map_mainland <- map_statewide[mainland_indices, ]
+nb_mainland  <- poly2nb(map_mainland, queen = TRUE)
+W_mainland   <- nb2mat(nb_mainland, style = "B")
 
 
 ```
 
-```{r}
 
-
-
-train_census_df_3 <- readRDS("train_census_df_3.rds")
-```
 
 ```{r}
 
