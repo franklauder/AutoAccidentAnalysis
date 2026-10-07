@@ -6320,6 +6320,16 @@ brms_model_cat_plot_top_60_2 <- brms_model_2 %>%
 
 ```{r}
 
+brms_count <- brms_model_2 %>%
+  spread_draws(r_GEOID[GEOID, Intercept]) %>%
+  median_qi(.width = 0.95) %>%
+  slice_max(order_by = abs(r_GEOID), n = 100)
+
+
+```
+
+```{r}
+
 
 
 brms_model_cat_plot_top_60
@@ -6461,65 +6471,20 @@ pal<-colorBin(palette="RdYlBu",
 
 
 
-
-
-
-
-
-
-
-
-
-```{r}
-
-
-ma_tract_middle_extreme_formatted <- ma_extreme_middle_higher |> 
-    mutate(accident_duration = format(accident_duration, big.mark = ",", big.interval = 3, digits=12) ) 
-     
-
-
-```
-
-```{r}
-
-saveRDS(ma_tract_middle_extreme_formatted, "ma_tract_middle_extreme_formatted.rds")
-
-```
-
-```{r}
-
-ma_tract_middle_extreme_formatted <- readRDS("ma_tract_middle_extreme_formatted.rds")
-
-
-```
-
-```{r}
-
-
-
-mytext <- paste(
-  "Census Tract: ", ma_census_middle$GEOID, "<br/>",
-  "Total Vehicles Census Tract: ", ma_census_middle$total_vehicles_tractE, "<br/>",
-  "Total Housing Census Tract: ", ma_census_middle$total_tract_housing_unitsE,"<br/>", 
-  "Census Tract Accident County: ", ma_census_middle$tract_accident_count,"<br/>",
-    sep="") %>%
-  lapply(htmltools::HTML)
-
-
-```
-
 ```{r}
 
 
 
 
-map_tract_extreme_middle_plt <- ma_census_middle |> leaflet(options = leafletOptions(minZoom = 11, maxZoom = 18)) |> 
+
+
+map_population_extreme_tract_high <- ma_census4326 |> leaflet(options = leafletOptions(minZoom = 9.4, maxZoom = 18)) |> 
   addProviderTiles(providers$Esri.WorldStreetMap) |> 
-  setView(lng = -071.23928, lat = 42.38980, zoom = 11.5) |> 
+  setView(lng = -071.9402820, lat = 42.3116934, zoom = 10) |> 
   addPolygons(
  fillColor=~pal(total_population_tractE),
  weight=2,
- opacity=0.8,
+ opacity=0.5,
  color= "white",
  label=~mytext,
  dashArray = "3",
@@ -6528,26 +6493,49 @@ map_tract_extreme_middle_plt <- ma_census_middle |> leaflet(options = leafletOpt
     weight = 5,
     color = "#666",
     dashArray = "",
-    fillOpacity = 0.2,
+    fillOpacity = 0.5,
     bringToFront = FALSE)) |> 
-  addMarkers(
-    data = ma_tract_middle_extreme_formatted,
+ addMarkers(
+    data = subset(ma_census4326, GEOID %in% c("25021418004", "25001011802", "25017321500", "25005644200", "25005630202","25017315403", "25021421200","25017373902", "25023520100", "25023507101", "25001010206", "25025051000", ":25025110105", "25023511702","25009262100", "25009254402", "25017383600")),
     lng = ~LONGITUDE,
     lat = ~LATITUDE,
     popup = ~paste("Accident ID: ", ID,
-                   "<br>Accident Duration: ", accident_duration, 
-                   "<br>City: ", City, 
-                   "<br>Weekday/Weekend: ", day_type,
-                   "<br>Time of Day: ", hour_day_sections,
-                   "<br>Road Type: ", road_category) )     
+                   "<br>City: ", City)
+  )
+
+
+
+
+```
+
+
+
+
+```{r}
+
+saveRDS(map_population_extreme_tract_high, "map_population_extreme_tract_high.rds")
+
 
 ```
 
 ```{r}
 
 
-tract_map_extreme_middle<-map_tract_extreme_middle_plt %>% 
-  addLegend(pal = pal, values = ~total_population_tractE, opacity = 0.6, title = "Massachusetts Extreme Census Tract Population",
+
+map_population_extreme_tract_high <- readRDS("map_population_extreme_tract_high.tds")
+
+
+```
+
+
+
+
+
+```{r}
+
+
+tract_map_extreme_higher_plt <- map_population_extreme_tract_high %>% 
+  addLegend(pal = pal, values = ~total_population_tractE, opacity = 0.6, title = "Massachusetts Census Tract Population",
   position = "bottomright")
 
 
@@ -6555,147 +6543,78 @@ tract_map_extreme_middle<-map_tract_extreme_middle_plt %>%
 
 ```{r}
 
-tract_map_extreme_middle
 
 
-```
-
-```{r}
-
-
-bins_2<-c(0,200,4000,5400,6500,7500,8500,Inf)
-
+saveRDS(tract_map_extreme_higher_plt , "tract_map_extreme_higher_plt.rds")
 
 ```
 
 ```{r}
 
 
-ma_census_norfolk <- ma_census4326 |> 
-    filter(County == "Norfolk")
+tract_map_extreme_higher_plt  <- readRDS("tract_map_extreme_higher_plt.rds")
 
 
 ```
 
 ```{r}
 
-saveRDS(ma_census_norfolk, "ma_census_norfolk.rds")
+tract_map_extreme_higher_plt 
 
 ```
 
-```{r}
-#| include: false
 
-
-ma_census_norfolk <- readRDS("ma_census_norfolk.rds")
-
-
-```
 
 ```{r}
 
 
 
-ma_extreme_norfolk_higher <- ma_census_norfolk |> 
-    select(GEOID, ID, accident_duration, County, City, hour_day_sections, day_type, Month,total_vehicles_tractE,road_category, LONGITUDE, LATITUDE) |> 
-    filter(GEOID %in% c("25021421200","25021421100","25021416101", "25021418004")) |> 
-        st_drop_geometry()
 
-
-```
-
-```{r}
-
-saveRDS(ma_extreme_norfolk_higher, "ma_extreme_norfolk_higher.rds")
-
-```
-
-```{r}
-#| include: false
-
-ma_extreme_norfolk_higher <- readRDS("ma_extreme_norfolk_higher.rds")
-
-
-```
-
-```{r}
-
-pal_2 <- colorBin(palette="RdYlBu",
-            domain=ma_census_norfolk$total_population_tractE,bins=bins_2)
-
-
-```
-
-```{r}
-
-
-ma_tract_norfolk_extreme_formatted <- ma_extreme_norfolk_higher |> 
-    mutate(accident_duration = format(accident_duration, big.mark = ",", big.interval = 3, digits=12) )
-
-
-```
-
-```{r}
-
-saveRDS(ma_tract_norfolk_extreme_formatted, "ma_tract_norfolk_extreme_formatted.rds")
-
-
-```
-
-```{r}
-#| include: false
-
-
-ma_tract_norfolk_extreme_formatted <- readRDS("ma_tract_norfolk_extreme_formatted.rds")
-
-
-```
-
-```{r}
-
-
-mytext_2 <- paste(
-  "Census Tract: ", ma_census_norfolk$GEOID, "<br/>",
-  "Total Vehicles Census Tract: ", ma_census_norfolk$total_vehicles_tractE, "<br/>",
-  "Total Housing Census Tract: ", ma_census_norfolk$total_tract_housing_unitsE,"<br/>", 
-  "Census Tract Accident County: ", ma_census_norfolk$tract_accident_count,"<br/>",
-    sep="") %>%
-  lapply(htmltools::HTML)
-
-
-```
-
-```{r}
-
-
-
-map_tract_extreme_norfolk_plt <- ma_census_norfolk |> leaflet(options = leafletOptions(minZoom = 9, maxZoom = 18)) |> 
+map_population_extreme_tract_lower <- ma_census4326 |> leaflet(options = leafletOptions(minZoom = 9.4, maxZoom = 18)) |> 
   addProviderTiles(providers$Esri.WorldStreetMap) |> 
-  setView(lng = -71.17127  , lat = 42.17051 , zoom = 11.5) |> 
+  setView(lng = -071.9402820, lat = 42.3116934, zoom = 10) |> 
   addPolygons(
- fillColor=~pal_2(total_population_tractE),
+ fillColor=~pal(total_population_tractE),
  weight=2,
  opacity=0.5,
  color= "white",
- label=~mytext_2,
+ label=~mytext,
  dashArray = "3",
  fillOpacity=0.05,
  highlightOptions = highlightOptions(
     weight = 5,
     color = "#666",
     dashArray = "",
-    fillOpacity = 0.2,
+    fillOpacity = 0.5,
     bringToFront = FALSE)) |> 
-  addMarkers(
-    data = ma_tract_norfolk_extreme_formatted,
+ addMarkers(
+    data = subset(ma_census4326, GEOID %in% c("25017320105","25021419700","25009254401", "25009254401", "25013802101","25017350105", "25009252101", "25025081001", "25009268200", "25021411200", "25025170301", 
+                                              "25027732500", "25027710200","25017337300", "25017368400", "25005614102", "25027744103", "25017374800", "25017321400", "5017383700", "25027737300", "25021403100",
+                                               "25025050901", "25017320106", "25025010802", "25017367200", "25025000806", "25025020305","25023501204", "25017358600", "25025100700", "25025090100", "25021416400")),
     lng = ~LONGITUDE,
     lat = ~LATITUDE,
     popup = ~paste("Accident ID: ", ID,
-                   "<br>Accident Duration: ", accident_duration, 
-                   "<br>City: ", City, 
-                   "<br>Weekday/Weekend: ", day_type,
-                   "<br>Time of Day: ", hour_day_sections,
-                   "<br>Road Type: ", road_category) ) 
+                   "<br>City: ", City)
+  )
+     
+
+
+
+
+```
+
+```{r}
+
+saveRDS(map_population_extreme_tract_lower , "map_population_extreme_tract_lower.rds")
+
+
+
+```
+
+```{r}
+
+map_population_extreme_tract_lower  <- readRDS("map_population_extreme_tract_lower.rds")
+
 
 
 ```
@@ -6703,8 +6622,9 @@ map_tract_extreme_norfolk_plt <- ma_census_norfolk |> leaflet(options = leafletO
 ```{r}
 
 
-tract_map_extreme_norfolk<-map_tract_extreme_norfolk_plt %>% 
-  addLegend(pal = pal_2, values = ~total_population_tractE, opacity = 0.6, title = "Norfolk Extreme Census Tract Population",
+
+tract_map_extreme_lower_plt <- map_population_extreme_tract_lower %>% 
+  addLegend(pal = pal, values = ~total_population_tractE, opacity = 0.6, title = "Massachusetts Census Tract Population",
   position = "bottomright")
 
 
@@ -6712,7 +6632,15 @@ tract_map_extreme_norfolk<-map_tract_extreme_norfolk_plt %>%
 
 ```{r}
 
-tract_map_extreme_norfolk
+
+saveRDS(tract_map_extreme_lower_plt, "tract_map_extreme_lower_plt.rds")
+
+```
+
+```{r}
+
+
+
 
 
 ```
@@ -6720,33 +6648,14 @@ tract_map_extreme_norfolk
 ```{r}
 
 
+tract_map_extreme_lower_plt
 
-print(ma_census_norfolk  |> select(GEOID, County), n=1500)
 
 
 ```
 
 
-```{r}
 
-
-
-
-brms_extreme_df_2 <- brms_model_2 %>%
-  spread_draws(r_GEOID[GEOID, Intercept]) %>%
-  median_qi(.width = 0.95) %>%
-  slice_max(order_by = abs(r_GEOID), n = 100)
-
-
-```
-
-```{r}
-
-
-print(brms_extreme_df_2, n=100)
-
-
-```
 
 
 
@@ -7734,6 +7643,24 @@ extremes_df <- readRDS("extremes_df.rds")
 ```
 
 
+```{r}
+
+print(extremes_df, n=80)
+
+
+```
+
+```{r}
+
+
+print(extremes_df |>
+    filter(spatial_log < 0) |> 
+    select(GEOID), n=80)
+
+
+```
+
+
 
 ```{r}
 
@@ -7771,6 +7698,14 @@ saveRDS(high_low_tract_risk_plt , "high_low_tract_risk_plt.rds")
 
 high_low_tract_risk_plt  <- readRDS("high_low_tract_risk_plt.rds")
 
+
+
+```
+
+```{r}
+
+
+high_low_tract_risk_plt
 
 
 ```
@@ -7923,38 +7858,64 @@ labels_car <- sprintf(
 
 ```
 
+
+
 ```{r}
 
 
-leaflet(map_icar_sf) %>%
-  addProviderTiles(providers$Esri.WorldStreetMap) %>%
+
+extreme_tract_high_count_plt <- map_icar_sf|> leaflet(options = leafletOptions(minZoom = 9.4, maxZoom = 18)) |> 
+  addProviderTiles(providers$Esri.WorldStreetMap) |> 
+  setView(lng = -071.9402820, lat = 42.3116934, zoom = 10) |> 
   addPolygons(
-    fillColor = ~pal_car(log(spatial_RR)),
-    weight = 0.5,
-    opacity = 1,
-    color = "white",
-    dashArray = "1",
-    fillOpacity = 0.7,
-    highlightOptions = highlightOptions(
-      weight = 2,
-      color = "#444",
-      fillOpacity = 0.9,
-      bringToFront = TRUE
-    ),
+ fillColor=~pal_car(log(spatial_RR)),
+ weight= 0.5,
+ opacity= 1,
+ color= "white",
+ dashArray = "1",
+ fillOpacity = 0.7,
+ highlightOptions = highlightOptions(
+    weight = 2,
+    color = "#444",
+    fillOpacity = 0.9,
+    bringToFront = TRUE),
     label = labels_car,
     labelOptions = labelOptions(
-      style = list("font-weight" = "normal", padding = "3px 8px"),
-      textsize = "13px",
-      direction = "auto"
+        style = list("font-weight" = "normal", padding = "3px 8px"),
+        textsize = "13px",
+        direction = "auto"
+    ) 
+)|> 
+ addMarkers(
+    data = subset(census_tract_df, GEOID %in% c("25025100800", "25009210401","25009210500", "25021403100", "25025160501","25027736200", "25017339802", "25017317101", "25017320106","25009254403", "25025040600", 
+                                                "25017358500", "25009260100", "25017339200", "25025030100", "25017331102", "25021456301",  "25025080300", "25021419200", "25021419100", "25021416101", "25021417100", 
+                                                "25017368101", "25025091100", "25017317103",  "25017334200", "25025010103", "25025100700", "25009254402", "25025060604", "25025030400", "25025090901", "25017333602", 
+                                                "25017333100", "25025070201", "25025981300", "25025070104", "25025981100", "25027700100","25025981800")),
+    lng = ~LONGITUDE,
+    lat = ~LATITUDE,
+    popup = ~paste("Accident ID: ", ID,
+                   "<br>City: ", City,
+                   "<br>Road Type: ", road_category)
+  ) |> 
+    addLegend(
+        pal = pal_car,
+        values = c(-max_val, max_val),
+        opacity = 0.7,
+        title = "Log Spatial RR<br/>(0 = Statewide Avg)",
+        position = "bottomright"
     )
-  ) %>%
-  addLegend(
-    pal = pal_car,
-    values = c(-max_val, max_val),
-    opacity = 0.7,
-    title = "Log Spatial RR<br/>(0 = Statewide Avg)",
-    position = "bottomright"
-  )
+
+
+
+```
+
+
+    
+
+```{r}
+
+
+saveRDS(extreme_tract_high_count_plt, "extreme_tract_high_count_plt.rds")
 
 
 
@@ -7963,19 +7924,30 @@ leaflet(map_icar_sf) %>%
 ```{r}
 
 
-
+extreme_tract_high_count_plt <- readRDS("extreme_tract_high_count_plt.rds")
 
 ```
+
+
+<br><br>
+
+
+
+<br><br>
 
 ```{r}
 
 
 
-
+extreme_tract_high_count_plt
 
 
 ```
 
+
+
+
+<br><br>
 
 <br><br>
 
@@ -8030,6 +8002,93 @@ How to read the values:
 1.0(0.0 on the log scale): Exactly at statewide expected levels. 
 > 1.0(Red): Higher-risk accident hotspots (e.g., 1.4x = 40% higher risk. 
 < 1.0(Blue): Lower-risk areas (e.g., 0.7 = 30% lower risk).
+
+
+
+<br><br>
+
+
+
+
+```{r}
+
+
+
+
+extreme_tract_low_count_plt <- map_icar_sf|> leaflet(options = leafletOptions(minZoom = 9.4, maxZoom = 18)) |> 
+  addProviderTiles(providers$Esri.WorldStreetMap) |> 
+  setView(lng = -071.9402820, lat = 42.3116934, zoom = 10) |> 
+  addPolygons(
+ fillColor=~pal_car(log(spatial_RR)),
+ weight= 0.5,
+ opacity= 1,
+ color= "white",
+ dashArray = "1",
+ fillOpacity = 0.7,
+ highlightOptions = highlightOptions(
+    weight = 2,
+    color = "#444",
+    fillOpacity = 0.9,
+    bringToFront = TRUE),
+    label = labels_car,
+    labelOptions = labelOptions(
+        style = list("font-weight" = "normal", padding = "3px 8px"),
+        textsize = "13px",
+        direction = "auto"
+    ) 
+)|> 
+ addMarkers(
+    data = subset(census_tract_df, GEOID %in% c("25015821400","25003935200","25005652800","25005640202","25005652300", "25017341901", "25027748100", "25027752102", "25009206300", "25021417501",  "25013802500", 
+                                                "25005654100", "25009206400", "25009204101", "25005651700", "25021410100", "25009203100", "25021442104", "25009250300", "25009206100", "25005650102", 
+                                                "25015821000", "25027732302", "25003932300", "25015821904", "25027741101", "25027744103", "2009218100", "25021417802", "25023506102", "25017341700", "25005652500", 
+                                                "25015820500","25005650300", "25005644101", "25017354100", "25013813404", "25013812800", "25005631600", "25013813500")),
+    lng = ~LONGITUDE,
+    lat = ~LATITUDE,
+    popup = ~paste("Accident ID: ", ID,
+                   "<br>City: ", City,
+                   "<br>Road Type: ", road_category)
+  ) |> 
+    addLegend(
+        pal = pal_car,
+        values = c(-max_val, max_val),
+        opacity = 0.7,
+        title = "Log Spatial RR<br/>(0 = Statewide Avg)",
+        position = "bottomright"
+    )
+
+
+
+```
+
+```{r}
+
+saveRDS(extreme_tract_low_count_plt, "extreme_tract_low_count_plt.rds")
+
+
+
+```
+
+```{r}
+
+
+
+extreme_tract_low_count_plt <- readRDS("extreme_tract_low_count_plt.rds")
+
+```
+
+<br><br>
+
+```{r}
+
+
+extreme_tract_low_count_plt
+
+
+```
+
+
+
+
 
 
 
