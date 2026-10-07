@@ -71,6 +71,7 @@ library(tidyr)
 library(tibble)
 library(spdep)
 library(posterior)
+library(readr)
 
 
 
@@ -5019,7 +5020,7 @@ mytext <- paste(
 
 map_tract_population_plt<- ma_census4326 |> leaflet(options = leafletOptions(minZoom = 9.4, maxZoom = 18)) |> 
   addProviderTiles(providers$Esri.WorldStreetMap) |> 
-  setView(lng = -071.9402820, lat = 42.3116934, zoom = 9.4) |> 
+  setView(lng = -071.9402820, lat = 42.3116934, zoom = 10) |> 
   addPolygons(
  fillColor=~pal(total_population_tractE),
  weight=2,
@@ -5111,23 +5112,6 @@ ma_census4326 |>
 
 
 ```
-
-```{r}
-
-
-
-
-
-
-```
-
-
-
-
-
-
-
-
 
 
 
@@ -7363,7 +7347,7 @@ Now that our data is prepared, we can fit the CAR model.
 
 brms_poisson_3 <- brm(
     formula = accident_count ~ offset(log(total_population_tractE)) + temp_z + Month + day_type + car(W_bin, gr = GEOID, type = "icar"),
-    data = train_census_df_3,
+    data = train_census_data_3,
     data2 = list(W_bin = W_bin),
     family = negbinomial(link = "log"),
     prior = c(
@@ -7383,6 +7367,9 @@ brms_poisson_3 <- brm(
 
 ```
 
+
+<br><br>
+
 ```{r}
 
 
@@ -7399,6 +7386,10 @@ brms_poisson_3  <- readRDS("brms_poisson_3.rds")
 
 ```
 
+## Model Interpretation
+
+<br><br>
+
 ```{r}
 
 
@@ -7407,6 +7398,73 @@ brms_poisson_3  <- readRDS("brms_poisson_3.rds")
 summary(brms_poisson_3)
 
 ```
+
+
+
+
+<br><br>
+
+### Regression Coefficients
+
+<br><br>
+
+
+
+
+```{r}
+
+
+
+fixef_summary_3 <- fixef(brms_poisson_3)
+
+
+```
+
+```{r}
+
+
+irr_table_3<- exp(fixef_summary_3[, c("Estimate", "Q2.5", "Q97.5")])
+
+
+```
+
+<br><br>
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+round(irr_table_3, 2)
+
+
+```
+
+<br><br>
+
+
+day_typeWeekend - IRR = exp(-3.18) = approximatly 0.042.  After controlling for residential population and local spatial structure, the per-capita baseline accident rate drops by roughly 96% on weekends relative to weekkdays (1 - .042) x 100
+
+Temperature - The credible interval range includes zero and thus Temperature is not signifcant. Temperature does not not exert an independent effect one Month and spatial structure are contolled for. 
+
+Month - March (-0.16, IRR approximatly 0.85) and April (-0.13, IRR aprroximatly 0.88) show lower accident rates. Accident rates drop by 15% for March and 125 for April relative to the reference month of January.  September (0.14, IRR approximatly 1.15), October (0.22, IRR approximatly 1.25), November (0.27, IRR approximatly 1.31), and December (0.16, IRR approximatly 1.17), show an increase in accident rates.  Accident rates increase by 15% for September, 25% for October, 31% for November, and 17% for December realative to the reference month January. The remaining months have credible interval ranges that include zero and thus are not significant. 
+
+
+
+<br><br>
+
 
 ```{r}
 
@@ -7428,14 +7486,24 @@ loo_compare(loo(brms_poisson_2), loo(brms_poisson_3)
 ```
 
 
+ 
+ ### Model Visualization
+
+ <br><br>
+ 
+ 
  Extract ICAR tract random effects
+ <br><br>
 
 ```{r}
 
 
-spatial_effects <- summary(statewide_car_fit)$random$GEOID 
+spatial_effects <- summary(brms_poisson_3)$random$GEOID 
 
 ```
+
+
+<br><br>
 
 If pulling directly via posterior draws:
 
@@ -7443,14 +7511,13 @@ If pulling directly via posterior draws:
 
 
 
-
-library(posterior)
-
 icar_draws <- as_draws_df(brms_poisson_3) %>%
   subset_draws(variable = "^rcar\\[", regex = TRUE)
 
 
 ```
+
+<br><br>
 
 ```{r}
 
@@ -7467,14 +7534,11 @@ icar_draws <- readRDS("icar_draws.rds")
 ```
 
 
-
+<br><br>
 
 ```{r}
 
 
-
-
-library(readr)
 
 icar_summary <- summarise_draws(
   icar_draws,
@@ -7482,9 +7546,9 @@ icar_summary <- summarise_draws(
   ~quantile(.x, probs = c(0.025, 0.975))
 ) %>%
   mutate(
-    # Extracts the integer directly from "rcar[123]"
+    # Extracts row index to map back to GEOID factor levels
     idx = parse_number(variable),
-    GEOID = levels(train_census_df_3$GEOID)[idx],
+    GEOID = levels(train_census_data_3$GEOID)[idx],
     spatial_RR = exp(mean),
     spatial_RR_lower = exp(`2.5%`),
     spatial_RR_upper = exp(`97.5%`)
@@ -7495,6 +7559,8 @@ icar_summary <- summarise_draws(
 
 
 ```
+
+<br><br>
 
 ```{r}
 
@@ -7522,10 +7588,15 @@ head(icar_summary)
 
 ```
 
+
+
+
+<br><br>
+
 ```{r}
 
 
-plot_df <- icar_summary %>%
+spatial_risk_df <- icar_summary %>%
   arrange(spatial_RR) %>%
   mutate(
     rank = row_number(),
@@ -7547,7 +7618,7 @@ plot_df <- icar_summary %>%
 
 ```{r}
 
-saveRDS(plot_df, "plot_df.rds")
+saveRDS(spatial_risk_df, "spatial_risk_df.rds")
 
 
 ```
@@ -7555,19 +7626,20 @@ saveRDS(plot_df, "plot_df.rds")
 ```{r}
 
 
-plot_df <- readRDS("plot_df.rds")
+plot_df <- readRDS("spatial_risk_df.rds")
 
 
 ```
 
 
+<br><br>
 
 ```{r}
 
 
 
 
-ggplot(plot_df, aes(x = rank, y = spatial_RR, color = significance)) +
+tract_spatial_risk_plt <- ggplot(spatial_risk_df, aes(x = rank, y = spatial_RR, color = significance)) +
   # Null reference line at RR = 1.0
   geom_hline(yintercept = 1, linetype = "dashed", color = "black", linewidth = 0.6) +
   # 95% Credible interval error bars
@@ -7605,10 +7677,40 @@ ggplot(plot_df, aes(x = rank, y = spatial_RR, color = significance)) +
 
 ```
 
+<br><br>
+
 ```{r}
 
 
-extremes_df <- plot_df %>%
+
+saveRDS(tract_spatial_risk_plt, "tract_spatial_risk_plt.rds")
+
+
+```
+
+```{r}
+
+tract_spatial_risk_plt <- readRDS("tract_spatial_risk_plt.rds")
+
+
+```
+
+```{r}
+
+
+tract_spatial_risk_plt
+
+
+```
+
+
+<br><br>
+
+
+```{r}
+
+
+extremes_df <- spatial_risk_df %>%
   filter(rank <= 40 | rank > (max(rank) - 40)) %>%
   mutate(GEOID = factor(GEOID, levels = GEOID))
 
@@ -7636,7 +7738,7 @@ extremes_df <- readRDS("extremes_df.rds")
 ```{r}
 
 
-ggplot(extremes_df, aes(x = GEOID, y = spatial_RR, color = significance)) +
+high_low_tract_risk_plt <- ggplot(extremes_df, aes(x = GEOID, y = spatial_RR, color = significance)) +
   geom_hline(yintercept = 1, linetype = "dashed", color = "black", linewidth = 0.5) +
   geom_pointrange(aes(ymin = spatial_RR_lower, ymax = spatial_RR_upper), size = 0.4) +
   scale_y_log10() +
@@ -7647,7 +7749,7 @@ ggplot(extremes_df, aes(x = GEOID, y = spatial_RR, color = significance)) +
   coord_flip() +
   labs(
     title = "Top 40 Highest & Lowest Risk Census Tracts",
-    x = "Tract GEOID",
+    x = "Census Tract GEOID",
     y = "Spatial Rate Multiplier (log scale)"
   ) +
   theme_minimal() +
@@ -7656,6 +7758,27 @@ ggplot(extremes_df, aes(x = GEOID, y = spatial_RR, color = significance)) +
 
 ```
 
+```{r}
+
+saveRDS(high_low_tract_risk_plt , "high_low_tract_risk_plt.rds")
+
+
+```
+
+```{r}
+
+
+
+high_low_tract_risk_plt  <- readRDS("high_low_tract_risk_plt.rds")
+
+
+
+```
+
+
+
+
+
 
 
 
@@ -7677,20 +7800,6 @@ W_mainland   <- nb2mat(nb_mainland, style = "B")
 
 
 
-
-```{r}
-
-
-
-main_component_id <- which.max(table(comp$comp.id))
-mainland_indices <- which(comp$comp.id == main_component_id)
-
-map_mainland <- map_statewide[mainland_indices, ]
-nb_mainland  <- poly2nb(map_mainland, queen = TRUE)
-W_mainland   <- nb2mat(nb_mainland, style = "B")
-
-
-```
 
 
 
@@ -7981,21 +8090,6 @@ cat("Total modeling rows: ", nrow(train_census_df_3), "\n")
 
 
 
-```{r}
-
-
-fixef_summary <- fixef(brms_poisson_2)
-
-
-```
-
-```{r}
-
-irr_table <- exp(fixef_summary[, c("Estimate", "Q2.5", "Q97.5")])
-
-
-
-```
 
 
 
