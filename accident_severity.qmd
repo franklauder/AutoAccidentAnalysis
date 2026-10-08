@@ -5810,7 +5810,7 @@ scaled_census_train <- bake(train_census_rec, new_data = train_census_data)
 ```
 
 
-
+<br><br>
 
 
 
@@ -5829,6 +5829,10 @@ lr <- lm(log(accident_duration) ~ . -GEOID, data = train_census_data)
 
 
 ```
+
+<br><br>
+
+
 
 
 ```{r}
@@ -5862,6 +5866,120 @@ summary(lr)
 
 ```
 
+<br><br>
+
+The summary of the model outputs the coefficients a nd metrics of our model.  Let's focus on the metrics to evaluate our model.  
+<br><br>
+
+
+First , we'll check the p-value. 
+<br><br>
+
+```{r}
+
+lr_pvalue <- lr |> 
+    glance() |> 
+    pull(p.value) 
+   
+
+
+
+
+```
+<br><br>
+
+
+```{r}
+round(lr_pvalue, 4)
+
+
+```
+
+<br><br>
+
+
+The p-value for the lr model is zero.  P-values less than or equal to 0.05 mean a model is  considered significant.
+
+<br>
+
+Next, we'll check r-squared. 
+
+
+<br>
+
+R Squared defined as the proportion of the variance in our target variable that is predictable from the predictor variables. A score of 1 means a perfect fit, and a score of 0 means the model is no better than randomness. 
+
+<br><br>
+
+
+
+```{r}
+
+
+lr_rsquared <- lr |> 
+    glance() |> 
+    pull(r.squared)
+
+
+
+```
+
+```{r}
+
+
+round(lr_rsquared, 2)
+
+
+```
+
+The r-squared calue of 0.03 is interpreted as 3% of the variance in accident duration can be explained by the lr model.  The remaining 97% is the leftover noise or unmeasured variance that the lr model failed to explain. Our lr model is not much better than randomness.  
+
+
+
+<br><br>
+
+Lastly, we'll check the Residual standard error (RSE).  
+
+<br>
+RSE measures the standard deviation of the residuals. It tells us the typical size of the model’s prediction errors on the log scale. (Remember we log transformed accident_duraction)
+
+<br><br>
+
+
+```{r}
+
+
+lr_rse <- lr |> 
+    glance() |> 
+    pull(sigma)
+
+
+```
+
+<br><br>
+
+```{r}
+
+
+
+ round(lr_rse, 2)
+
+
+```
+
+<br><br>
+
+
+The RSE of 0.64, translates into 64% standard deviation in error around our predicted values. This means that individual predictions will typically vary by about +/- 64% from actual market prices.
+
+
+
+<br>
+
+The r-squared and RSE metrics point to a model that has poor accuracy in predicting accident_ uraction. 
+
+
+<br><br>
 
 ```{r}
 
@@ -5922,6 +6040,11 @@ lr_residual_plot
 
 ```
 
+
+We'll add the county feature as a predictor and evaluate if this improves model performance. 
+
+<br><br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -5954,19 +6077,135 @@ lr_2 <- readRDS("lr_2.rds")
 
 ```
 
+<br><br>
+
+
+
 ```{r}
 
 summary(lr_2)
 
 ```
 
+<br><br>
+
+
+
+
+
 ```{r}
+
+
+lr_2_pvalue <- lr_2 |> 
+    glance() |>
+    pull(p.value) 
+
+
+
+```
+
+<br><br>
+
+lr_2 p-value
+<br><br>
+
+
+```{r}
+
+
+round(lr_2_pvalue, 2)
+
+
+```
+
+<br><br>
+
+
+
+```{r}
+
+
+lr_2_rsquared <- lr_2 |> 
+    glance() |> 
+    pull(r.squared)
+
+
+```
+
+<br><br>
+
+lr_2 r-squared
+
+
+
+```{r}
+
+
+round(lr_2_rsquared,2)
+
+
+```
+
+<br><br>
+
+```{r}
+
+
+
+lr_2_rse <- lr_2 |> 
+    glance() |> 
+    pull(sigma)
+
+
+```
+
+<br><br>
+
+lr_2 RSE
+<br><br>
+
+
+```{r}
+
+
+round(lr_2_rse,2)
+
+
+
+```
+
+<br><br>
+
+
+The lr_2 model metrics are unchanged from the poor performance of the lr model
+
+<br><br>
+
+
+```{r}
+
+
+
+
+
+
+```
+
+```{r}
+
 
 
 lr_2_resid <- data.frame(residuals = residuals(lr_2))
 
 
 ```
+
+
+<br><br>
+
+
+
+<br><br>
 
 ```{r}
 
@@ -5981,11 +6220,26 @@ lr_2_qq <- ggplot(lr_2_resid, aes(sample = residuals)) +
 
 ```
 
+<br><br>
+
+
+We'll use a qq plot to visually inspect out lr_2 model. 
+
+<br><br>
+
 ```{r}
 
 lr_2_qq
 
 ```
+
+
+<br><br>
+
+
+The data points curves move upwards away from the red line with the right tail diverging away more sharply.  The upward curve on the right tail means our modl underestimates higher accident durations. The data points show our model results do not follow a normal distribution. 
+
+<br><br>
 
 ```{r}
 
@@ -5995,6 +6249,12 @@ lr_2_resid_data <- data.frame(
 )
 
 ```
+
+<br><br>
+
+
+
+<br><br>
 
 ```{r}
 
@@ -6006,11 +6266,23 @@ lr_2_residual_plot <- ggplot(lr_2_resid_data, aes(x = Fitted, y = Residuals)) +
 
 ```
 
+
+<br><br>
+
+
+
+
 ```{r}
 
 lr_2_residual_plot 
 
 ```
+
+
+<br><br>
+
+
+<br><br>
 
 
 
@@ -6022,6 +6294,22 @@ lr_2_residual_plot
 
 <br><br>
 
+
+Since our linear regression models performed poorly, we'll use bayesian mixed models for predictions. 
+
+
+<br><br>
+
+Mixed effects models consist of fixed effects and random effects.
+
+<br>
+
+Fixed effects are predictor valiables that have a constant effect across the same population.  They represent relationships you want to test and measure directly.  Examples from our data would be temperature and road category.  
+<br>
+
+Random effects are grouping variablesthat account for natural variations and non-independent data.  They treat group differences as random samples from a larger population,  Census tracts (GEOID), are our random effect. 
+
+<br><br>
 
 
 
@@ -6667,14 +6955,32 @@ tract_map_extreme_lower_plt
 
 
 
+<br><br>
+
+
+
+
+Possion regression models are usefull for modeling count data.  For our purposes, we'll be using poisson regression to model rate data, like  predicting the count of accidents per unit (per capita).  We'd like to predict the count of accidents per census tract (unit).   
+
+
+<br><br>
+
+
+Since we are predicting accident counts per unit, we need to include an exposure variable that describes the population size or area corresponding to each observation.  In regression this is known as an offset.  Our offset variable will be the total population of a census tract and we add it to our model by using the offset() function. 
+<br>
+
 
 In our model, the prior argument includes:
 prior(normal(0,0.5), class = "b" - this  regularizes prior for fixed effects.
+<br>
 
 prior(exponential(1), class = "sd") - This is the prior for census tract varying intercept. 
 
+<br>
 
 prior(gamma(0.01, 0.01), class = "shape") - The negative binomial distribution estimates an additional parameter (shape) that allows the conditioinal variance to scale quadratically. 
+
+<br><br>
 
 
 
