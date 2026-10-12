@@ -2048,13 +2048,18 @@ ma_accidents_16_21_7 |>
 
   <br><br>
 
+
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| label: "ck-103"
  
 ma_accidents_16_21_7 |> 
-    count(County, No_Exit)
+    count(Bump) |> 
+    mutate(perc = round(n/sum(n),4)) |> 
+    arrange(desc(perc))
 
  ```
 
@@ -2067,10 +2072,10 @@ ma_accidents_16_21_7 |>
 #| label: "ck-104"
 
 
-ma_accidents_16_21_7|> 
-    group_by(No_Exit ) |> 
-    summarise(median_acc_dur_exit = median(accident_duration)) |> 
-    arrange(desc(median_acc_dur_exit))
+ma_accidents_16_21_7 |> 
+    count(Roundabout) |> 
+    mutate(perc = round(n/sum(n),4)) |> 
+    arrange(desc(perc))
 
 ```
 
@@ -2111,6 +2116,8 @@ ma_accidents_16_21_7 |>
   <br><br>
 
 
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2119,8 +2126,10 @@ ma_accidents_16_21_7 |>
  
 
 
- ma_accidents_16_21_7 |> 
-    count(County, Railway)
+ma_accidents_16_21_7 |> 
+    count(Turning_Loop) |> 
+    mutate(perc = round(n/sum(n),4)) |> 
+    arrange(desc(perc))
 
  ```
 
@@ -2143,9 +2152,11 @@ ma_accidents_16_21_7 |>
   <br><br>
 
 
+
  ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
 #| label: "ck-109"
  
 
@@ -2177,8 +2188,9 @@ ma_accidents_16_21_7 |>
 
 
  ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
 #| label: "ck-111"
  
 ma_accidents_16_21_7 |> 
@@ -2208,8 +2220,9 @@ ma_accidents_16_21_7 |>
 
 
  ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
 #| label: "ck-113"
  
 
@@ -2239,8 +2252,9 @@ ma_accidents_16_21_7 |>
 
 
  ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
 #| label: "ck-115"
  
 
@@ -2270,8 +2284,10 @@ ma_accidents_16_21_7 |>
 
 
  ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
+#| label: "ck-111"
  
 
  ma_accidents_16_21_7 |> 
@@ -2281,6 +2297,7 @@ ma_accidents_16_21_7 |>
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-112"
  
 
 ma_accidents_16_21_7 |> 
@@ -2294,8 +2311,10 @@ ma_accidents_16_21_7 |>
 
 
  ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
+#| label: "ck-113"
  
 
 ma_accidents_16_21_7|> 
@@ -2310,8 +2329,10 @@ ma_accidents_16_21_7|>
 
 
  ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
+#| label: "ck-114"
  
 
 ma_accidents_16_21_7 |> 
@@ -2328,6 +2349,7 @@ ma_accidents_16_21_7 |>
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-115"
  
 
 ma_accidents_16_21_7 |> 
@@ -2342,8 +2364,10 @@ ma_accidents_16_21_7 |>
 
 
  ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
+#| label: "ck-116"
  
 
  ma_accidents_16_21_7 |> 
@@ -2357,12 +2381,16 @@ ma_accidents_16_21_7 |>
 
 
 
+The features No_Exit, Traffic_calming, Give_Way, Railway, Bump, Roundabout, and Turning_Loop have a binary category of 1% or less and will be dropped from our data.  
+
+ <br><br>
 
 
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-117"
  
 
 ma_accidents_16_21_8 <- ma_accidents_16_21_7 |> 
@@ -2371,10 +2399,13 @@ ma_accidents_16_21_8 <- ma_accidents_16_21_7 |>
 
  ```
 
+ <br><br>
+
  ```{r}
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-118"
  
 saveRDS(ma_accidents_16_21_8, "ma_accidents_16_21_8.rds")
 
@@ -2382,7 +2413,9 @@ saveRDS(ma_accidents_16_21_8, "ma_accidents_16_21_8.rds")
  ```
 
  ```{r}
- #| include: false
+#| include: false
+#| label: "ck-119"
+
  
 
 
@@ -2393,6 +2426,7 @@ ma_accidents_16_21_8 <- readRDS("ma_accidents_16_21_8.rds")
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-120"
  
 
 ma_accidents_16_21_8 |> 
@@ -2414,9 +2448,10 @@ ma_accidents_16_21_8 |>
 
 
   ```{r}
-  #| echo: false
+#| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-121"
   
 saveRDS(ma_accidents_16_21_9, "ma_accidents_16_21_9.rds")
 
@@ -2427,6 +2462,7 @@ saveRDS(ma_accidents_16_21_9, "ma_accidents_16_21_9.rds")
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-122"
   
 
 ma_accidents_16_21_9 <- readRDS("ma_accidents_16_21_9.rds")
@@ -2448,17 +2484,10 @@ ma_accidents_16_21_9 <- readRDS("ma_accidents_16_21_9.rds")
 
 
 ```{r}
-
-
-
-
-
-```
-
-```{r}
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-123"
 
 
 
@@ -2477,12 +2506,21 @@ ma_accidents_16_21_3  <- ma_accidents_16_21_2  |>
 ## County
 
 
+ <br><br>
+
+
+ County level census data will be imported for our analysis. 
+
+  <br><br>
+
+
 
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-124"
 
 
 ma_county <- counties("MA", year = 2024)
@@ -2495,6 +2533,7 @@ ma_county <- counties("MA", year = 2024)
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-125"
 
 
 saveRDS(ma_county, "ma_county.rds")
@@ -2504,6 +2543,7 @@ saveRDS(ma_county, "ma_county.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-126"
 
 
 ma_county <- readRDS("ma_county.rds")
@@ -2517,6 +2557,7 @@ ma_county <- readRDS("ma_county.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-127"
 
 
 ma_county |> 
@@ -2531,6 +2572,7 @@ ma_county |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-128"
 
 
 ma_county |> 
@@ -2544,6 +2586,7 @@ ma_county |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-128"
 
 
 print(ma_county |> select(NAME), n=14)
@@ -2559,6 +2602,7 @@ print(ma_county |> select(NAME), n=14)
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-129"
 
 
 ma_county_shape <- ma_county |> 
@@ -2572,6 +2616,7 @@ ma_county_shape <- ma_county |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-130"
 
 saveRDS(ma_county_shape , "ma_county_shape.rds")
 
@@ -2581,6 +2626,7 @@ saveRDS(ma_county_shape , "ma_county_shape.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-140"
 
 
 ma_county_shape  <- readRDS("ma_county_shape.rds")
@@ -2595,6 +2641,7 @@ ma_county_shape  <- readRDS("ma_county_shape.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-141"
 
 
 
@@ -2610,6 +2657,7 @@ print(ma_county_shape |> select(NAME), n=14)
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-142"
 
 
 
@@ -2623,6 +2671,7 @@ ma_county_shape_2 <- ma_county_shape |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-143"
 
 ma_county_shape_2 <- ma_county_shape_2 |> 
     rename("GEOID_COUNTY" = "GEOID")
@@ -2634,6 +2683,7 @@ ma_county_shape_2 <- ma_county_shape_2 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label:  "ck-144"
 
 
 
@@ -2643,6 +2693,7 @@ saveRDS(ma_county_shape_2, "ma_county_shape_2.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-145"
 
 
 
@@ -2657,6 +2708,7 @@ ma_county_shape_2 <- readRDS("ma_county_shape_2.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-146"
 
 
 ma_county_shape_2 |> glimpse()
@@ -2671,6 +2723,7 @@ ma_county_shape_2 |> glimpse()
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-147"
 
 
 saveRDS(census_county_urban, "census_county_urban.rds")
@@ -2680,6 +2733,7 @@ saveRDS(census_county_urban, "census_county_urban.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-148"
 
 census_county_urban <- readRDS("census_county_urban.rds")
 
@@ -2693,6 +2747,7 @@ census_county_urban <- readRDS("census_county_urban.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-149"
 
 
 census_county_urban |> glimpse()
@@ -2706,6 +2761,7 @@ census_county_urban |> glimpse()
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-150"
 
 
 census_county_urban |> 
@@ -2722,6 +2778,7 @@ census_county_urban |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-151"
 
 
 ma_county_urban <- census_county_urban |> 
@@ -2735,6 +2792,7 @@ ma_county_urban <- census_county_urban |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-152"
 
 saveRDS(ma_county_urban , "ma_county_urban.rds")
 
@@ -2743,6 +2801,7 @@ saveRDS(ma_county_urban , "ma_county_urban.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-153"
 
 
 ma_county_urban  <- readRDS("ma_county_urban.rds")
@@ -2755,6 +2814,7 @@ ma_county_urban  <- readRDS("ma_county_urban.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-154"
 
 
 
@@ -2769,6 +2829,7 @@ ma_county_urban |> summary()
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-155"
 
 
 
@@ -2781,10 +2842,13 @@ print(ma_county_urban |> select(COUNTY_NAME), n=14 )
   <br><br>
 
 
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-156"
 
 
 ma_county_urban_2 <- ma_county_urban |> 
@@ -2801,6 +2865,7 @@ ma_county_urban_2 <- ma_county_urban |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-157"
 
 
 ma_county_urban_2 <- ma_county_urban_2 |> 
@@ -2817,6 +2882,7 @@ ma_county_urban_2 <- ma_county_urban_2 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-158"
 
 
 ma_county_urban_2 <- ma_county_urban_2 |> 
@@ -2824,10 +2890,14 @@ ma_county_urban_2 <- ma_county_urban_2 |>
 
 ```
 
+ <br><br>
+
+
 ```{r}
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-159"
 
 
 saveRDS(ma_county_urban_2, "ma_county_urban_2.rds")
@@ -2838,6 +2908,7 @@ saveRDS(ma_county_urban_2, "ma_county_urban_2.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-160"
 
 
 ma_county_urban_2 <- readRDS("ma_county_urban_2.rds")
@@ -2851,6 +2922,7 @@ ma_county_urban_2 <- readRDS("ma_county_urban_2.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-161"
 
 
 ma_county_urban_2 |> glimpse()
@@ -2864,6 +2936,7 @@ ma_county_urban_2 |> glimpse()
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-162"
 
 
 
@@ -2881,6 +2954,7 @@ print(ma_county_urban_2 |> select(COUNTYFP), n=14)
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-163"
 
 
 
@@ -2897,6 +2971,7 @@ ma_county_urban_3 <- ma_county_urban_2 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-164"
 
 saveRDS(ma_county_urban_3, "ma_county_urban_3.rds")
 
@@ -2905,6 +2980,7 @@ saveRDS(ma_county_urban_3, "ma_county_urban_3.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-165"
 
 
 ma_county_urban_3 <- readRDS("ma_county_urban_3.rds")
@@ -2918,6 +2994,7 @@ ma_county_urban_3 <- readRDS("ma_county_urban_3.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-166"
 
 
 print(ma_county_urban_3 |> select(county_house_density, county_pop_density),n=14)
@@ -2932,6 +3009,7 @@ print(ma_county_urban_3 |> select(county_house_density, county_pop_density),n=14
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-167"
 
 
 county_geo <- ma_county_shape_2 |> 
@@ -2945,6 +3023,7 @@ county_geo <- ma_county_shape_2 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-168"
 
 
 saveRDS(county_geo , "county_geo.rds")
@@ -2954,6 +3033,7 @@ saveRDS(county_geo , "county_geo.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-169"
 
 
 
@@ -2966,6 +3046,7 @@ county_geo  <- readRDS("county_geo.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-170"
 
 
 
@@ -2982,6 +3063,7 @@ county_geo |> glimpse()
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-171"
 
 
 county_geo_2 <- county_geo |> 
@@ -2998,6 +3080,7 @@ county_geo_2 <- county_geo |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-172"
 
 county_geo_2 <- county_geo_2 |> 
     rename("County" = "NAME", "Cou_POPPCT_URB" = "POPPCT_URB", "COU_HOU_URB" = "HOU_URB")
@@ -3016,6 +3099,7 @@ county_geo_2 <- county_geo_2 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-173"
 
 
 saveRDS(county_geo_2, "county_geo_2.rds")
@@ -3024,6 +3108,7 @@ saveRDS(county_geo_2, "county_geo_2.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-174"
 
 
 county_geo_2 <- readRDS("county_geo_2.rds")
@@ -3037,6 +3122,7 @@ county_geo_2 <- readRDS("county_geo_2.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-175"
 
 
 county_geo_2 |> glimpse()
@@ -3050,6 +3136,7 @@ county_geo_2 |> glimpse()
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-176"
 
 
 ma_county_urban |> 
@@ -3063,10 +3150,13 @@ ma_county_urban |>
 
 ## Tracts
 
+ <br><br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-177"
 
 
 ma_tracts <- tracts("MA", year = 2024)
@@ -3078,6 +3168,7 @@ ma_tracts <- tracts("MA", year = 2024)
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-178"
 
 
 saveRDS(ma_tracts, "ma_tracts.rds")
@@ -3087,6 +3178,7 @@ saveRDS(ma_tracts, "ma_tracts.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-179"
 
 ma_tracts <- readRDS("ma_tracts.rds")
 
@@ -3099,6 +3191,7 @@ ma_tracts <- readRDS("ma_tracts.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-180"
 
 
 ma_tracts
@@ -3117,6 +3210,7 @@ We will define the census tract variables we want to retrieve from the US Census
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-181"
 
 
 variables_to_get <- c(
@@ -3140,6 +3234,7 @@ variables_to_get <- c(
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-182"
 
 
 ma_tract_data <- get_acs(
@@ -3159,6 +3254,7 @@ ma_tract_data <- get_acs(
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-183"
 
 
 saveRDS(ma_tract_data, "ma_tract_data.rds")
@@ -3169,6 +3265,7 @@ saveRDS(ma_tract_data, "ma_tract_data.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-184"
 
 ma_tract_data <- readRDS("ma_tract_data.rds")
 
@@ -3185,6 +3282,7 @@ ma_tract_data <- readRDS("ma_tract_data.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-185"
 
 
 
@@ -3199,6 +3297,7 @@ ma_tract_data |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-186"
 
 
 
@@ -3217,6 +3316,7 @@ ma_tract_data |> summary()
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-187"
 
 
 ma_tract_geometry <- ma_tract_data |> 
@@ -3233,6 +3333,7 @@ ma_tract_geometry <- ma_tract_data |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-188"
 
 
 saveRDS(ma_tract_geometry, "ma_tract_geometry.rds")
@@ -3241,6 +3342,7 @@ saveRDS(ma_tract_geometry, "ma_tract_geometry.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-189"
 
 
 ma_tract_geometry <- readRDS("ma_tract_geometry.rds")
@@ -3252,9 +3354,10 @@ ma_tract_geometry <- readRDS("ma_tract_geometry.rds")
 <br><br>
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
 #| eval: false
+#| label: "ck-190"
 
 
 
@@ -3271,6 +3374,7 @@ ma_tract_cls <- ma_tract_geometry |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-191"
 
 saveRDS(ma_tract_cls, "ma_tract_cls.rds")
 
@@ -3279,6 +3383,7 @@ saveRDS(ma_tract_cls, "ma_tract_cls.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-192"
 
 
 ma_tract_cls <- readRDS("ma_tract_cls.rds")
@@ -3292,6 +3397,7 @@ ma_tract_cls <- readRDS("ma_tract_cls.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-193"
 
 
 ma_tract_data |> 
@@ -3318,6 +3424,7 @@ The output of the NAME column shows it contains Census Tract, Coumty, and State.
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-194"
 
 ma_tract_data_2 <- ma_tract_data |> 
     separate(NAME, into=c("census_tract", "County", "state"), sep=", ") |> 
@@ -3339,6 +3446,7 @@ Remove State
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-195"
 
 
 ma_tract_data_2 <- ma_tract_data_2 |> 
@@ -3352,6 +3460,7 @@ ma_tract_data_2 <- ma_tract_data_2 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-196"
 
 
 saveRDS(ma_tract_data_2 , "ma_tract_data_2.rds")
@@ -3361,6 +3470,7 @@ saveRDS(ma_tract_data_2 , "ma_tract_data_2.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-197"
 
 ma_tract_data_2  <- readRDS("ma_tract_data_2.rds")
 
@@ -3373,6 +3483,7 @@ ma_tract_data_2  <- readRDS("ma_tract_data_2.rds")
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-198"
 
 
 ma_tract_data_3 <- ma_tract_geometry |> 
@@ -3387,6 +3498,7 @@ ma_tract_data_3 <- ma_tract_geometry |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-199"
 
 
 saveRDS(ma_tract_data_3 , "ma_tract_data_3.rds")
@@ -3395,6 +3507,7 @@ saveRDS(ma_tract_data_3 , "ma_tract_data_3.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-200"
 
 
 ma_tract_data_3  <- readRDS("ma_tract_data_3.rds")
@@ -3409,6 +3522,7 @@ ma_tract_data_3  <- readRDS("ma_tract_data_3.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-201"
 
 
 
@@ -3427,6 +3541,7 @@ ma_tract_data_3 |> summary()
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-202"
 
 
 ma_tract_data_4 <- ma_tract_data_3 |> 
@@ -3450,6 +3565,7 @@ ma_tract_data_4 <- ma_tract_data_3 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-203"
 
 
 ma_tract_data_4 |> 
@@ -3471,6 +3587,7 @@ ma_tract_data_4 |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-204"
 
 
 ma_tract_data_3 |> 
@@ -3491,6 +3608,7 @@ ma_tract_data_3 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-205"
 
 
 
@@ -3515,6 +3633,7 @@ Certain tract variables we retrieved from ACS have missing values.  We will repl
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-206"
 
 
 
@@ -3537,6 +3656,7 @@ ma_tract_data_3 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-207"
 
 
 ma_tract_data_4 <- ma_tract_data_4 |> 
@@ -3560,6 +3680,7 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-208"
 
 
 
@@ -3579,6 +3700,7 @@ ma_tract_data_3 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-209"
 
 
 
@@ -3595,6 +3717,7 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-210"
 
 
 
@@ -3616,6 +3739,7 @@ ma_tract_data_3 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| "ck-211"
 
 
 
@@ -3631,6 +3755,7 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-212"
 
 
 
@@ -3650,6 +3775,7 @@ ma_tract_data_3 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-213"
 
 
 
@@ -3665,6 +3791,7 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-214"
 
 
 
@@ -3684,6 +3811,7 @@ ma_tract_data_3 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-215"
 
 
 
@@ -3699,6 +3827,7 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-216"
 
 
 
@@ -3719,6 +3848,7 @@ ma_tract_data_3 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-217"
 
 
 
@@ -3736,6 +3866,7 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-218"
 
 
 
@@ -3757,6 +3888,7 @@ ma_tract_data_3 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-219"
 
 
 ma_tract_data_4 <- ma_tract_data_4 |> 
@@ -3772,6 +3904,7 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-220"
 
 
 
@@ -3791,6 +3924,7 @@ ma_tract_data_3 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-221"
 
 
 ma_tract_data_4 <- ma_tract_data_4 |> 
@@ -3806,6 +3940,7 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-222"
 
 
 ma_tract_data_3 |> 
@@ -3825,6 +3960,7 @@ ma_tract_data_3 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-223"
 
 
 ma_tract_data_4 <- ma_tract_data_4 |> 
@@ -3840,6 +3976,7 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-224"
 
 
 
@@ -3860,6 +3997,7 @@ ma_tract_data_3 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-225"
 
 
 ma_tract_data_4 <- ma_tract_data_4 |> 
@@ -3874,6 +4012,7 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-226"
 
 
 ma_tract_data_3 |> 
@@ -3893,6 +4032,7 @@ ma_tract_data_3 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-227"
 
 
 ma_tract_data_4 <- ma_tract_data_4 |> 
@@ -3914,6 +4054,7 @@ ma_tract_data_4 <- ma_tract_data_4 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-228"
 
 
 saveRDS(ma_tract_data_4, "ma_tract_data_4.rds")
@@ -3922,6 +4063,7 @@ saveRDS(ma_tract_data_4, "ma_tract_data_4.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-229"
 
 
 ma_tract_data_4 <- readRDS("ma_tract_data_4.rds")
@@ -3937,6 +4079,7 @@ ma_tract_data_4 <- readRDS("ma_tract_data_4.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-230"
 
 
 ma_tract_data_4 |> 
@@ -3950,6 +4093,7 @@ ma_tract_data_4 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-231"
 
 
 ma_tract_data_5 <- ma_tract_data_4 |> 
@@ -3963,6 +4107,7 @@ ma_tract_data_5 <- ma_tract_data_4 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-232"
 
 
 ma_tract_data_5 <- ma_tract_data_4 |> 
@@ -3979,6 +4124,7 @@ ma_tract_data_5 <- ma_tract_data_4 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-233"
 
 
 ma_tract_data_5 <- ma_tract_data_5 |> 
@@ -3996,6 +4142,7 @@ ma_tract_data_5 <- ma_tract_data_5 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-234"
 
 
 saveRDS(ma_tract_data_5, "ma_tract_data_5.rds")
@@ -4005,6 +4152,7 @@ saveRDS(ma_tract_data_5, "ma_tract_data_5.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-235"
 
 
 ma_tract_data_5 <- readRDS("ma_tract_data_5.rds")
@@ -4018,6 +4166,9 @@ ma_tract_data_5 <- readRDS("ma_tract_data_5.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| label: "ck-236"
 
 ma_tract_data_5 |> count(County)
 
@@ -4032,6 +4183,7 @@ ma_tract_data_5 |> count(County)
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-237"
 
 ma_tract_data_5 |> 
     filter(is.na(total_vehicles_tractE)) |> 
@@ -4046,6 +4198,7 @@ ma_tract_data_5 |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-238"
 
 
 ma_tract_data_5 |> 
@@ -4081,6 +4234,7 @@ From our retrieved census tract variables, we will create new variables for hous
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-239"
 
 
 ma_tract_data_6 <- ma_tract_data_5 |> 
@@ -4107,6 +4261,7 @@ ma_tract_data_6 <- ma_tract_data_5 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-240"
 
 
 
@@ -4126,6 +4281,7 @@ print(ma_tract_data_5 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-241"
 
 
 ma_tract_data_6 <- ma_tract_data_6 |> 
@@ -4138,6 +4294,7 @@ ma_tract_data_6 <- ma_tract_data_6 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-242"
 
 
 ma_tract_data_6 <- ma_tract_data_6 |> 
@@ -4154,6 +4311,7 @@ ma_tract_data_6 <- ma_tract_data_6 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-243"
 
 
 saveRDS(ma_tract_data_6 , "ma_tract_data_6.rds")
@@ -4163,6 +4321,7 @@ saveRDS(ma_tract_data_6 , "ma_tract_data_6.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-244"
 
 
 ma_tract_data_6 <- readRDS("ma_tract_data_6.rds")
@@ -4175,6 +4334,7 @@ ma_tract_data_6 <- readRDS("ma_tract_data_6.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-245"
 
 
 
@@ -4193,6 +4353,7 @@ ma_tract_data_6|> glimpse()
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-246"
 
 
 
@@ -4209,6 +4370,7 @@ ma_tract_data_6 |> summary()
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-247"
 
 
 ma_tract_data_7 <- ma_tract_data_6 |> 
@@ -4227,6 +4389,7 @@ ma_tract_data_7 <- ma_tract_data_6 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-248"
 
 
 saveRDS(ma_tract_data_7, "ma_tract_data_7.rds")
@@ -4236,6 +4399,7 @@ saveRDS(ma_tract_data_7, "ma_tract_data_7.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-249"
 
 ma_tract_data_7 <- readRDS("ma_tract_data_7.rds")
 
@@ -4246,6 +4410,7 @@ ma_tract_data_7 <- readRDS("ma_tract_data_7.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-250"
 
 
 
@@ -4258,9 +4423,8 @@ ma_tract_data_7|>
 
 
 
+<br><br>
 
-
-## Joining
 
 
 # Exploratory Data Analysis
@@ -4280,12 +4444,240 @@ ma_tract_data_7|>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-251"
 
 
-ma_accidents_16_21_6 |> 
+accident_dur_temp_scatter <- ma_accidents_16_21_6 |> 
     ggplot(aes(x=accident_duration, y=temperature)) +
-    geom_point()
+    geom_point() +
+    labs(
+    title = "Accident Duration Vs Temperature",
+    x = "Accident Duration",
+    y = "Temperature"
+  ) +
+  theme_minimal(base_size = 12)
 
+
+
+```
+
+<br><br>
+
+
+
+```{r}
+
+
+accident_dur_temp_scatter
+
+
+```
+
+
+<br><br>
+
+
+Accident duration values are clustered between 0 and 100.  We'll  transform accicdent duration on the logarithmic scale. 
+
+
+
+<br><br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+
+
+log_accDur_temp_scatter <- ma_accidents_16_21_6 |> 
+    ggplot(aes(x=log(accident_duration), y=temperature)) +
+    geom_point() +
+    labs(
+    title = "Accident Duration (Log) Vs Temperature",
+    x = "Accident Duration (log)",
+    y = "Temperature"
+  ) +
+  theme_minimal(base_size = 12)
+
+
+```
+
+<br><br>
+
+```{r}
+
+
+log_accDur_temp_scatter
+
+
+```
+
+<br><br>
+
+Our plot has improved after the log transformation.  
+
+
+<br><br>
+
+
+
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+hour_day_type_plt <- ma_accidents_16_21_7 |> 
+ggplot(aes(x=hour_day_sections, fill = day_type)) +
+    geom_bar(position = "fill") +
+    labs(
+    title = "Accident Count by Time of Day and Weekday/Weekend",
+    x = "Time of Day",
+    y = "Accident Count"
+  ) +
+  theme_minimal(base_size = 12)
+
+
+
+```
+
+<br><br>
+
+
+```{r}
+
+hour_day_type_plt
+
+
+```
+
+<br><br>
+
+
+
+
+<br><br>
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+road_day_type_plt <- ma_accidents_16_21_7 |> 
+ggplot(aes(x=road_category, fill = day_type)) +
+    geom_bar(position = "fill") +
+    labs(
+    title = "Accident Count by Road Category and Weekday/Weekend",
+    x = "Road Category",
+    y = "Accident Count"
+  ) +
+  theme_minimal(base_size = 12) +
+    coord_flip()
+
+
+
+```
+
+<br><br>
+
+
+
+```{r}
+
+
+road_day_type_plt
+
+
+
+```
+
+<br><br>
+
+
+<br><br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+road_cat_summary <- ma_accidents_16_21_7 |> 
+    group_by(road_category) |> 
+    summarize(accident_duration = mean(accident_duration, na.rm = TRUE, n = n()))
+
+
+
+
+
+```
+
+<br><br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+road_accident_duration_plt <- ggplot(road_cat_summary, aes(x = accident_duration, y = road_category)) +
+    geom_point() +
+    labs(
+    title = "Average Accident Duration by Road Category",
+    x = "Average Accident Duration",
+    y = "Road Category"
+  ) +
+  theme_minimal(base_size = 12)
+
+```
+
+<br><br>
+
+
+
+```{r}
+
+
+road_accident_duration_plt
+
+
+
+```
+
+
+<br><br>
+
+
+
+
+<br><br>
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+road_count_summary <- ma_accidents_16_21_7 |> 
+    group_by(road_category) |> 
+    summarize(road_category_count = sum(road_category)
+
+
+
+    )
+
+
+
+```
+
+
+
+```{r}
+
+road_count_summary <- ma_accidents_16_21_7 |> 
+    count(road_category) 
 
 
 ```
@@ -4295,16 +4687,82 @@ ma_accidents_16_21_6 |>
 #| code-summary: "Show Code"
 
 
-
-
-ma_accidents_16_21_6 |> 
-    ggplot(aes(x=log(accident_duration), y=temperature)) +
-    geom_point()
+road_accident_count_plt <- ggplot(road_count_summary, aes(x = n, y = road_category)) +
+    geom_point() +
+    labs(
+    title = "Accident Count by Road Category",
+    x = "Accident Count",
+    y = "Road Category"
+  ) +
+  theme_minimal(base_size = 12)
 
 
 ```
 
+```{r}
+
+
+road_accident_count_plt
+
+
+```
+
+
 <br><br>
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+hour_day_summary <- ma_accidents_16_21_7 |> 
+    group_by(hour_day_sections) |> 
+    summarize(accident_duration = mean(accident_duration, na.rm = TRUE, n = n()))
+
+```
+
+<br><br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+hour_day_acc_dur_plt <- ggplot(hour_day_summary, aes(x = accident_duration, y = hour_day_sections)) +
+    geom_point() +
+    labs(
+    title = "Average Accident Duration by Time of Day",
+    x = "Average Accident Duration",
+    y = "Time of Day"
+  ) +
+  theme_minimal(base_size = 12)
+
+
+
+```
+
+
+<br><br>
+
+```{r}
+
+
+
+hour_day_acc_dur_plt 
+
+
+```
+
+
+<br><br>
+
+
+
+<br><br>
+
+
+
+
 
 
 
@@ -6697,6 +7155,9 @@ ma_census_middle <- ma_census4326 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(ma_census_middle, "ma_census_middle.rds")
@@ -6723,6 +7184,9 @@ ma_extreme_middle_higher <- ma_census_middle |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(ma_extreme_middle_higher, "ma_extreme_middle_higher.rds")
@@ -6800,6 +7264,9 @@ map_population_extreme_tract_high <- ma_census4326 |> leaflet(options = leafletO
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(map_population_extreme_tract_high, "map_population_extreme_tract_high.rds")
 
@@ -6830,6 +7297,9 @@ tract_map_extreme_higher_plt <- map_population_extreme_tract_high %>%
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -6892,6 +7362,9 @@ map_population_extreme_tract_lower <- ma_census4326 |> leaflet(options = leaflet
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(map_population_extreme_tract_lower , "map_population_extreme_tract_lower.rds")
 
@@ -6919,6 +7392,9 @@ tract_map_extreme_lower_plt <- map_population_extreme_tract_lower %>%
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(tract_map_extreme_lower_plt, "tract_map_extreme_lower_plt.rds")
@@ -7011,6 +7487,9 @@ brms_poisson_2 <- brm(
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(brms_poisson_2, "brms_poisson_2.rds")
@@ -7077,6 +7556,9 @@ tract_ranef <- ranef(brms_poisson_2)$GEOID[, , "Intercept"] |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(tract_ranef, "tract_ranef.rds")
 
@@ -7109,6 +7591,9 @@ boundaries = ma_tract_data_6 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(boundaries, "boundaries.rds")
 
@@ -7130,6 +7615,9 @@ boundaries_clean <- boundaries %>%
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(boundaries_clean, "boundaries_clean.rds")
@@ -7160,6 +7648,9 @@ map_sf <- boundaries_clean |>
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(map_sf, "map_sf.rds")
 
@@ -7199,6 +7690,9 @@ map_analysis <- map_sf |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(map_analysis, "map_analysis.rds")
@@ -7235,6 +7729,9 @@ neighbors <- poly2nb(map_analysis, queen = TRUE)
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -7273,6 +7770,9 @@ weights_list <- nb2listw(neighbors, style = "W", zero.policy = TRUE)
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(weights_list, "weights_list.rds")
@@ -7311,6 +7811,9 @@ moran_analytical <- moran.test(
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(moran_analytical, "moran_analytical.rds")
@@ -7501,6 +8004,9 @@ train_census_data_3 <- train_census_data_2 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(train_census_data_3, "train_census_data_3.rds")
@@ -7586,6 +8092,9 @@ brms_poisson_3 <- brm(
 <br><br>
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(brms_poisson_3 , "brms_poisson_3.rds")
@@ -7735,6 +8244,9 @@ icar_draws <- as_draws_df(brms_poisson_3) %>%
 <br><br>
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(icar_draws, "icar_draws.rds")
 
@@ -7778,6 +8290,9 @@ icar_summary <- summarise_draws(
 <br><br>
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(icar_summary, "icar_summary.rds")
@@ -7832,6 +8347,9 @@ spatial_risk_df <- icar_summary %>%
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(spatial_risk_df, "spatial_risk_df.rds")
 
@@ -7895,6 +8413,9 @@ tract_spatial_risk_plt <- ggplot(spatial_risk_df, aes(x = rank, y = spatial_RR, 
 <br><br>
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -7934,6 +8455,9 @@ extremes_df <- spatial_risk_df %>%
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(extremes_df, "extremes_df.rds")
@@ -7992,6 +8516,9 @@ high_low_tract_risk_plt <- ggplot(extremes_df, aes(x = GEOID, y = spatial_RR, co
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(high_low_tract_risk_plt , "high_low_tract_risk_plt.rds")
 
@@ -8055,6 +8582,9 @@ map_icar <- map_mainland %>%
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(map_icar, "map_icar.rds")
@@ -8088,6 +8618,9 @@ map_leaflet_icar <- st_transform(map_icar, 4326)
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(map_leaflet_icar, "map_leaflet_icar.rds")
@@ -8133,6 +8666,9 @@ map_icar_sf <- st_transform(map_icar, 4326)
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(map_icar_sf , "map_icar_sf.rds")
@@ -8219,6 +8755,9 @@ extreme_tract_high_count_plt <- map_icar_sf|> leaflet(options = leafletOptions(m
     
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(extreme_tract_high_count_plt, "extreme_tract_high_count_plt.rds")
@@ -8367,6 +8906,9 @@ extreme_tract_low_count_plt <- map_icar_sf|> leaflet(options = leafletOptions(mi
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(extreme_tract_low_count_plt, "extreme_tract_low_count_plt.rds")
 
