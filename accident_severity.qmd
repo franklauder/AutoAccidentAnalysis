@@ -4440,6 +4440,8 @@ ma_tract_data_7|>
 
 <br><br>
 
+### Accident Duration
+
 
 ```{r}
 #| code-fold: true
@@ -4524,6 +4526,337 @@ Our plot has improved after the log transformation.
 
 
 
+```{r}
+
+road_cat_summary <- ma_accidents_16_21_7 |> 
+    group_by(road_category) |> 
+    summarize(accident_duration = mean(accident_duration, na.rm = TRUE, n = n()))
+
+```
+
+```{r}
+
+
+road_accident_duration_plt <- ggplot(road_cat_summary, aes(x = accident_duration, y = fct_reorder(road_category, accident_duration))) +
+    geom_point() +
+    labs(
+    title = "Average Accident Duration by Road Category",
+    x = "Average Accident Duration",
+    y = "Road Category"
+  ) +
+  theme_minimal(base_size = 12)
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+
+```
+
+```{r}
+
+
+road_accident_duration_plt
+
+
+```
+
+```{r}
+
+
+hour_day_summary <- ma_accidents_16_21_7 |> 
+    group_by(hour_day_sections) |> 
+    summarize(accident_duration = mean(accident_duration, na.rm = TRUE, n = n()))
+
+
+```
+
+```{r}
+
+
+
+saveRDS(hour_day_summary, "hour_day_summary.rds")
+
+
+```
+
+```{r}
+
+hour_day_summary <- readRDS("hour_day_summary.rds")
+
+
+
+```
+
+```{r}
+
+
+
+hour_day_acc_dur_plt <- ggplot(hour_day_summary, aes(x = accident_duration, y = fct_reorder(hour_day_sections, accident_duration))) +
+    geom_point() +
+    labs(
+    title = "Average Accident Duration by Time of Day",
+    x = "Average Accident Duration",
+    y = "Time of Day"
+  ) +
+  theme_minimal(base_size = 12)
+
+
+```
+
+```{r}
+
+
+saveRDS(hour_day_acc_dur_plt, "hour_day_acc_dur_plt.rds")
+
+
+
+```
+
+```{r}
+
+
+hour_day_acc_dur_plt <-readRDS("hour_day_acc_dur_plt.rds")
+
+
+
+```
+
+
+```{r}
+
+hour_day_acc_dur_plt
+
+
+
+```
+
+```{r}
+
+
+road_cat_summary <- ma_accidents_16_21_7 |> 
+    group_by(road_category) |> 
+    summarize(accident_duration = mean(accident_duration, na.rm = TRUE, n = n()))
+
+
+
+```
+
+```{r}
+
+
+
+saveRDS(road_cat_summary, "road_cat_summary.rds")
+
+```
+
+```{r}
+
+
+road_cat_summary <- readRDS("road_cat_summary.rds")
+
+
+```
+
+```{r}
+
+
+road_cat_acc_dur_plt <- ggplot(road_cat_summary, aes(x = accident_duration, y = fct_reorder(road_category, accident_duration))) +
+    geom_point() +
+    labs(
+    title = "Average Accident Duration by Road Category",
+    x = "Average Accident Duration",
+    y = "Road Categoy"
+  ) +
+  theme_minimal(base_size = 12)
+
+
+```
+
+```{r}
+
+
+
+saveRDS(road_cat_acc_dur_plt, "road_cat_acc_dur_plt.rds")
+
+```
+
+```{r}
+
+
+road_cat_acc_dur_plt <- readRDS("road_cat_acc_dur_plt.rds")
+
+
+
+```
+
+```{r}
+
+
+
+road_cat_acc_dur_plt
+
+
+```
+
+```{r}
+
+
+road_duration_stat_plt <- ggplot(ma_accidents_16_21_7) +
+    stat_summary(
+        aes(x = road_category, y = accident_duration),
+        fun.min = min,
+        fun.max = max,
+        fun = median
+    )
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+
+```
+
+```{r}
+
+
+road_duration_stat_plt
+
+
+
+```
+
+### Accident Count
+
+
+
+```{r}
+
+
+
+road_prop <- ggplot(ma_accidents_16_21_7, aes(x = road_category, y = after_stat(prop), group = 1)) +
+    geom_bar() +
+    coord_flip()
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+ma_accidents_16_21_7  |> glimpse()
+
+
+```
+
+```{r}
+
+
+road_prop
+
+
+```
+
+```{r}
+
+
+day_time_prop <- ggplot(ma_accidents_16_21_7, aes(x = hour_day_sections, y = after_stat(prop), group = 1)) +
+    geom_bar() +
+    coord_flip()
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+
+```{r}
+
+
+
+
+```
+
+
+```{r}
+
+
+
+day_time_prop 
+
+
+```
+
+```{r}
+
+
+weather_prop_plt <- ggplot(ma_accidents_16_21_7, aes(x = Weather_Condition, y = after_stat(prop), group = 1)) +
+    geom_bar() +
+    coord_flip()
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+
+```{r}
+
+
+weather_prop_plt
+
+
+```
+
 
 
 ```{r}
@@ -4598,58 +4931,7 @@ road_day_type_plt
 <br><br>
 
 
-<br><br>
 
-
-```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
-
-
-road_cat_summary <- ma_accidents_16_21_7 |> 
-    group_by(road_category) |> 
-    summarize(accident_duration = mean(accident_duration, na.rm = TRUE, n = n()))
-
-
-
-
-
-```
-
-<br><br>
-
-
-```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
-
-
-road_accident_duration_plt <- ggplot(road_cat_summary, aes(x = accident_duration, y = fct_reorder(road_category, accident_duration))) +
-    geom_point() +
-    labs(
-    title = "Average Accident Duration by Road Category",
-    x = "Average Accident Duration",
-    y = "Road Category"
-  ) +
-  theme_minimal(base_size = 12)
-
-```
-
-<br><br>
-
-
-
-```{r}
-
-
-road_accident_duration_plt
-
-
-
-```
-
-
-<br><br>
 
 
 
@@ -4684,6 +4966,8 @@ road_count_summary <- ma_accidents_16_21_7 |>
 ```
 
 
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -4702,6 +4986,8 @@ road_accident_count_plt <- ggplot(road_count_summary, aes(x = n, y = fct_reorder
 
 ```
 
+<br><br>
+
 ```{r}
 
 
@@ -4710,9 +4996,14 @@ road_accident_count_plt
 
 ```
 
+<br><br>
+
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -4733,6 +5024,8 @@ road_day_accident_count_summary <- ma_accidents_16_21_7 |>
 
 
 ```
+
+<br><br>
 
 ```{r}
 
@@ -4766,6 +5059,8 @@ road_dayTime_count_plt <- ggplot(road_day_accident_count_summary, aes(x=hour_day
 
 ```
 
+<br><br>
+
 ```{r}
 
 
@@ -4797,14 +5092,18 @@ ggplotly(road_dayTime_count_plt, tooltip = "text")
 
 ```
 
+<br><br>
+
 Accdidents by road category as a proportion of accidents by time of day are relatively consistant with the categories Interstate and Road claiming the largest proportions.  Interstate highways have 40% of total accidents for the Dawn and Middle of Night categories. The Street category have the largest proportion of accidents during the late morning and evening periods at 31% for both.  
 
 
-
+<br><br>
 
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 road_month_accident_count_summary <- ma_accidents_16_21_7 |> 
@@ -4825,6 +5124,8 @@ road_month_accident_count_summary <- ma_accidents_16_21_7 |>
 
 ```
 
+<br><br>
+
 ```{r}
 
 
@@ -4840,6 +5141,8 @@ road_month_accident_count_summary <- readRDS("road_month_accident_count_summary.
 
 ```
 
+
+<br><br>
 
 
 ```{r}
@@ -4860,6 +5163,8 @@ road_month_count_plt <- ggplot(road_month_accident_count_summary, aes(x=Month, y
 
 
 ```
+
+<br><br>
 
 ```{r}
 
@@ -4889,11 +5194,13 @@ ggplotly(road_month_count_plt, tooltip = "text")
 
 ```
 
+<br><br>
+
 
 The number of accidents by road category as a proprtion of month appears relativley consistant.  Accidents on Interstate highways range from 31% to 34% as a proportion of monthly accidents. Accidents on the street category range from 24% to 27% as a propirtion of monthly accidents. 
 
 
-
+<br><br>
 
 ```{r}
 
@@ -4905,6 +5212,8 @@ road_year_count_plt <- ggplot(ma_accidents_16_21_7, aes(x=Year, y=road_category)
 
 ```
 
+<br><br>
+
 ```{r}
 
 road_year_count_plt <- ggplot(ma_accidents_16_21_7, aes(x=Year, y=road_category)) +
@@ -4915,6 +5224,8 @@ road_year_count_plt <- ggplot(ma_accidents_16_21_7, aes(x=Year, y=road_category)
 
 ```
 
+
+<br><br>
 
 
 ```{r}
@@ -4938,7 +5249,7 @@ month_year_count_plt <- ggplot(ma_accidents_16_21_7, aes(x=Year, y=Month)) +
 
 ```
 
-
+<br><br>
 
 ```{r}
 
@@ -4949,91 +5260,21 @@ ggplotly(month_year_count_plt)
 ```
 
 
-<br><br>
-
-```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
-
-
-hour_day_summary <- ma_accidents_16_21_7 |> 
-    group_by(hour_day_sections) |> 
-    summarize(accident_duration = mean(accident_duration, na.rm = TRUE, n = n()))
-
-```
-
-<br><br>
-
-
-```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
-
-hour_day_acc_dur_plt <- ggplot(hour_day_summary, aes(x = accident_duration, y = fct_reorder(hour_day_sections, accident_duration))) +
-    geom_point() +
-    labs(
-    title = "Average Accident Duration by Time of Day",
-    x = "Average Accident Duration",
-    y = "Time of Day"
-  ) +
-  theme_minimal(base_size = 12)
-
-
-
-```
-
-
-<br><br>
-
-```{r}
-
-
-
-hour_day_acc_dur_plt 
-
-
-```
-
-```{r}
-
-
-
-road_cat_summary <- ma_accidents_16_21_7 |> 
-    group_by(road_category) |> 
-    summarize(accident_duration = mean(accident_duration, na.rm = TRUE, n = n()))
-
-```
-
-```{r}
-
-
-road_cat_acc_dur_plt <- ggplot(road_cat_summary, aes(x = accident_duration, y = fct_reorder(road_category, accident_duration))) +
-    geom_point() +
-    labs(
-    title = "Average Accident Duration by Road Category",
-    x = "Average Accident Duration",
-    y = "Road Categoy"
-  ) +
-  theme_minimal(base_size = 12)
-
-
-```
-
-```{r}
-
-
-road_cat_acc_dur_plt
-
-
-
-```
 
 
 <br><br>
 
 
 
-<br><br>
+
+
+
+
+
+
+
+
+
 
 
 
