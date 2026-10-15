@@ -4585,6 +4585,9 @@ hour_day_summary <- ma_accidents_16_21_7 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -4618,6 +4621,9 @@ hour_day_acc_dur_plt <- ggplot(hour_day_summary, aes(x = accident_duration, y = 
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(hour_day_acc_dur_plt, "hour_day_acc_dur_plt.rds")
@@ -4656,6 +4662,9 @@ road_cat_summary <- ma_accidents_16_21_7 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -4671,6 +4680,7 @@ road_cat_summary <- readRDS("road_cat_summary.rds")
 
 ```
 
+
 ```{r}
 
 
@@ -4684,13 +4694,16 @@ road_cat_acc_dur_plt <- ggplot(road_cat_summary, aes(x = accident_duration, y = 
   theme_minimal(base_size = 12)
 
 
+
 ```
 
 ```{r}
-
-
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(road_cat_acc_dur_plt, "road_cat_acc_dur_plt.rds")
+
 
 ```
 
@@ -4699,6 +4712,13 @@ saveRDS(road_cat_acc_dur_plt, "road_cat_acc_dur_plt.rds")
 
 road_cat_acc_dur_plt <- readRDS("road_cat_acc_dur_plt.rds")
 
+```
+
+```{r}
+
+
+road_cat_acc_dur_plt
+
 
 
 ```
@@ -4707,7 +4727,41 @@ road_cat_acc_dur_plt <- readRDS("road_cat_acc_dur_plt.rds")
 
 
 
-road_cat_acc_dur_plt
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+
+```{r}
+
+
+
+
 
 
 ```
@@ -4760,22 +4814,31 @@ road_duration_stat_plt
 
 road_prop <- ggplot(ma_accidents_16_21_7, aes(x = road_category, y = after_stat(prop), group = 1)) +
     geom_bar() +
-    coord_flip()
+    coord_flip() +
+    labs(
+    title = "Proportion of Accidents by Road Category",
+    x = "Proportion",
+    y = "Road Category"
+  ) +
+  theme_minimal(base_size = 12)
 
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(road_prop , "road_prop.rds")
 
 ```
 
 ```{r}
 
 
-
-
-```
-
-```{r}
-
-
-ma_accidents_16_21_7  |> glimpse()
+road_prop  <- readRDS("road_prop.rds")
 
 
 ```
@@ -4793,14 +4856,23 @@ road_prop
 
 day_time_prop <- ggplot(ma_accidents_16_21_7, aes(x = hour_day_sections, y = after_stat(prop), group = 1)) +
     geom_bar() +
-    coord_flip()
+    coord_flip() +
+    labs(
+    title = "Proportion of Accidents by Time of Day",
+    x = "Proportion",
+    y = "Time of Day"
+  ) +
+  theme_minimal(base_size = 12)
 
 
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
-
+saveRDS(day_time_prop , "day_time_prop.rds ")
 
 
 ```
@@ -4808,7 +4880,7 @@ day_time_prop <- ggplot(ma_accidents_16_21_7, aes(x = hour_day_sections, y = aft
 
 ```{r}
 
-
+day_time_prop  <- readRDS("day_time_prop.rds")
 
 
 ```
@@ -4828,21 +4900,30 @@ day_time_prop
 
 weather_prop_plt <- ggplot(ma_accidents_16_21_7, aes(x = Weather_Condition, y = after_stat(prop), group = 1)) +
     geom_bar() +
-    coord_flip()
+    coord_flip() +
+    labs(
+    title = "Proportion of Accidents by Weather Condition",
+    x = "Proportion",
+    y = "Weather Condition"
+  ) +
+  theme_minimal(base_size = 12)
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDSD(weather_prop_plt, "weather_prop_plt.rds")
 
 
 ```
 
 ```{r}
 
-
-
-
-```
-
-```{r}
-
-
+weather_prop_plt <- reawdeRDS("weather_prop_plt.rds")
 
 
 
@@ -4874,6 +4955,27 @@ ggplot(aes(x=hour_day_sections, fill = day_type)) +
   ) +
   theme_minimal(base_size = 12)
 
+
+
+```
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(hour_day_type_plt, m"hour_day_type_plt.rds)
+
+```
+
+
+```{r}
+
+
+
+hour_day_type_plt <- readRDS("hour_day_type_plt.rds")
 
 
 ```
@@ -4915,6 +5017,26 @@ ggplot(aes(x=road_category, fill = day_type)) +
 
 ```
 
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(road_day_type_plt, "road_day_type_plt.rds")
+
+
+```
+
+```{r}
+
+
+
+road_day_type_plt <- readRDS("road_day_type_plt.rds")
+
+
+```
+
 <br><br>
 
 
@@ -4938,22 +5060,7 @@ road_day_type_plt
 
 <br><br>
 
-```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
 
-
-road_count_summary <- ma_accidents_16_21_7 |> 
-    group_by(road_category) |> 
-    summarize(road_category_count = sum(road_category)
-
-
-
-    )
-
-
-
-```
 
 
 
@@ -4961,6 +5068,24 @@ road_count_summary <- ma_accidents_16_21_7 |>
 
 road_count_summary <- ma_accidents_16_21_7 |> 
     count(road_category) 
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(road_count_summary, "road_count_summary.rds")
+
+```
+
+```{r}
+
+road_count_summary <- readRDS("road_count_summary.rds")
+
 
 
 ```
@@ -4982,6 +5107,24 @@ road_accident_count_plt <- ggplot(road_count_summary, aes(x = n, y = fct_reorder
     y = "Road Category"
   ) +
   theme_minimal(base_size = 12)
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(road_accident_count_plt, "road_accident_count_plt.rds")
+
+```
+
+```{r}
+
+road_accident_count_plt <- readRDS("road_accident_count_plt.rds")
+
 
 
 ```
@@ -5028,6 +5171,9 @@ road_day_accident_count_summary <- ma_accidents_16_21_7 |>
 <br><br>
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(road_day_accident_count_summary, "road_day_accident_count_summary.rds")
@@ -5062,6 +5208,9 @@ road_dayTime_count_plt <- ggplot(road_day_accident_count_summary, aes(x=hour_day
 <br><br>
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(road_dayTime_count_plt, "road_dayTime_count_plt.rds")
@@ -5127,6 +5276,9 @@ road_month_accident_count_summary <- ma_accidents_16_21_7 |>
 <br><br>
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(road_month_accident_count_summary, "road_month_accident_count_summary.rds")
@@ -5167,6 +5319,9 @@ road_month_count_plt <- ggplot(road_month_accident_count_summary, aes(x=Month, y
 <br><br>
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(road_month_count_plt, "road_month_count_plt.rds")
 
@@ -5201,6 +5356,10 @@ The number of accidents by road category as a proprtion of month appears relativ
 
 
 <br><br>
+
+
+
+
 
 ```{r}
 
