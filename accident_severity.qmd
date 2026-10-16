@@ -2442,7 +2442,6 @@ ma_accidents_16_21_8 |>
 
  
 
-  <br><br>
 
 
 
@@ -2477,7 +2476,6 @@ ma_accidents_16_21_9 <- readRDS("ma_accidents_16_21_9.rds")
 
 
 
-  <br><br>
 
 
 
@@ -4443,6 +4441,14 @@ ma_tract_data_7|>
 ### Accident Duration
 
 
+<br><br>
+
+
+First, we’ll look at plots revolving around accident duration. 
+
+<br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -4450,7 +4456,7 @@ ma_tract_data_7|>
 #| label: "ck-251"
 
 
-accident_dur_temp_scatter <- ma_accidents_16_21_6 |> 
+accident_dur_temp_scatter <- ma_accidents_16_21_7 |> 
     ggplot(aes(x=accident_duration, y=temperature)) +
     geom_point() +
     labs(
@@ -4459,6 +4465,27 @@ accident_dur_temp_scatter <- ma_accidents_16_21_6 |>
     y = "Temperature"
   ) +
   theme_minimal(base_size = 12)
+
+
+
+```
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(accident_dur_temp_scatter, "accident_dur_temp_scatter.rds")
+
+
+
+```
+
+```{r}
+
+
+accident_dur_temp_scatter <- readRDS("accident_dur_temp_scatter.rds")
 
 
 
@@ -4490,11 +4517,12 @@ Accident duration values are clustered between 0 and 100.  We'll  transform acci
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
 
-log_accDur_temp_scatter <- ma_accidents_16_21_6 |> 
+log_accDur_temp_scatter <- ma_accidents_16_21_7 |> 
     ggplot(aes(x=log(accident_duration), y=temperature)) +
     geom_point() +
     labs(
@@ -4503,6 +4531,26 @@ log_accDur_temp_scatter <- ma_accidents_16_21_6 |>
     y = "Temperature"
   ) +
   theme_minimal(base_size = 12)
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(log_accDur_temp_scatter, "log_accDur_temp_scatter.rds")
+
+
+```
+
+```{r}
+
+
+log_accDur_temp_scatter <- readRDS("log_accDur_temp_scatter.rds")
+
 
 
 ```
@@ -4527,6 +4575,9 @@ Our plot has improved after the log transformation.
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 road_cat_summary <- ma_accidents_16_21_7 |> 
     group_by(road_category) |> 
@@ -4535,6 +4586,31 @@ road_cat_summary <- ma_accidents_16_21_7 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(road_cat_summary, "road_cat_summary.rds")
+
+```
+
+```{r}
+
+
+road_cat_summary <- readRDS("road_cat_summary.rds")
+
+
+```
+
+
+
+<br><br>
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 road_accident_duration_plt <- ggplot(road_cat_summary, aes(x = accident_duration, y = fct_reorder(road_category, accident_duration))) +
@@ -4550,9 +4626,12 @@ road_accident_duration_plt <- ggplot(road_cat_summary, aes(x = accident_duration
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
-
+saveRDS(road_accident_duration_plt, "road_accident_duration_plt.rds")
 
 
 ```
@@ -4561,10 +4640,12 @@ road_accident_duration_plt <- ggplot(road_cat_summary, aes(x = accident_duration
 
 
 
-
+road_accident_duration_plt <- readRDS("road_accident_duration_plt.rds")
 
 
 ```
+
+<br><br>
 
 ```{r}
 
@@ -4574,7 +4655,20 @@ road_accident_duration_plt
 
 ```
 
+
+<br><br>
+
+
+Trail, Drive, and Highway have a greater separation from the other road categories, with average accident duration greater than 90 minutes. 
+
+
+
+<br><br>
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 hour_day_summary <- ma_accidents_16_21_7 |> 
@@ -4604,7 +4698,13 @@ hour_day_summary <- readRDS("hour_day_summary.rds")
 
 ```
 
+<br><br>
+
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -4641,6 +4741,10 @@ hour_day_acc_dur_plt <-readRDS("hour_day_acc_dur_plt.rds")
 
 ```
 
+<br><br>
+
+
+
 
 ```{r}
 
@@ -4650,13 +4754,29 @@ hour_day_acc_dur_plt
 
 ```
 
+
+<br><br>
+
+
+
+
+
+
+<br><br>
+
+
+
+
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
-road_cat_summary <- ma_accidents_16_21_7 |> 
-    group_by(road_category) |> 
+weather_summary <- ma_accidents_16_21_7 |> 
+    group_by(Weather_Condition) |> 
     summarize(accident_duration = mean(accident_duration, na.rm = TRUE, n = n()))
-
 
 
 ```
@@ -4667,29 +4787,32 @@ road_cat_summary <- ma_accidents_16_21_7 |>
 #| eval: false
 
 
+saveRDS(weather_summary , "weather_summary.rds")
 
-saveRDS(road_cat_summary, "road_cat_summary.rds")
 
 ```
 
 ```{r}
 
 
-road_cat_summary <- readRDS("road_cat_summary.rds")
+weather_summary  <- readRDS("weather_summary.rds")
 
 
 ```
 
+<br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
-
-road_cat_acc_dur_plt <- ggplot(road_cat_summary, aes(x = accident_duration, y = fct_reorder(road_category, accident_duration))) +
+weather_acc_dur_plt <- ggplot(weather_summary, aes(x = accident_duration, y = fct_reorder(Weather_Condition, accident_duration))) +
     geom_point() +
     labs(
-    title = "Average Accident Duration by Road Category",
+    title = "Average Accident Duration by Weather Condition",
     x = "Average Accident Duration",
-    y = "Road Categoy"
+    y = "Weather Condition"
   ) +
   theme_minimal(base_size = 12)
 
@@ -4702,56 +4825,8 @@ road_cat_acc_dur_plt <- ggplot(road_cat_summary, aes(x = accident_duration, y = 
 #| include: false
 #| eval: false
 
-saveRDS(road_cat_acc_dur_plt, "road_cat_acc_dur_plt.rds")
 
-
-```
-
-```{r}
-
-
-road_cat_acc_dur_plt <- readRDS("road_cat_acc_dur_plt.rds")
-
-```
-
-```{r}
-
-
-road_cat_acc_dur_plt
-
-
-
-```
-
-```{r}
-
-
-
-
-
-```
-
-```{r}
-
-
-
-
-
-```
-
-```{r}
-
-
-
-
-
-
-```
-
-```{r}
-
-
-
+saveRDS(weather_acc_dur_plt , "weather_acc_dur_plt.rds")
 
 
 ```
@@ -4760,55 +4835,50 @@ road_cat_acc_dur_plt
 ```{r}
 
 
-
-
+weather_acc_dur_plt  <- readRDS("weather_acc_dur_plt.rds")
 
 
 ```
 
-```{r}
+<br><br>
 
 
-road_duration_stat_plt <- ggplot(ma_accidents_16_21_7) +
-    stat_summary(
-        aes(x = road_category, y = accident_duration),
-        fun.min = min,
-        fun.max = max,
-        fun = median
-    )
-
-```
 
 ```{r}
 
 
 
-
-```
-
-```{r}
-
-
-
-
+weather_acc_dur_plt 
 
 
 ```
 
-```{r}
+
+<br><br>
 
 
-road_duration_stat_plt
+Unsurprisingly, the weather condition “Heavy Snow” has the greatest average accident duration. 
+
+<br><br>
 
 
 
-```
 
 ### Accident Count
 
+<br><br>
+
+Now we'll focus on plots dealing with the number of accidents (count). 
+
+
+<br><br>
+
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -4843,6 +4913,8 @@ road_prop  <- readRDS("road_prop.rds")
 
 ```
 
+<br><br>
+
 ```{r}
 
 
@@ -4851,7 +4923,12 @@ road_prop
 
 ```
 
+<br><br>
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 day_time_prop <- ggplot(ma_accidents_16_21_7, aes(x = hour_day_sections, y = after_stat(prop), group = 1)) +
@@ -4872,7 +4949,7 @@ day_time_prop <- ggplot(ma_accidents_16_21_7, aes(x = hour_day_sections, y = aft
 #| include: false
 #| eval: false
 
-saveRDS(day_time_prop , "day_time_prop.rds ")
+saveRDS(day_time_prop , "day_time_prop.rds")
 
 
 ```
@@ -4886,6 +4963,11 @@ day_time_prop  <- readRDS("day_time_prop.rds")
 ```
 
 
+<br><br>
+
+
+
+
 ```{r}
 
 
@@ -4895,7 +4977,19 @@ day_time_prop
 
 ```
 
+
+<br><br>
+
+
+Approximately a little over half of all accidents occur during the early morning and early afternoon. 
+
+
+<br><br>
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 weather_prop_plt <- ggplot(ma_accidents_16_21_7, aes(x = Weather_Condition, y = after_stat(prop), group = 1)) +
@@ -4916,14 +5010,14 @@ weather_prop_plt <- ggplot(ma_accidents_16_21_7, aes(x = Weather_Condition, y = 
 #| include: false
 #| eval: false
 
-saveRDSD(weather_prop_plt, "weather_prop_plt.rds")
+saveRDS(weather_prop_plt, "weather_prop_plt.rds")
 
 
 ```
 
 ```{r}
 
-weather_prop_plt <- reawdeRDS("weather_prop_plt.rds")
+weather_prop_plt <- readRDS("weather_prop_plt.rds")
 
 
 
@@ -4943,6 +5037,7 @@ weather_prop_plt
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 hour_day_type_plt <- ma_accidents_16_21_7 |> 
@@ -4951,7 +5046,8 @@ ggplot(aes(x=hour_day_sections, fill = day_type)) +
     labs(
     title = "Accident Count by Time of Day and Weekday/Weekend",
     x = "Time of Day",
-    y = "Accident Count"
+    y = "Accident Count",
+    fill = "Day Type"
   ) +
   theme_minimal(base_size = 12)
 
@@ -4966,7 +5062,7 @@ ggplot(aes(x=hour_day_sections, fill = day_type)) +
 #| eval: false
 
 
-saveRDS(hour_day_type_plt, m"hour_day_type_plt.rds)
+saveRDS(hour_day_type_plt, "hour_day_type_plt.rds")
 
 ```
 
@@ -5000,6 +5096,7 @@ hour_day_type_plt
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 road_day_type_plt <- ma_accidents_16_21_7 |> 
@@ -5065,6 +5162,9 @@ road_day_type_plt
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 road_count_summary <- ma_accidents_16_21_7 |> 
     count(road_category) 
@@ -5097,6 +5197,7 @@ road_count_summary <- readRDS("road_count_summary.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 road_accident_count_plt <- ggplot(road_count_summary, aes(x = n, y = fct_reorder(road_category, n))) +
@@ -5146,6 +5247,7 @@ road_accident_count_plt
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -5192,6 +5294,7 @@ road_day_accident_count_summary <- readRDS("road_day_accident_count_summary.rds"
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 road_dayTime_count_plt <- ggplot(road_day_accident_count_summary, aes(x=hour_day_sections, y=road_category)) +
     geom_point(aes(size = prop,text = hover_text)) +
@@ -5253,6 +5356,7 @@ Accdidents by road category as a proportion of accidents by time of day are rela
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 road_month_accident_count_summary <- ma_accidents_16_21_7 |> 
@@ -5300,6 +5404,7 @@ road_month_accident_count_summary <- readRDS("road_month_accident_count_summary.
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
