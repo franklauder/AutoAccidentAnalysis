@@ -8113,76 +8113,30 @@ ma_census4326 |>
 ```
 
 
-```{r}
-
-ma_census_middle <- ma_census4326 |> 
-    filter(County == "Middlesex")
 
 
-```
+
 
 ```{r}
-#| echo: false
-#| include: false
+#| code-fold: true
+#| code-summary: "Show Code"
 #| eval: false
 
-
-saveRDS(ma_census_middle, "ma_census_middle.rds")
-
+bins<-c(0,50,500,1000,2000,3000,4000,6000,7000,8000,9500,Inf)
 
 ```
 
-```{r}
-#| include: false
 
 
-ma_census_middle <- readRDS("ma_census_middle.rds")
 
-
-```
 
 ```{r}
-
-ma_extreme_middle_higher <- ma_census_middle |> 
-    select(GEOID, ID, accident_duration, County, City, hour_day_sections, day_type, Month,total_vehicles_tractE,road_category, LONGITUDE, LATITUDE) |> 
-    filter(GEOID %in% c("25017321500","25017358700", "25017315401", "25017373902", "25017312000" )) |> 
-        st_drop_geometry()
-
-```
-
-```{r}
-#| echo: false
-#| include: false
+#| code-fold: true
+#| code-summary: "Show Code"
 #| eval: false
-
-
-saveRDS(ma_extreme_middle_higher, "ma_extreme_middle_higher.rds")
-
-
-```
-
-```{r}
-#| include: false
-
-ma_extreme_middle_higher <- readRDS("ma_extreme_middle_higher.rds")
-
-
-```
-
-```{r}
-
-bins<-c(0,200,4000,5400,6500,7500,8500,Inf)
-
-```
-
-
-
-
-
-```{r}
 
 pal<-colorBin(palette="RdYlBu",
-            domain=ma_census_middle$total_population_tractE,bins=bins)
+            domain=ma_census4326$total_population_tractE,bins=bins)
 
 
 
@@ -8191,6 +8145,9 @@ pal<-colorBin(palette="RdYlBu",
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -8241,6 +8198,7 @@ saveRDS(map_population_extreme_tract_high, "map_population_extreme_tract_high.rd
 ```
 
 ```{r}
+#| include: false
 
 
 
@@ -8254,10 +8212,13 @@ map_population_extreme_tract_high <- readRDS("map_population_extreme_tract_high.
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 tract_map_extreme_higher_plt <- map_population_extreme_tract_high %>% 
-  addLegend(pal = pal, values = ~total_population_tractE, opacity = 0.6, title = "Massachusetts Census Tract Population",
+  addLegend(pal = pal, values = ~total_population_tractE, opacity = 0.6, title = "Massachusetts Extreme Census Tracts (Higher)",
   position = "bottomright")
 
 
@@ -8275,6 +8236,7 @@ saveRDS(tract_map_extreme_higher_plt , "tract_map_extreme_higher_plt.rds")
 ```
 
 ```{r}
+#| include: false
 
 
 tract_map_extreme_higher_plt  <- readRDS("tract_map_extreme_higher_plt.rds")
@@ -8369,8 +8331,10 @@ saveRDS(tract_map_extreme_lower_plt, "tract_map_extreme_lower_plt.rds")
 ```
 
 ```{r}
+#| include: false
 
 
+tract_map_extreme_lower_plt <- readRDS("tract_map_extreme_lower_plt.rds")
 
 
 
