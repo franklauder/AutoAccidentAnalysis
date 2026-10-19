@@ -5461,7 +5461,7 @@ ggplotly(road_dayTime_count_plt, tooltip = "text")
 
 <br><br>
 
-Accdidents by road category as a proportion of accidents by time of day are relatively consistant with the categories Interstate and Road claiming the largest proportions.  Interstate highways have 40% of total accidents for the Dawn and Middle of Night categories. The Street category have the largest proportion of accidents during the late morning and evening periods at 31% for both.  
+Accdidents by road category as a proportion of accidents by time of day are relatively consistant with the categories Interstate and Road claiming the largest proportions.  Interstate highways have 40% of total accidents for the Dawn and Middle of Night categories. The Street category has the largest proportion of accidents during the late morning and evening periods at 31% for both.  
 
 
 <br><br>
@@ -5602,12 +5602,62 @@ The number of accidents by road category as a proprtion of month appears relativ
 <br><br>
 
 
+Our first map we’ll create is will be population of Massachusetts counties.  Before we start, we need to check the coordinate reference system (crs) of the county_geo spatial dataset. 
+
+
+<br><br>
+
+
+
+
+
+
+
+
+```{r}
+
+
+county_geo_stcrs <- st_crs(county_geo)
+
+
+
+```
+
+
+
+
+<br><br>
+
+
+
+```{r}
+
+
+county_geo_stcrs$input
+
+
+```
+
+<br><br>
+
+
+From the output we can see the crs is  NAD83.  Though we could use this for building our map, we will transform the spatial dataset to ESPG:4326 for ease of use with the Leaflet library.  The transformation will be accomplished using the st_crs function from the sf library.
+
+
+<br><br>
+
+
+
+
+
 
 
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-320"
+
 
 
 
@@ -5621,6 +5671,7 @@ ma_county_geo_4326 <- county_geo |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-321"
 
 
 saveRDS(ma_county_geo_4326, "ma_county_geo_4326.rds")
@@ -5631,6 +5682,7 @@ saveRDS(ma_county_geo_4326, "ma_county_geo_4326.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-322"
 
 
 ma_county_geo_4326 <- readRDS("ma_county_geo_4326.rds")
@@ -5639,9 +5691,13 @@ ma_county_geo_4326 <- readRDS("ma_county_geo_4326.rds")
 
 ```
 
+<br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-323"
 
 
 
@@ -5651,9 +5707,15 @@ ma_county_stcrs <- st_crs(ma_county_geo_4326)
 ```
 
 
+
+<br><br>
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-324"
 
 
 
@@ -5669,12 +5731,15 @@ ma_county_stcrs$input
 
 
 
+<br><br>
+
 
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-325"
 
 
 
@@ -5683,10 +5748,15 @@ bins<-c(0,71029,150000,400000,600000,800000,1000000,1300000,Inf)
 
 ```
 
+
+
+<br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-326"
 
 
 
@@ -5695,10 +5765,15 @@ pal<-colorBin(palette="RdYlBu",
             domain=ma_county_geo_4326$POP_COU,bins=bins)
 ```
 
+
+
+<br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-327"
 
 
 
@@ -5711,13 +5786,14 @@ ma_county_formated <- ma_county_geo_4326 |>
 ```
 
 
-
+<br>
 
 
 ```{r}
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-328"
 
 
 saveRDS(ma_county_formated , "ma_county_formated.rds")
@@ -5727,6 +5803,7 @@ saveRDS(ma_county_formated , "ma_county_formated.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-329"
 
 
 ma_county_formated  <- readRDS("ma_county_formated.rds")
@@ -5738,6 +5815,7 @@ ma_county_formated  <- readRDS("ma_county_formated.rds")
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-330"
 
 
 
@@ -5754,11 +5832,14 @@ mytext <- paste(
 ```
 
 
+<br>
+
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-331"
 
 
 
@@ -5791,6 +5872,7 @@ map_county_pop_density_plt<- ma_county_geo_4326 |> leaflet(options = leafletOpti
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-332"
 
 
 saveRDS(map_county_pop_density_plt, "map_county_pop_density_plt.rds")
@@ -5799,6 +5881,7 @@ saveRDS(map_county_pop_density_plt, "map_county_pop_density_plt.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-333"
 
 
 
@@ -5809,10 +5892,13 @@ map_county_pop_density_plt <- readRDS("map_county_pop_density_plt.rds")
 
 
 
+<br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-334"
 
 
 county_map_pop_density<-map_county_pop_density_plt %>% 
@@ -5826,6 +5912,7 @@ county_map_pop_density<-map_county_pop_density_plt %>%
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-335"
 
 
 saveRDS(county_map_pop_density, "county_map_pop_density.rds")
@@ -5834,6 +5921,7 @@ saveRDS(county_map_pop_density, "county_map_pop_density.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-336"
 
 
 county_map_pop_density <- readRDS("county_map_pop_density.rds")
@@ -5845,6 +5933,7 @@ county_map_pop_density <- readRDS("county_map_pop_density.rds")
 <br><br>
 
 ```{r}
+#| label: "ck-337"
 
 county_map_pop_density
 
@@ -5871,10 +5960,21 @@ We observe that Middlesex County has the largest population while Berkshire and 
 
 
 
+We’ll now create a map for populations of each Massachusetts census tract.  
+
+<br>
+
+Tract accident count will be created for inclusion on the census tract map. 
+
+<br><br>
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-338"
 
 tract_accident_count <- ma_accidents_16_21_8 |> 
     count(GEOID, name = "tract_accident_count")
@@ -5886,6 +5986,7 @@ tract_accident_count <- ma_accidents_16_21_8 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-339"
 
 saveRDS(tract_accident_count, "tract_accident_count.rds")
 
@@ -5893,6 +5994,7 @@ saveRDS(tract_accident_count, "tract_accident_count.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-340"
 
 
 tract_accident_count <- readRDS("tract_accident_count.rds")
@@ -5901,9 +6003,14 @@ tract_accident_count <- readRDS("tract_accident_count.rds")
 
 ```
 
+<br><br>
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-341"
 
 
 
@@ -5914,9 +6021,15 @@ tract_accident_count |>
 
 ```
 
+<br><br>
+
+
+
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
+#| label: "ck-342"
 
 
 ma_accidents_16_21_8 |> 
@@ -5927,8 +6040,10 @@ ma_accidents_16_21_8 |>
 ```
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
+#| label: "ck-343"
 
 
 
@@ -5938,10 +6053,21 @@ ma_accidents_16_21_8 |>
 ```
 
 
+
+<br><br>
+
+
+
+Tract_accident_count  will be joined with our accident dataset.  
+
+<br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-344"
 
 
 
@@ -5956,6 +6082,7 @@ ma_accidents_16_21_10 <- ma_accidents_16_21_8 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-345"
 
 
 saveRDS(ma_accidents_16_21_10, "ma_accidents_16_21_10.rds")
@@ -5965,6 +6092,8 @@ saveRDS(ma_accidents_16_21_10, "ma_accidents_16_21_10.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-346"
+
 
 
 
@@ -5979,6 +6108,11 @@ ma_accidents_16_21_10 <- readRDS("ma_accidents_16_21_10.rds")
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-347"
+
+
+
+
 
  
 ma_accidents_16_21_10 |> 
@@ -5990,12 +6124,22 @@ ma_accidents_16_21_10 |>
 
 
 
+
+
+
 <br><br>
 
 
  ```{r}
- #| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
+#| label: "ck-348"
+
+
+
+
+
 
  
 
@@ -6006,6 +6150,15 @@ ma_accidents_16_21_10 |>
 
  ```
 
+
+
+ <br><br>
+
+
+ Our accident dataset will be joined with census tract spatial dataset. 
+
+
+
  <br><br>
 
 
@@ -6014,6 +6167,10 @@ ma_accidents_16_21_10 |>
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-349"
+
+
+
 
 
 
@@ -6027,6 +6184,7 @@ ma_tract_accident <- ma_tract_data_6 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-350"
 
 
 
@@ -6037,6 +6195,7 @@ saveRDS(ma_tract_accident, "ma_tract_accident.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-351"
 
 
 ma_tract_accident <- readRDS("ma_tract_accident.rds")
@@ -6049,8 +6208,11 @@ ma_tract_accident <- readRDS("ma_tract_accident.rds")
 
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
+#| label: "ck-352"
+
 
 
 
@@ -6068,6 +6230,7 @@ ma_tract_accident |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-353"
 
 
 
@@ -6085,6 +6248,7 @@ ma_tract_accident |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-354"
 
 
 
@@ -6102,8 +6266,10 @@ ma_tract_accident |>
 
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
+#| label: "ck-355"
 
 
 ma_tract_accident |> 
@@ -6119,10 +6285,18 @@ ma_tract_accident |>
 <br><br>
 
 
+We'll replace NAs in our census tract features with zeros through impuation. 
+
+
+<br><br>
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-356"
 
 
 ma_tract_accident_2 <- ma_tract_accident |> 
@@ -6140,6 +6314,7 @@ ma_tract_accident_2 <- ma_tract_accident |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-357"
 
 saveRDS(ma_tract_accident_2, "ma_tract_accident_2.rds")
 
@@ -6147,6 +6322,7 @@ saveRDS(ma_tract_accident_2, "ma_tract_accident_2.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-358"
 
 
 ma_tract_accident_2 <- readRDS("ma_tract_accident_2.rds")
@@ -6160,17 +6336,28 @@ ma_tract_accident_2 <- readRDS("ma_tract_accident_2.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-359"
 
 
 ma_tract_accident_2 |> 
+    select(day_of_week, day_type) |> 
     summary()
 
 ```
+
+
+
+<br><br>
+
+NAs in day_of_week will be removed from the dataset. 
+
+<br><br>
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-360"
 
 
 
@@ -6183,6 +6370,7 @@ ma_tract_accident_3 <- ma_tract_accident_2 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-361"
 
 saveRDS(ma_tract_accident_3, "ma_tract_accident_3.rds")
 
@@ -6190,6 +6378,7 @@ saveRDS(ma_tract_accident_3, "ma_tract_accident_3.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-362"
 
 ma_tract_accident_3 <- readRDS("ma_tract_accident_3.rds")
 
@@ -6205,16 +6394,28 @@ ma_tract_accident_3 <- readRDS("ma_tract_accident_3.rds")
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-363"
 
 ma_tract_accident_3 |> 
+    select(day_of_week, day_type) |> 
     summary()
 
 
 ```
 
+
+<br><br>
+
+
+
+
+
+<br><br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-364"
 
 
 ma_tract_cls <- st_crs(ma_tract_accident_3)
@@ -6229,12 +6430,17 @@ ma_tract_cls <- st_crs(ma_tract_accident_3)
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
-#| eval: false
+#| label: "ck-365"
 
-ma_tract_cls
+ma_tract_cls$input
 
 
 ```
+
+<br><br>
+
+
+As with the county spatial dataset, we will transform the ma_tract_accident_3 spatial dataset’s crs to EPSG:4326.  
 
 <br><br>
 
@@ -6245,6 +6451,7 @@ ma_tract_cls
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-366"
 
 ma_census4326 <- ma_tract_accident_3 |> 
     st_transform(crs=4326)
@@ -6252,10 +6459,14 @@ ma_census4326 <- ma_tract_accident_3 |>
 
 ```
 
+<br><br>
+
+
 ```{r}
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-367"
 
 
 saveRDS(ma_census4326, "ma_census4326.rds")
@@ -6265,6 +6476,7 @@ saveRDS(ma_census4326, "ma_census4326.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-368"
 
 
 
@@ -6276,6 +6488,7 @@ ma_census4326 <- readRDS("ma_census4326.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-369"
 
 
 
@@ -6291,6 +6504,7 @@ ma_tract_cls_2 <- st_crs(ma_census4326)
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| label: "ck-370"
 
 
 ma_tract_cls_2$input
@@ -6298,10 +6512,14 @@ ma_tract_cls_2$input
 
 ```
 
+<br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-371" 
 
 
 bins<-c(0,50,500,1000,2000,3000,4000,6000,7000,8000,9500,Inf)
@@ -6309,10 +6527,13 @@ bins<-c(0,50,500,1000,2000,3000,4000,6000,7000,8000,9500,Inf)
 
 ```
 
+<br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-372"
 
 
 
@@ -6323,10 +6544,14 @@ pal<-colorBin(palette="RdYlBu",
 
 ```
 
+
+<br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-373"
 
        
        
@@ -6344,6 +6569,7 @@ ma_tract_formated <- ma_tract_accident_3 |>
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-374"
 
 saveRDS(ma_tract_formated , "ma_tract_formated.rds")
 
@@ -6352,6 +6578,7 @@ saveRDS(ma_tract_formated , "ma_tract_formated.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-375"
 
 ma_tract_formated  <- readRDS("ma_tract_formated.rds")
 
@@ -6364,6 +6591,7 @@ ma_tract_formated  <- readRDS("ma_tract_formated.rds")
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-376"
 
 
 
@@ -6386,6 +6614,7 @@ mytext <- paste(
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-377"
 
 
 
@@ -6417,6 +6646,7 @@ map_tract_population_plt <- ma_census4326 |> leaflet(options = leafletOptions(mi
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-378"
 
 saveRDS(map_tract_population_plt, "map_tract_population_plt.rds")
 
@@ -6424,6 +6654,7 @@ saveRDS(map_tract_population_plt, "map_tract_population_plt.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-379"
 
 map_tract_population_plt <- readRDS("map_tract_population_plt.rds")
 
@@ -6436,6 +6667,7 @@ map_tract_population_plt <- readRDS("map_tract_population_plt.rds")
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| label: "ck-380"
 
 
 
@@ -6450,6 +6682,7 @@ tract_map_population<-map_tract_population_plt %>%
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-381"
 
 
 
@@ -6459,6 +6692,7 @@ saveRDS(tract_map_population, "tract_map_population.rds")
 
 ```{r}
 #| include: false
+#| label: "ck-382"
 
 
 tract_map_population <- readRDS("tract_map_population.rds")
@@ -6472,6 +6706,7 @@ tract_map_population <- readRDS("tract_map_population.rds")
 
 
 ```{r}
+#| label: "ck-383"
 
 
 tract_map_population
@@ -6485,7 +6720,7 @@ tract_map_population
 
 
 
-There are twelve census tracts with populations greater than 9,500, located in the counties of Worcester, Bristol, Middlesex, and Essex.  Hovering over census tracts with populations of 50 and less (dark red), you’ll notice zero housing units.  These areas are most likely commercial.  No census survey was completed for these areas though they do have GEOIDs attached to them which allows us to include them on our map.  Though having low population counts, they encompass roads and have accidents within there boundaries.    
+There are twelve census tracts with populations greater than 9,500, located in the counties of Worcester, Bristol, Middlesex, and Essex.  Hovering over census tracts with populations of 50 or less (dark red), you’ll notice single digit or zero housing units.  Census tracts with single digit housing most likely are commercial areas that have some overlap with residential areas. Areas with zero housing are likely commercial areas or areas that encompass only roads.  Since these areas have no housing and population, no census survey was completed for these areas. They are not considered census tracts in the true sense, though since they GEOIDs attached to them this allowed us to retrieve their coordinates and include them on our map.  Though having low or zero population counts, they encompass roads and have accidents within their boundaries. 
 
 <br><br>
 
@@ -6494,6 +6729,7 @@ There are twelve census tracts with populations greater than 9,500, located in t
 #| echo: false
 #| include: false
 #| eval: false
+#| label: "ck-384"
 
 
 
@@ -6520,9 +6756,13 @@ ma_census4326 |>
 ```
 
 
-#rows / columns 
-10:1 rule 
-You should have at least 10 rows of data for every 1 column (feature) in your dataset. 
+<br><br>
+
+We’ll now prepare our data for modeling.  This includes select predictor features, scaling and centering, and splitting the data into training and testing sets. 
+
+<br><br>
+
+
 
 
 
@@ -6573,6 +6813,9 @@ census_tract_df |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 census_tract_df  |> filter(is.na(total_population_tractE))  |> count(GEOID)
 
@@ -6580,11 +6823,17 @@ census_tract_df  |> filter(is.na(total_population_tractE))  |> count(GEOID)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 census_tract_df |> filter(total_tract_housing_unitsE == 0) |> head(10)
 
 
 ```
+
+
+## Linear
 
 
 
@@ -6634,6 +6883,9 @@ Our next data preparation will be for a poisson regression model.  Unlike our li
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 census_tract_df_3 <- census_tract_df |> 
@@ -6667,6 +6919,9 @@ census_tract_df_3  <- readRDS("census_tract_df_3.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -6862,7 +7117,7 @@ agg_observed <- readRDS("agg_observed.rds")
 
 Next, we want to ensure that all rows of the combination GEOID, Month, and day_type, for accident_count, have no NAs but an actual value.  The complete() function from tidyr will be used for this task.  We will call complete() with the names of our combination of features and fill in the missing values of accident_count with 0. 
 
-Additionally, we will fill missing temperatures for zero-accident months with mean temperature. .  We will then scale the mean_temperature using the scale() function from base R. 
+Additionally, we will fill missing temperatures for zero-accident months with mean temperature.  We will then scale the mean_temperature using the scale() function from base R. 
 
 
 
@@ -7044,12 +7299,37 @@ census_tract_df_2 |>
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
+
 
 
 acci_census_df <- initial_split(census_tract_df_2, prop = 0.80)
 
 
 ```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(acci_census_df, "acci_census_df.rds")
+
+
+```
+
+```{r}
+#| include: false
+
+
+acci_census_df <- readRDS("acci_census_df.rds")
+
+
+
+```
+
+<br><br>
 
 ```{r}
 #| code-fold: true
@@ -7060,6 +7340,10 @@ print(acci_census_df)
 
 
 ```
+
+<br><br>
+
+
 
 ### Poisson Split
 
@@ -7099,6 +7383,9 @@ acci_census_df_2 <- readRDS("acci_census_df_2.rds")
 
 
 ### Linear train/test
+
+
+<br><br>
 
 ```{r}
 #| code-fold: true
@@ -7140,12 +7427,17 @@ dim(test_census_data)
 ```
 
 
+<br><br>
+
 
 ### Poisson train/test
+
+<br><br>
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 train_census_data_2 <- training(acci_census_df_2)
 
@@ -7172,6 +7464,9 @@ train_census_data_2 <- readRDS("train_census_data_2.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 test_census_data_2 <- testing(acci_census_df_2)
@@ -7203,9 +7498,14 @@ test_census_data_2 <- readRDS("test_census_data_2.rds")
 
 
 ### Linear scale and center
+
+<br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -7216,20 +7516,57 @@ census_rec <- recipe(accident_duration ~ ., data = train_census_data) |>
 
 ```
 
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(census_rec, "census_rec.rds")
+
+
+```
+
+```{r}
+#| include: false
+#| 
+census_rec  <- reawdRDS("census_rec.rds")
+
+
+```
 
 
 
-
-
-### Linear
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 train_census_rec <- prep(census_rec, training= train_census_data)
 scaled_census_train <- bake(train_census_rec, new_data = train_census_data)
+
+
+```
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(scaled_census_train, "scaled_census_train.rds")
+
+```
+
+```{r}
+#| include: false
+
+
+scaled_census_train <- readRDS("scaled_census_train.rds")
+
 
 
 ```
@@ -7241,7 +7578,12 @@ scaled_census_train <- bake(train_census_rec, new_data = train_census_data)
 
 # Linear Fixed/Mixed Effects Models
 
+<br><br>
+
 ## Linear Regression
+
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -7293,7 +7635,7 @@ summary(lr)
 
 <br><br>
 
-The summary of the model outputs the coefficients a nd metrics of our model.  Let's focus on the metrics to evaluate our model.  
+The summary of the model outputs the coefficients and metrics of our model.  Let's focus on the metrics to evaluate our model.  
 <br><br>
 
 
@@ -7301,6 +7643,8 @@ First , we'll check the p-value.
 <br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 lr_pvalue <- lr |> 
     glance() |> 
@@ -7315,6 +7659,10 @@ lr_pvalue <- lr |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
 round(lr_pvalue, 4)
 
 
@@ -7323,7 +7671,7 @@ round(lr_pvalue, 4)
 <br><br>
 
 
-The p-value for the lr model is zero.  P-values less than or equal to 0.05 mean a model is  considered significant.
+The p-value for the lr model is zero.  P-values less than or equal to 0.05 mean a model is considered significant.
 
 <br>
 
@@ -7339,6 +7687,8 @@ R Squared defined as the proportion of the variance in our target variable that 
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 lr_rsquared <- lr |> 
@@ -7349,13 +7699,21 @@ lr_rsquared <- lr |>
 
 ```
 
+<br><br>
+
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 round(lr_rsquared, 2)
 
 
 ```
+
+<br><br>
+
 
 The r-squared calue of 0.03 is interpreted as 3% of the variance in accident duration can be explained by the lr model.  The remaining 97% is the leftover noise or unmeasured variance that the lr model failed to explain. Our lr model is not much better than randomness.  
 
@@ -7372,6 +7730,8 @@ RSE measures the standard deviation of the residuals. It tells us the typical si
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 lr_rse <- lr |> 
@@ -7384,6 +7744,8 @@ lr_rse <- lr |>
 <br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -7401,69 +7763,13 @@ The RSE of 0.64, translates into 64% standard deviation in error around our pred
 
 <br>
 
-The r-squared and RSE metrics point to a model that has poor accuracy in predicting accident_ uraction. 
+The r-squared and RSE metrics point to a model that has poor accuracy in predicting accident duration. 
 
 
 <br><br>
 
-```{r}
 
 
-lr_resid <- data.frame(residuals = residuals(lr))
-
-```
-
-
-
-```{r}
-
-
-lr_qq <- ggplot(lr_resid, aes(sample = residuals)) +
-  stat_qq() +
-  stat_qq_line(color = "red") +
-  labs(
-    title = "LR Model Normal Q-Q Plot of Residuals",
-    x = "Theoretical Quantiles",
-    y = "Sample Quantiles"
-  )
-```
-
-```{r}
-
-
-lr_qq
-
-```
-
-```{r}
-
-
-
-lr_resid_data <- data.frame(
-    Fitted = fitted(lr),
-    Residuals = resid(lr)
-)
-
-
-```
-
-```{r}
-
-
-lr_residual_plot <- ggplot(lr_resid_data, aes(x = Fitted, y = Residuals)) +
-    geom_point(color = "steelblue", size =2) +
-    geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
-    labs(title = "lr Model Residual Plot", x = "Fitted Values", y = "Residuals" ) +
-    theme_minimal()
-
-```
-
-```{r}
-
-
-lr_residual_plot
-
-```
 
 
 We'll add the county feature as a predictor and evaluate if this improves model performance. 
@@ -7507,6 +7813,8 @@ lr_2 <- readRDS("lr_2.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 summary(lr_2)
 
@@ -7519,6 +7827,8 @@ summary(lr_2)
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 lr_2_pvalue <- lr_2 |> 
@@ -7536,6 +7846,8 @@ lr_2 p-value
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 round(lr_2_pvalue, 2)
@@ -7548,6 +7860,8 @@ round(lr_2_pvalue, 2)
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 lr_2_rsquared <- lr_2 |> 
@@ -7562,8 +7876,13 @@ lr_2_rsquared <- lr_2 |>
 lr_2 r-squared
 
 
+<br><br>
+
+
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 round(lr_2_rsquared,2)
@@ -7574,6 +7893,8 @@ round(lr_2_rsquared,2)
 <br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -7591,6 +7912,8 @@ lr_2 RSE
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 round(lr_2_rse,2)
@@ -7607,16 +7930,12 @@ The lr_2 model metrics are unchanged from the poor performance of the lr model
 <br><br>
 
 
-```{r}
 
-
-
-
-
-
-```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -7633,6 +7952,9 @@ lr_2_resid <- data.frame(residuals = residuals(lr_2))
 <br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 lr_2_qq <- ggplot(lr_2_resid, aes(sample = residuals)) +
   stat_qq() +
@@ -7652,6 +7974,28 @@ We'll use a qq plot to visually inspect out lr_2 model.
 
 <br><br>
 
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(lr_2_qq, "lr_2_qq.rds")
+
+```
+
+
+```{r}
+#| include: false
+
+
+
+lr_2_qq <- readRDS("lr_2_qq.rds")
+
+
+```
+
 ```{r}
 
 lr_2_qq
@@ -7666,50 +8010,10 @@ The data points curves move upwards away from the red line with the right tail d
 
 <br><br>
 
-```{r}
-
-lr_2_resid_data <- data.frame(
-    Fitted = fitted(lr_2),
-    Residuals = resid(lr_2)
-)
-
-```
-
-<br><br>
 
 
 
 <br><br>
-
-```{r}
-
-lr_2_residual_plot <- ggplot(lr_2_resid_data, aes(x = Fitted, y = Residuals)) +
-    geom_point(color = "steelblue", size =2) +
-    geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
-    labs(title = "lr Model Residual Plot", x = "Fitted Values", y = "Residuals" ) +
-    theme_minimal()
-
-```
-
-
-<br><br>
-
-
-
-
-```{r}
-
-lr_2_residual_plot 
-
-```
-
-
-<br><br>
-
-
-<br><br>
-
-
 
 
 
@@ -7720,7 +8024,14 @@ lr_2_residual_plot
 <br><br>
 
 
-Since our linear regression models performed poorly, we'll use bayesian mixed models for predictions. 
+Since our linear regression models performed poorly, we'll use bayesian mixeded effects models for predictions. 
+
+<br>
+
+
+It should be noted that we fitted a frequentist mixed effect model to our data. The model was unable to calculated variances in both fixed and random effects.   The data may be too complex for this approach which is why we have chosen the Bayesian method. 
+
+
 
 
 <br><br>
@@ -7732,9 +8043,21 @@ Mixed effects models consist of fixed effects and random effects.
 Fixed effects are predictor valiables that have a constant effect across the same population.  They represent relationships you want to test and measure directly.  Examples from our data would be temperature and road category.  
 <br>
 
-Random effects are grouping variablesthat account for natural variations and non-independent data.  They treat group differences as random samples from a larger population,  Census tracts (GEOID), are our random effect. 
+Random effects are grouping variables that account for natural variations and non-independent data.  They treat group differences as random samples from a larger population,  Census tracts (GEOID), are our random effect. 
 
 <br><br>
+
+
+
+In Bayesian analysis, each parameter of the model is considered as a random variable, meaning they are not fixed.  Probability is explicitly used to model this uncertainty.  This differs from the Frequentist approach, which considers parameter values fixed but unknown. 
+
+<br>
+
+For our model, the parameters are the coefficient estimates.  These include the intercept (accident duration) and our predictor features. 
+
+<br><br>
+
+
 
 
 
@@ -7760,12 +8083,6 @@ brms_model <- brm(
 ```
 
 
-```{r}
-
-
-
-
-```
 
 ```{r}
 #| echo: false
@@ -7788,7 +8105,7 @@ brms_model <- readRDS("brms_model.rds")
 ```
 
 
-
+<br><br>
 
 
 ```{r}
@@ -7801,6 +8118,8 @@ summary(brms_model)
 
 
 ```
+
+<br><br>
 
 ```{r}
 #| code-fold: true
@@ -7824,15 +8143,17 @@ performance::check_collinearity(brms_model)
 
 ```
 
+<br><br>
 
 
-```{r}
+ Checking the collinearity of our predictor features, the output shows wind direction and weather condition have high correlation. We will remove these features from the formula. 
 
 
-icc(brms_model, nrep=50)
+<br><br>
 
 
-```
+
+
 
 
 ```{r}
@@ -7874,16 +8195,11 @@ brms_model_2 <- readRDS("brms_model_2.rds")
 
 ```
 
-```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
 
 
+<br><br>
 
-summary(brms_model_2)
 
-
-```
 
 ```{r}
 #| code-fold: true
@@ -7897,8 +8213,8 @@ performance::check_collinearity(brms_model_2)
 ```
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
 #| eval: false
 
 
@@ -7928,8 +8244,9 @@ saveRDS(brms_model_3, "brms_model_3.rds")
 ```
 
 ```{r}
+#| echo: false
 #| include: false
-
+#| eval: false
 
 brms_model_3 <- readRDS("brms_model_3.rds")
 
@@ -7938,6 +8255,9 @@ brms_model_3 <- readRDS("brms_model_3.rds")
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 summary(brms_model_3)
@@ -7974,16 +8294,88 @@ brms_model_3 <- brm(
 
 ```
 
+### Model Evaluation
+
+<br><br>
+
+
 ```{r}
-#| echo: false
-#| include: false
-#| eval: false
+#| code-fold: true
+#| code-summary: "Show Code"
 
-
-summary(brms_model_3)
+summary(brms_model_2)
 
 
 ```
+
+
+
+
+<br><br>
+
+
+Our Bayesian mixed effects model is an improvement from the linear regression model fit earlier.  Near the end of the output under Further Distributional Parameters, we find sigma, our error term, which is similar to RSE from the linear regression model.  It is the variation between census tracts versus the residual variation left over among individual accidents. The sigma estimate of 0.45 means after accounting for temperature, Month, day_type, road_category, and hour_day_sections, the models individual accident duration predictions are typically off target by about +/- 45%.  This is large error term for a model, though it is a 19% improvement over the linear regression models RSE of 64%.  
+
+
+<br><br>
+
+
+
+
+
+## Model Interpretation
+
+
+
+
+<br><br>
+
+
+
+ Group Level Effects. 
+
+Group level effects (Random effects) are found under Multilevel Hyperparameters. 
+Sd(Intercept) = 0.10.  After controlling for temperature, Month, day_type, road_category, and hour_day_sections, baseline accident duration still vary by roughly 10% based on the specific census tract an accident occurs in. 
+sd(Intercept) = 0.48. Even after controlling for all property types, property square feet, bathrooms, median home value, percent college educated, population density, baseline property prices still vary by roughly 48% purely based on the specific census tract they sit in.
+
+
+Fixed Level Effects
+
+Fixed level effects are under Regression Coefficients. 
+
+Intercept (3.79) This is the baseline log accident duration.  This approximately translates to an accident duration of 44.26. 
+
+Bayesian estimation does not have p-values to help determine coefficient significance.  It does have credible intervals, which is the probability an estimate falls within the interval.  Credible intervals that include zero, are not considered significant.   Due to the number of coefficients, we will concentrate on larger estimate vales that are significant. 
+
+Month3 (March):  accident duration is 0.06 log units longer than the reference month of January.  This translates into a 6.2% increase in accident duration over the month of January. 
+
+Month5 (May):  accident duration is 0.07 log units longer than the reference month of January.  This translates into a 7% increase in accident duration over the month of January. 
+Month7 (July):  accident duration is 0.07 log units longer than the reference month of January.  This translates into a 7% increase in accident duration over the month of January. 
+Month8 (August):  accident duration is -0.07 log units shorter than the reference month of January.  This translates into a 6.8% decrease in accident duration over the month of January. 
+
+Month9(September):  accident duration is -0.09 log units shorter than the reference month of January.  This translates into an 8.6% decrease in accident duration over the month of January. 
+
+DaytypeWeekend: accident duration is 0.23 log units longer that the reference DaytypeWeekday.  This translates into a 25.9% increase in accident duration on weekends over weekdays. 
+
+Road_categoryBouvevard: accident duration is -0.07 log units shorter than the reference road category Avenue.  This translates into a 6.8% decrease in accident duration compared to road type Avenue. 
+Road_categoryBridge: accident duration is -0.07 log units shorter than the reference road category Avenue.  This translates into a 7.7% decrease in accident duration compared to road type Avenue. 
+Road_categoryConnector: accident duration is -0.09 log units shorter than the reference road category Avenue.  This translates into an 8.6% decrease in accident duration compared to road type Avenue. 
+Road_categoryCourt: accident duration is 0.15 log units longer1 than the reference road category Avenue.  This translates into a 16.2% increase in accident duration compared to road type Avenue. 
+Road_categorySquare: accident duration is 0.22 log units longer than the reference road category Avenue.  This translates into a 24.6% increase in accident duration compared to road type Avenue. 
+
+Road_categoryTunnel: accident duration is -0.20 log units shorter than the reference road category Avenue.  This translates into a 18.1% decrease in accident duration compared to road type Avenue. 
+hour_day_sectionsEarlyAfternoon: accident duration is 0.12 log units longer than the reference category Dawn.  This translates into a 12.75% increase in accident duration compared to the time-of-day Dawn.
+
+hour_day_sectionsLateAfternoon: accident duration is 0.13 log units longer than the reference category Dawn.  This translates into a 13.88% increase in accident duration compared to the time-of-day Dawn.
+
+hour_day_sectionsMiddleofNight: accident duration is 0.17 log units longer than the reference category Dawn.  This translates into a 18.5% increase in accident duration compared to the time-of-day Dawn.
+
+hour_day_sectionsNight: accident duration is 0.12 log units longer than the reference category Dawn.  This translates into a 12.75% increase in accident duration compared to the time-of-day Dawn.
+
+<br><br>
+
+
+
 
 
 
@@ -8452,6 +8844,8 @@ ppcheck_poi_2
 
 ```
 
+### Model Evaluation
+
 ```{r}
 
 
@@ -8460,6 +8854,8 @@ summary(brms_poisson_2)
 
 
 ```
+
+### Model Interpretation
 
 
 
