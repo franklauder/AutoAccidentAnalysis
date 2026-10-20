@@ -8202,8 +8202,9 @@ brms_model_2 <- readRDS("brms_model_2.rds")
 
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -8212,25 +8213,7 @@ performance::check_collinearity(brms_model_2)
 
 ```
 
-```{r}
-#| echo: false
-#| include: false
-#| eval: false
 
-
-
-brms_model_3 <- brm(
-  log(accident_duration) ~ . -GEOID -Wind_Direction -Weather_Condition + temperature * Month + (temperature | GEOID),
-  data = scaled_census_train,
-  chains = 4,
-  iter = 8000,
-  family = student(),
-  cores = 16, 
-  seed = 42
-)
-
-
-```
 
 ```{r}
 #| echo: false
@@ -8254,47 +8237,17 @@ brms_model_3 <- readRDS("brms_model_3.rds")
 
 ```
 
-```{r}
-#| echo: false
-#| include: false
-#| eval: false
+
+<br><br>
 
 
-summary(brms_model_3)
-
-
-```
-
-
-
-
-
-
-
-
-
-
-
-```{r}
-#| echo: false
-#| include: false
-#| eval: false
-
-
-brms_model_3 <- brm(
-  log(accident_duration) ~ . -GEOID -Wind_Direction -Weather_Condition + temperature * Month + hour_day_sections * day_type + (temperature | GEOID),
-  data = scaled_census_train,
-  chains = 4,
-  iter = 8000,
-  family = student(),
-  cores = 16, 
-  seed = 42
-)
-
-
-```
 
 ### Model Evaluation
+
+<br><br>
+
+
+Model Summary
 
 <br><br>
 
@@ -8311,6 +8264,8 @@ summary(brms_model_2)
 
 
 
+
+
 <br><br>
 
 
@@ -8323,7 +8278,7 @@ Our Bayesian mixed effects model is an improvement from the linear regression mo
 
 
 
-## Model Interpretation
+### Model Interpretation
 
 
 
@@ -8332,25 +8287,36 @@ Our Bayesian mixed effects model is an improvement from the linear regression mo
 
 
 
- Group Level Effects. 
-
-Group level effects (Random effects) are found under Multilevel Hyperparameters. 
-Sd(Intercept) = 0.10.  After controlling for temperature, Month, day_type, road_category, and hour_day_sections, baseline accident duration still vary by roughly 10% based on the specific census tract an accident occurs in. 
-sd(Intercept) = 0.48. Even after controlling for all property types, property square feet, bathrooms, median home value, percent college educated, population density, baseline property prices still vary by roughly 48% purely based on the specific census tract they sit in.
-
-
 Fixed Level Effects
 
-Fixed level effects are under Regression Coefficients. 
+<br><br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+
+round(fixef(brms_model_2),2)
+
+
+```
+
+<br><br>
+
+ 
 
 Intercept (3.79) This is the baseline log accident duration.  This approximately translates to an accident duration of 44.26. 
 
-Bayesian estimation does not have p-values to help determine coefficient significance.  It does have credible intervals, which is the probability an estimate falls within the interval.  Credible intervals that include zero, are not considered significant.   Due to the number of coefficients, we will concentrate on larger estimate vales that are significant. 
+Bayesian estimation does not have p-values to help determine coefficient significance.  It does have credible intervals, which is the probability an estimate falls within the interval.  Credible intervals that include zero, are not considered significant. The lower bound credible interval is column Q2.5 and the upper bound credible interval is Q97.5.    Due to the number of coefficients, we will concentrate on larger estimate vales that are significant. 
 
 Month3 (March):  accident duration is 0.06 log units longer than the reference month of January.  This translates into a 6.2% increase in accident duration over the month of January. 
 
 Month5 (May):  accident duration is 0.07 log units longer than the reference month of January.  This translates into a 7% increase in accident duration over the month of January. 
+
 Month7 (July):  accident duration is 0.07 log units longer than the reference month of January.  This translates into a 7% increase in accident duration over the month of January. 
+
 Month8 (August):  accident duration is -0.07 log units shorter than the reference month of January.  This translates into a 6.8% decrease in accident duration over the month of January. 
 
 Month9(September):  accident duration is -0.09 log units shorter than the reference month of January.  This translates into an 8.6% decrease in accident duration over the month of January. 
@@ -8358,13 +8324,17 @@ Month9(September):  accident duration is -0.09 log units shorter than the refere
 DaytypeWeekend: accident duration is 0.23 log units longer that the reference DaytypeWeekday.  This translates into a 25.9% increase in accident duration on weekends over weekdays. 
 
 Road_categoryBouvevard: accident duration is -0.07 log units shorter than the reference road category Avenue.  This translates into a 6.8% decrease in accident duration compared to road type Avenue. 
+
 Road_categoryBridge: accident duration is -0.07 log units shorter than the reference road category Avenue.  This translates into a 7.7% decrease in accident duration compared to road type Avenue. 
+
 Road_categoryConnector: accident duration is -0.09 log units shorter than the reference road category Avenue.  This translates into an 8.6% decrease in accident duration compared to road type Avenue. 
 Road_categoryCourt: accident duration is 0.15 log units longer1 than the reference road category Avenue.  This translates into a 16.2% increase in accident duration compared to road type Avenue. 
+
 Road_categorySquare: accident duration is 0.22 log units longer than the reference road category Avenue.  This translates into a 24.6% increase in accident duration compared to road type Avenue. 
 
 Road_categoryTunnel: accident duration is -0.20 log units shorter than the reference road category Avenue.  This translates into a 18.1% decrease in accident duration compared to road type Avenue. 
 hour_day_sectionsEarlyAfternoon: accident duration is 0.12 log units longer than the reference category Dawn.  This translates into a 12.75% increase in accident duration compared to the time-of-day Dawn.
+
 
 hour_day_sectionsLateAfternoon: accident duration is 0.13 log units longer than the reference category Dawn.  This translates into a 13.88% increase in accident duration compared to the time-of-day Dawn.
 
@@ -8374,38 +8344,24 @@ hour_day_sectionsNight: accident duration is 0.12 log units longer than the refe
 
 <br><br>
 
+ Group Level Effects. 
+
+Group level effects (Random effects) are found under Multilevel Hyperparameters from the summary ouyput. 
+Sd(Intercept) = 0.10.  After controlling for temperature, Month, day_type, road_category, and hour_day_sections, baseline accident duration still vary by roughly 10% based on the specific census tract an accident occurs in. 
 
 
 
 
-
-```{r}
-
-
-
-brms_model_cat_plot_top_60 <- brms_model_2 %>%
-  spread_draws(r_GEOID[GEOID, Intercept]) %>%
-  median_qi(.width = 0.95) %>%
-  slice_max(order_by = abs(r_GEOID), n = 60) %>%
-  ggplot(aes(x = r_GEOID, y = reorder(GEOID, r_GEOID), xmin = .lower, xmax = .upper)) +
-  geom_pointinterval(color = "#1f78b4") +
-  geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
-  theme_minimal() +
-  labs(
-    title = "Top 60 Most Extreme Census Tract Effects (brms_model)",
-    x = "Log Accident Duration Adjustment",
-    y = "Census Tract (GEOID)"
-  )
-
-
-```
-
+<br><br>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
-brms_model_cat_plot_top_60_2 <- brms_model_2 %>%
+brms_model_cat_plot_top_100 <- brms_model_2 %>%
   spread_draws(r_GEOID[GEOID, Intercept]) %>%
   median_qi(.width = 0.95) %>%
   slice_max(order_by = abs(r_GEOID), n = 100) %>%
@@ -8414,10 +8370,32 @@ brms_model_cat_plot_top_60_2 <- brms_model_2 %>%
   geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
   theme_minimal() +
   labs(
-    title = "Top 60 Most Extreme Census Tract Effects (brms_model)",
+    title = "Top 100 Most Extreme Census Tract Effects",
     x = "Log Accident Duration Adjustment",
     y = "Census Tract (GEOID)"
   )
+
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(brms_model_cat_plot_top_100, "brms_model_cat_plot_top_100.rds")
+
+
+```
+
+
+```{r}
+
+
+
+brms_model_cat_plot_top_100 <- readRDS("brms_model_cat_plot_top_100.rds")
 
 
 
@@ -8433,79 +8411,60 @@ brms_count <- brms_model_2 %>%
 
 ```
 
-```{r}
-
-
-
-brms_model_cat_plot_top_60
-
-
-```
 
 ```{r}
 
 
-brms_model_cat_plot_top_60_2
+print(brms_count, n=100)
 
 
 ```
+
+<br><br>
+
+
+
+
+Now, let’s evaluate our model’s group-level effects of individual census tracts. We’ll use an interval plot to accomplish this. It visualizes the estimated accident duration adjustments for individual census tracts in our dataset alongside their Bayesian windows.
+How to read an interval plot: 
+The Vertical Y-Axis (Left): Each row represents a specific census tract. 
+The Horizontal X-Axis (Bottom): This represents the random effect deviation (in log accident duration units) from the global baseline. Remember, the global baseline is the average accident duration of each data point. 
+The Dark Blue Circles: The median posterior estimate for each census tract. 
+The Light Blue Whisker Lines: The 95% Credible Intervals (outer uncertainty window). 
+The Vertical Red Zero Line (0): Represents the overall average census tract in our dataset.
+Because of the large number of census tracts (1,462), our plot will only include the top one hundred census tracts with the most extreme effects.
+
+<br><br>
+
+
+
 
 ```{r}
 
 
-ma_census4326 |> 
-    filter(GEOID %in% c("25021418004",  "25001011802","25005644200", "25017321500", "25021416101", "25021421200","25023507101", "25017312000", "25005630202","25017315401", "25021421100", "25017373902",
-                         "25025130402", "25017358700", "25009211201","25025101001", "25025100800", "25025140300","25023520100", "25009208401", "25025981100", "25023502101")) |> 
-                            count(County) |> 
-                            arrange(desc(n)) |> 
-                            st_drop_geometry()
+
+brms_model_cat_plot_top_100
 
 
 ```
 
-```{r}
+<br><br>
 
+Interpreting the interval plot: The dots and intervals span roughly from -0.33 up to +0.48 on the log scale. This shows large variation across these 100 census tracts. Some tracts carry a large baseline accident duration reduction (far left), while others carry a large duration increase (far right).  The census tracts whose light blue whisker lines do not cross the vertical 0 line (the ones completely to the far left or far right) are statically significant. This means these census tracts a proven to be significant accident duration drivers. Location alone pushes their duration of accidents far above or below the regional average, independent of temperature, Month, day_type, road_category, and hour_day_sections.
+<br>
+Of the 100 census tracts in the plot, 46 crossed the vertical zero line, and thus are not significant. This means that 54 census tracts are significant (34 to the far left and 20 to the far right). 
 
-ma_census4326 |> 
-    filter(GEOID %in% c("25021418004",  "25001011802","25005644200", "25017321500", "25021416101", "25021421200","25023507101", "25017312000", "25005630202","25017315401", "25021421100", "25017373902",
-                         "25025130402", "25017358700", "25009211201","25025101001", "25025100800", "25025140300","25023520100", "25009208401", "25025981100", "25023502101")) |> 
-                            count(County,GEOID) |> 
-                            arrange(desc(n)) |> 
-                            st_drop_geometry()
+<br>
+Understanding the significance of these census tracts is best done by viewing them on a map.
 
-
-
-```
-
-```{r}
-
-
-ma_census4326 |> 
-    filter(GEOID %in% c( "25017320105",  "25021419700", "25021419800", "25009254401", "25025010600", "25027744103", "25017368400","25013802101", "25025170301", "25025170400", "25017350105", "25013810100",
-                        "25017320106", "25021411200", "25025081001", "25027732901","25017358600","25017374800", "25005614102", "25017337300", "25027710200", "25021403100", "25017342501", "25023501204",
-                          "25017383700", "25017384003", "25017374200", "25025050901", "25021410100","25021414100")) |> 
-                            count(County) |> 
-                            arrange(desc(n)) |> 
-                            st_drop_geometry()
-
-
-```
-
-```{r}
-
-
-ma_census4326 |> 
-    filter(GEOID %in% c( "25017320105",  "25021419700", "25021419800", "25009254401", "25025010600", "25027744103", "25017368400","25013802101", "25025170301", "25025170400", "25017350105", "25013810100",
-                        "25017320106", "25021411200", "25025081001", "25027732901","25017358600","25017374800", "25005614102", "25017337300", "25027710200", "25021403100", "25017342501", "25023501204",
-                          "25017383700", "25017384003", "25017374200", "25025050901", "25021410100","25021414100")) |> 
-                            count(County, GEOID) |> 
-                            arrange(desc(n)) |> 
-                            st_drop_geometry()
-
-```
+We’ll create two maps, one for extreme lower census tracts and one for extreme higher census tracts.  We’ll recreate our census tract population map from earlier and add the individual accidents of significant census tracts as points on each map.
 
 
 
+
+
+
+<br><br>
 
 
 
@@ -8519,7 +8478,7 @@ bins<-c(0,50,500,1000,2000,3000,4000,6000,7000,8000,9500,Inf)
 ```
 
 
-
+<br>
 
 
 ```{r}
@@ -8535,6 +8494,7 @@ pal<-colorBin(palette="RdYlBu",
 ```
 
 
+<br>
 
 ```{r}
 #| code-fold: true
@@ -8564,7 +8524,7 @@ map_population_extreme_tract_high <- ma_census4326 |> leaflet(options = leafletO
     fillOpacity = 0.5,
     bringToFront = FALSE)) |> 
  addMarkers(
-    data = subset(ma_census4326, GEOID %in% c("25021418004", "25001011802", "25017321500", "25005644200", "25005630202","25017315403", "25021421200","25017373902", "25023520100", "25023507101", "25001010206", "25025051000", ":25025110105", "25023511702","25009262100", "25009254402", "25017383600")),
+    data = subset(ma_census4326, GEOID %in% c("25021418004", "25001011802", "25017321500", "25005644200", "25005630202","25017315403", "25021421200","25017373902", "25023520100", "25023507101", "25001010206", "25025140300", "25023502101", "25025051000","25025110105", "25023511702", "25009262100", "25009254402", "25017383600", "25017320102")),
     lng = ~LONGITUDE,
     lat = ~LATITUDE,
     popup = ~paste("Accident ID: ", ID,
@@ -8575,6 +8535,8 @@ map_population_extreme_tract_high <- ma_census4326 |> leaflet(options = leafletO
 
 
 ```
+
+<br>
 
 
 
@@ -8610,11 +8572,14 @@ map_population_extreme_tract_high <- readRDS("map_population_extreme_tract_high.
 
 
 tract_map_extreme_higher_plt <- map_population_extreme_tract_high %>% 
-  addLegend(pal = pal, values = ~total_population_tractE, opacity = 0.6, title = "Massachusetts Extreme Census Tracts (Higher)",
+  addLegend(pal = pal, values = ~total_population_tractE, opacity = 0.6, title = "Massachusetts Census Tracts Population",
   position = "bottomright")
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 #| echo: false
@@ -8643,6 +8608,10 @@ tract_map_extreme_higher_plt
 ```
 
 
+<br><br>
+
+
+
 
 ```{r}
 
@@ -8667,9 +8636,8 @@ map_population_extreme_tract_lower <- ma_census4326 |> leaflet(options = leaflet
     fillOpacity = 0.5,
     bringToFront = FALSE)) |> 
  addMarkers(
-    data = subset(ma_census4326, GEOID %in% c("25017320105","25021419700","25009254401", "25009254401", "25013802101","25017350105", "25009252101", "25025081001", "25009268200", "25021411200", "25025170301", 
-                                              "25027732500", "25027710200","25017337300", "25017368400", "25005614102", "25027744103", "25017374800", "25017321400", "5017383700", "25027737300", "25021403100",
-                                               "25025050901", "25017320106", "25025010802", "25017367200", "25025000806", "25025020305","25023501204", "25017358600", "25025100700", "25025090100", "25021416400")),
+    data = subset(ma_census4326, GEOID %in% c("25017320105","25021419700","25009254401", "25021419800", "25013802101","25017350105", "25009252101", "25025081001", "25009268200", "25021411200", "25025170301", 
+                                              "25027732500", "25027710200","25017337300", "25017368400", "25005614102", "25027744103", "25017374800", "25017321400", "5017383700", "25027737300","25005631101", "25021403100","25025050901", "25017320106", "25025010802", "25017367200", "25025000806", "25025020305","25023501204", "25017358600", "25025100700", "25025090100", "25021416400")),
     lng = ~LONGITUDE,
     lat = ~LATITUDE,
     popup = ~paste("Accident ID: ", ID,
@@ -8737,6 +8705,60 @@ tract_map_extreme_lower_plt <- readRDS("tract_map_extreme_lower_plt.rds")
 
 tract_map_extreme_lower_plt
 
+
+
+```
+
+
+```{r}
+
+
+print(ma_census4326 |> 
+    select(GEOID, road_category, tract_accident_count) |> 
+    filter(GEOID == "25009254401"), n=500)
+
+
+```
+
+```{r}
+
+
+print(ma_census4326 |> 
+    select(GEOID, ID, road_category, tract_accident_count) |> 
+    filter(GEOID == "25009254402") |> 
+    arrange(ID), n=700)
+
+
+
+```
+
+```{r}
+
+
+ma_census4326 |> glimpse()
+
+
+```
+
+
+```{r}
+
+ma_census4326 |>
+    filter(GEOID == "25009254401") |> 
+    filter(road_category == "Interstate") |> 
+    summary()
+
+
+```
+
+```{r}
+
+
+
+ma_census4326 |>
+    filter(GEOID == "25009254402") |> 
+    filter(road_category == "Interstate") |> 
+    summary()
 
 
 ```
