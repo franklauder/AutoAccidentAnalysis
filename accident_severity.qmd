@@ -1314,6 +1314,41 @@ ma_accidents_16_21_5  <- readRDS("ma_accidents_16_21_5.rds")
 ```
 
 
+```{r}
+
+
+ma_accidents_16_21_5 |> glimpse()
+
+
+```
+
+```{r}
+
+ma_accidents_16_21_5 |> 
+    select(ID, Start_Time, End_Time, Street, City, GEOID) |> 
+    filter(ID == "A-7680343")
+
+
+
+
+```
+
+```{r}
+
+
+ma_accidents_16_21_5 |> 
+    select(Year, accident_duration) |> 
+    group_by(Year) |> 
+    summarize(median_duration = median(accident_duration)) 
+  
+
+
+
+```
+
+
+
+
 
 <br><br>
 
@@ -1920,7 +1955,89 @@ ma_accidents_16_21_7 <- readRDS("ma_accidents_16_21_7.rds")
 
  ```
 
-   <br><br>
+ <br><br>
+
+
+ ```{r}
+ 
+
+
+print(ma_accidents_16_21_7 |> 
+    select(Year, road_category, accident_duration) |> 
+    filter(Year == "2016") |> 
+    group_by(road_category) |> 
+    summarize(median_duration = median(accident_duration)), n=30)
+
+
+
+ ```
+
+ ```{r}
+ 
+
+print(ma_accidents_16_21_7 |> 
+    select(Year, road_category, accident_duration) |> 
+    filter(Year == "2017") |> 
+    group_by(road_category) |> 
+    summarize(median_duration = median(accident_duration)), n=30)
+
+
+
+ ```
+
+ ```{r}
+ 
+
+
+
+print(ma_accidents_16_21_7 |> 
+    select(Year, road_category, accident_duration) |> 
+    filter(Year == "2018") |> 
+    group_by(road_category) |> 
+    summarize(median_duration = median(accident_duration)), n=30)
+
+
+ ```
+
+ ```{r}
+ 
+
+
+print(ma_accidents_16_21_7 |> 
+    select(Year, road_category, accident_duration) |> 
+    filter(Year == "2019") |> 
+    group_by(road_category) |> 
+    summarize(median_duration = median(accident_duration)), n=30)
+
+
+ ```
+
+
+ ```{r}
+ 
+
+
+print(ma_accidents_16_21_7 |> 
+    select(Year, road_category, accident_duration) |> 
+    filter(Year == "2020") |> 
+    group_by(road_category) |> 
+    summarize(median_duration = median(accident_duration)), n=30)
+
+
+
+ ```
+
+ ```{r}
+ 
+
+print(ma_accidents_16_21_7 |> 
+    select(Year, road_category, accident_duration) |> 
+    filter(Year == "2021") |> 
+    group_by(road_category) |> 
+    summarize(median_duration = median(accident_duration)), n=30)
+
+
+ ```
 
 
 
@@ -5588,6 +5705,223 @@ The number of accidents by road category as a proprtion of month appears relativ
 
 
 
+### Year
+
+
+<br><br>
+
+
+
+<br><br>
+
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+accident_duration_year <- ma_accidents_16_21_7 |>
+    select(Year, road_category, accident_duration) |> 
+    group_by(Year, road_category) |> 
+    mutate(median_duration = median(accident_duration)) |> 
+    ungroup() |> 
+    mutate(
+        hover_text = paste0(
+            "<br>Median Accident Duration: ", median_duration,
+             "<br>Road Category: ", road_category) )
+
+```
+
+<br><br>
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(accident_duration_year, "accident_duration_year.rds")
+
+
+```
+
+```{r}
+#| include: false
+
+
+accident_duration_year <- readRDS("accident_duration_year.rds")
+
+
+
+```
+
+<br><br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+accident_duration_period_plt <- ggplot(accident_duration_year , aes(x = Year, y = median_duration, color = road_category, text = hover_text)) +
+    geom_line(aes(group = road_category)) +
+    labs(
+    title = "Median Accident Duration by Road Category and Year",
+    x = "Year",
+    y = "Median Accident Duration"
+  ) +
+    theme(legend.position = "none") +
+    theme_minimal(base_size = 12)
+
+
+
+```
+
+<br><br>
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(accident_duration_period_plt, "accident_duration_period_plt.rds")
+
+
+```
+
+```{r}
+#| include: false
+
+
+accident_duration_period_plt <- readRDS("accident_duration_period_plt.rds")
+
+
+```
+
+```{r}
+
+
+ggplotly(accident_duration_period_plt, tooltip = "text")
+
+
+```
+
+
+
+
+<br><br>
+
+
+Viewing this line graph may be difficult due to the number of road categories yet we can observe interesting pattern.  Other than a few categories, many categories have similar median accident durations for a year.  This becomes evident starting in the year 2018, where many categories have a median accident duration near 30.   The years 2019, 2020, and 2021 have many categories with median accident durations near 60.  To make inspecting this plot easier, it has an interactive element.  Hovering over a line you can view the category name and its associated median accident duration. 
+
+<br><br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+year_med_dur <- ma_accidents_16_21_5 |> 
+    select(Year, accident_duration) |> 
+    group_by(Year) |> 
+    summarize(median_duration = median(accident_duration)) 
+
+
+
+```
+
+<br><br>
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(year_med_dur, "year_med_dur.rds")
+
+
+```
+
+```{r}
+#| include: false
+
+year_med_dur <- readRD("year_med_dur.rds")
+
+
+```
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+acc_dur_year_plt <- ggplot(year_med_dur, aes(x = Year, y = median_duration) ) +
+    geom_col() +
+    labs(
+    title = "Median Accident Duration by Year",
+    x = "Year",
+    y = "Median Accident Duration"
+  ) +
+    theme_minimal(base_size = 12)
+
+
+
+```
+
+<br><br>
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(acc_dur_year_plt, "acc_dur_year_plt.rds")
+
+
+```
+
+```{r}
+#| include: false
+
+
+acc_dur_year_plt <- readRDS("acc_dur_year_plt.rds")
+
+
+```
+
+```{r}
+
+
+acc_dur_year_plt
+
+
+```
+
+<br><br>
+
+
+
+
+
+Visualizing the median accident duration by year we a dramatic change in values starting in 2019.   Median accident duration for the years 2016, 2017, and 2018 is close to 30 minutes.  The median accident duration doubles to 60 minutes for the years 2019, 2020, and 2021.  Our column plot displays the same changes we observed in our time series plot of road categories.  These differences between the year groups might be due to a change on how an accidents end time is determines, though  we have no documentation to support this. 
+
+<br><br>
+
+
 
 
 
@@ -8764,6 +9098,44 @@ ma_census4326 |>
 ```
 
 
+```{r}
+
+
+median_acc_dur <- ma_census4326 |> 
+    group_by(road_category) |> 
+    summarize(med_acc_dur = median(accident_duration)) |> 
+    st_drop_geometry() 
+    
+
+
+
+
+```
+
+
+```{r}
+
+
+print(median_acc_dur |> 
+    select(road_category, med_acc_dur) |> 
+    arrange(desc(med_acc_dur)), n=30)
+
+
+
+```
+
+```{r}
+
+
+
+print(ma_census4326 |> 
+    count(road_category) |> 
+    arrange(desc(n)), n = 30)
+
+
+
+```
+
 
 
 
@@ -8808,6 +9180,10 @@ prior(gamma(0.01, 0.01), class = "shape") - The negative binomial distribution e
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -8851,6 +9227,10 @@ brms_poisson_2 <- readRDS("brms_poisson_2.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
 
 
 ppcheck_poi_2 <- pp_check(brms_poisson_2, type = "dens_overlay", ndraws = 50)
@@ -8869,6 +9249,9 @@ ppcheck_poi_2
 ### Model Evaluation
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -8882,6 +9265,10 @@ summary(brms_poisson_2)
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 tract_ranef <- ranef(brms_poisson_2)$GEOID[, , "Intercept"] |> 
     as.data.frame() |> 
@@ -8924,6 +9311,10 @@ tract_ranef <- rreadRDS("tract_ranef.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
 
 
 
@@ -8933,6 +9324,10 @@ head(tract_ranef)
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 boundaries = ma_tract_data_6 |> 
     select(GEOID, census_tract, geometry)
@@ -8956,6 +9351,10 @@ boundaries <- readRDS("boundaries.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 boundaries_clean <- boundaries %>%
   mutate(GEOID = as.character(GEOID)) %>%
@@ -8985,6 +9384,10 @@ boundaries_clean <- readRDS("boundaries_clean.rds")
 Joining spatial polygons with random effect rate ratios. 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -9016,6 +9419,9 @@ map_sf <- readRDS("map_sf.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 map_sf
@@ -9026,9 +9432,13 @@ map_sf
 
 
 
-We'll filterthe map_sf dataset to tracts that have estimated random effects. 
+We'll filter the map_sf dataset to tracts that have estimated random effects. 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -9057,6 +9467,9 @@ map_analysis <- readRDS("map_analysis.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 map_analysis
@@ -9070,6 +9483,10 @@ map_analysis
 We'll use the poly2nb function from the spdep library to build a adjacency list (Queen contiguity: sharing a border or corner point)
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 neighbors <- poly2nb(map_analysis, queen = TRUE)
@@ -9098,6 +9515,10 @@ neighbors <- readRDS("neighbors.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
 
 
 neighbors
@@ -9111,6 +9532,10 @@ We have observations with no neighbors. To handle these islands/isolated tracts 
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 weights_list <- nb2listw(neighbors, style = "W", zero.policy = TRUE)
 
@@ -9138,6 +9563,9 @@ weights_list <- readeRDS("weights_list.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 weights_list
@@ -9147,6 +9575,10 @@ weights_list
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -9179,6 +9611,9 @@ moran_analytical <- readRDS("moran_analytical.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -9222,6 +9657,10 @@ First we'll find common census tracts across boundaries clean and train_cenusus_
 <br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -9237,6 +9676,10 @@ Next, we'll subset spattial polygons strictly to common GEOIDs.
 <br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 map_statewide <- boundaries_clean |> 
@@ -9254,6 +9697,10 @@ Spatial neighbor graph will be contructed.
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 nb_statewide <- poly2nb(map_statewide, queen = TRUE)
@@ -9270,6 +9717,10 @@ CAR matrices canno include disconnected islands (0 neighbors). A check will be p
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 islands <- which(card(nb_statewide) == 0)
 
@@ -9285,6 +9736,10 @@ map_statewide[-islands, ] - Removes islands from spatial polygon
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 if (length(islands) > 0) {
     island_geoids <- map_statewide$GEOID[islands]
@@ -9312,6 +9767,10 @@ A strictly binary W matrix will be built. nb2mat() function is from spdep librar
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -9322,6 +9781,10 @@ W_bin <- nb2mat(nb_statewide, style = "B", zero.policy = TRUE)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 rownames(W_bin) <- map_statewide$GEOID
@@ -9341,6 +9804,10 @@ The model data will subsetted to strictly to the final connected tracts in W_bin
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -9380,6 +9847,10 @@ Final check to verify strict alignment.
 <br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 stopifnot(identical(levels(train_census_data_3$GEOID), rownames(W_bin)))
@@ -9413,6 +9884,10 @@ Now that our data is prepared, we can fit the CAR model.
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 brms_poisson_3 <- brm(
@@ -9464,6 +9939,9 @@ brms_poisson_3  <- readRDS("brms_poisson_3.rds")
 <br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -9485,6 +9963,10 @@ summary(brms_poisson_3)
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -9494,6 +9976,10 @@ fixef_summary_3 <- fixef(brms_poisson_3)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 irr_table_3<- exp(fixef_summary_3[, c("Estimate", "Q2.5", "Q97.5")])
@@ -9512,12 +9998,15 @@ irr_table_3<- exp(fixef_summary_3[, c("Estimate", "Q2.5", "Q97.5")])
 
 ```{r}
 
-
+exp()
 
 
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 round(irr_table_3, 2)
@@ -9530,9 +10019,9 @@ round(irr_table_3, 2)
 
 day_typeWeekend - IRR = exp(-3.18) = approximatly 0.042.  After controlling for residential population and local spatial structure, the per-capita baseline accident rate drops by roughly 96% on weekends relative to weekkdays (1 - .042) x 100
 
-Temperature - The credible interval range includes zero and thus Temperature is not signifcant. Temperature does not not exert an independent effect one Month and spatial structure are contolled for. 
+Temperature - The credible interval range includes zero and thus Temperature is not signifcant. Temperature does not not exert an independent effect on Month and spatial structure are contolled for. 
 
-Month - March (-0.16, IRR approximatly 0.85) and April (-0.13, IRR aprroximatly 0.88) show lower accident rates. Accident rates drop by 15% for March and 125 for April relative to the reference month of January.  September (0.14, IRR approximatly 1.15), October (0.22, IRR approximatly 1.25), November (0.27, IRR approximatly 1.31), and December (0.16, IRR approximatly 1.17), show an increase in accident rates.  Accident rates increase by 15% for September, 25% for October, 31% for November, and 17% for December realative to the reference month January. The remaining months have credible interval ranges that include zero and thus are not significant. 
+Month - March (-0.16, IRR approximatly 0.85) and April (-0.13, IRR aprroximatly 0.88) show lower accident rates. Accident rates drop by 15% for March and 12% for April relative to the reference month of January.  September (0.14, IRR approximatly 1.15), October (0.22, IRR approximatly 1.25), November (0.27, IRR approximatly 1.31), and December (0.16, IRR approximatly 1.17), show an increase in accident rates.  Accident rates increase by 15% for September, 25% for October, 31% for November, and 17% for December realative to the reference month January. The remaining months have credible interval ranges that include zero and thus are not significant. 
 
 
 
@@ -9540,6 +10029,10 @@ Month - March (-0.16, IRR approximatly 0.85) and April (-0.13, IRR aprroximatly 
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 pp_checl(brms_poisson_3)
@@ -9549,6 +10042,10 @@ pp_checl(brms_poisson_3)
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -9569,6 +10066,10 @@ loo_compare(loo(brms_poisson_2), loo(brms_poisson_3)
  <br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 spatial_effects <- summary(brms_poisson_3)$random$GEOID 
@@ -9581,6 +10082,10 @@ spatial_effects <- summary(brms_poisson_3)$random$GEOID
 If pulling directly via posterior draws:
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -9613,6 +10118,10 @@ icar_draws <- readRDS("icar_draws.rds")
 <br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -9660,6 +10169,9 @@ icar_summary <- readRDS("icar_summary.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -9673,6 +10185,10 @@ head(icar_summary)
 <br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 spatial_risk_df <- icar_summary %>%
@@ -9717,6 +10233,10 @@ plot_df <- readRDS("spatial_risk_df.rds")
 <br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -9774,6 +10294,7 @@ saveRDS(tract_spatial_risk_plt, "tract_spatial_risk_plt.rds")
 ```
 
 ```{r}
+#| include: false
 
 tract_spatial_risk_plt <- readRDS("tract_spatial_risk_plt.rds")
 
@@ -9781,6 +10302,8 @@ tract_spatial_risk_plt <- readRDS("tract_spatial_risk_plt.rds")
 ```
 
 ```{r}
+
+
 
 
 tract_spatial_risk_plt
@@ -9793,6 +10316,10 @@ tract_spatial_risk_plt
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 extremes_df <- spatial_risk_df %>%
@@ -9823,6 +10350,9 @@ extremes_df <- readRDS("extremes_df.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 print(extremes_df, n=80)
 
@@ -9842,6 +10372,10 @@ print(extremes_df |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 high_low_tract_risk_plt <- ggplot(extremes_df, aes(x = GEOID, y = spatial_RR, color = significance)) +
@@ -9901,6 +10435,10 @@ high_low_tract_risk_plt
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -9921,6 +10459,10 @@ W_mainland   <- nb2mat(nb_mainland, style = "B")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -9955,6 +10497,10 @@ map_icar <- readRDS("map_icar.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -9986,6 +10532,10 @@ map_leaflet_icar <- reawdRDS("map_leaflet_icar.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -9996,6 +10546,10 @@ max_val <- max(abs(log(map_icar$spatial_RR)), na.rm = TRUE)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 pal_car <- colorNumeric(
   palette = "RdYlBu",
@@ -10008,6 +10562,10 @@ pal_car <- colorNumeric(
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 map_icar_sf <- st_transform(map_icar, 4326)
@@ -10034,6 +10592,10 @@ map_icar_sf  <- readRDS("map_icar_sf.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 labels_car <- sprintf(
@@ -10052,6 +10614,10 @@ labels_car <- sprintf(
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -10126,26 +10692,9 @@ extreme_tract_high_count_plt <- readRDS("extreme_tract_high_count_plt.rds")
 <br><br>
 
 
-
 <br><br>
 
-```{r}
-
-
-
-extreme_tract_high_count_plt
-
-
-```
-
-
-
-
-<br><br>
-
-<br><br>
-
-To help with the interpretation of our map, we’ll review the terms used and how they apply to our analysis.  
+To help with the interpretation of our maps we’ll review the terms used and how they apply to our analysis.  
 
 <br>
 
@@ -10170,18 +10719,16 @@ You’ll find the Multiplier Score when you hove over any census tract.
 
 Spatial
 
-We call it spatial because traffic doesn’t stop at invisible This model smooths out the noisy one-off spikes by looking at a census tract and its surrounding neighbors together, giving us a true underlying risk map instead of random flukes. 
+We call it spatial because traffic doesn’t stop at invisible borders.  This model smooths out the noisy one-off spikes by looking at a census tract and its surrounding neighbors together, giving us a true underlying risk map instead of random flukes. 
 
 <br>
 
-Spatial
 
-We call it spatial because traffic doesn’t stop at invisible This model smooths out the noisy one-off spikes by looking at a census tract and its surrounding neighbors together, giving us a true underlying risk map instead of random flukes. 
 
 <br>
 Log Spatial RR
 
-On our map you’ll find a legend scale for Log Spatial RR.  This is the shades a census tract base on its log spatial RR.  We use the Log Rate Ratio to make colors look fair on a map. 
+On our map you’ll find a legend scale for Log Spatial RR.  This is the shades a census tract baseed on its log spatial RR.  We use the Log Rate Ratio to make colors look fair on a map. 
 
  0.0 is the neutral center: It means a census tract is right at the statewide average (Multiplier = 1.0).
 
@@ -10203,8 +10750,41 @@ How to read the values:
 
 
 
+We’ve also added the individual accidents from our “Top 40 Highest & Lowest Risk Census Tracts" plot as markers on our maps.  This helps with interpreting our maps in two ways; it helps us focus on where the most extreme census tracts are located and adding the markers help locate what roads, interstates, highways, etc. the accidents occurred within a specific census tract. 
+
+
+<br><br>
 
 ```{r}
+
+
+
+extreme_tract_high_count_plt
+
+
+```
+
+
+
+
+<br><br>
+
+
+
+
+
+
+
+<br><br>
+
+
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
