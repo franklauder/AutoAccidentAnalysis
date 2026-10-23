@@ -7724,10 +7724,30 @@ acci_census_df_2 <- readRDS("acci_census_df_2.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
 train_census_data <- training(acci_census_df)
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(train_census_data , "train_census_data.rds")
+
+```
+
+```{r}
+#| include: false
+
+
+train_census_data  <- readRDS("train_census_data.rds")
 
 
 ```
@@ -7744,10 +7764,30 @@ dim(train_census_data)
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 test_census_data <- testing(acci_census_df)
 
+
+```
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(test_census_data, "test_census_data.rds")
+
+```
+
+```{r}
+#| include: false
+
+
+test_census_data <- readRDS("test_census_data.rds")
 
 ```
 
@@ -7762,6 +7802,49 @@ dim(test_census_data)
 
 
 <br><br>
+
+
+We’ll be using the model fit on the training data to predict on our test data.  Because there is a spatial element in our data (census tract), we need to confirm that all census tracts in our test data are also in our training data.  
+
+<br><br>
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+test_census_data$Exists <- test_census_data$GEOID %in% train_census_data$GEOID
+
+
+```
+
+<br><br>
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+test_census_data |> 
+    count(Exists)
+
+
+
+```
+
+<br><br>
+
+Our results show 42 FALSE counts, meaning these census tracts from our testing data are not in our training data.  We’ll drop these rows from the testing data when we are ready to predict. 
+
+
+<br><br>
+
+
+
+
+
+
+
 
 
 ### Poisson train/test
@@ -7828,10 +7911,53 @@ test_census_data_2 <- readRDS("test_census_data_2.rds")
 
 
 
+<br><br>
+
+
+Since we performed a different split of our data for the poison model, we’ll again confirm if census tracts in the test data are in the training data. 
+
+
+<br><br>
+
+
+```{r}
+
+
+test_census_data_2$Exists <- test_census_data_2$GEOID %in% train_census_data_2$GEOID
+
+
+```
+
+
+<br><br>
+
+```{r}
+
+test_census_data_2 |> 
+    count(Exists)
+
+
+```
 
 
 
-### Linear scale and center
+
+
+<br><br>
+
+
+The result shows a count of only TRUE.  This means that for our poisson test data, all its GEOIDs are in the poisson training data and thus no rows must be dropped before predicting. 
+
+
+<br><br>
+
+
+
+
+
+
+
+### Linear: scale and center
 
 <br><br>
 
@@ -9711,7 +9837,7 @@ nb_statewide <- poly2nb(map_statewide, queen = TRUE)
 <br><br>
 
 
-CAR matrices canno include disconnected islands (0 neighbors). A check will be performed to identify any census tracts with no neigbors with the card() function from spdep. 
+CAR matrices cannot include disconnected islands (0 neighbors). A check will be performed to identify any census tracts with no neigbors with the card() function from spdep. 
 
 <br><br>
 
@@ -10866,17 +10992,138 @@ extreme_tract_low_count_plt
 
 
 
+### Predict on Test Data
 
+
+<br><br>
+
+
+
+<br><br>
+
+
+
+
+
+<br><br>
 
 
 ```{r}
 
 
 
+test_census_data_3 <- test_census_data_2 |> 
+    filter(GEOID != "25005646104")
+
+
+```
+
+```{r}
+
+
+test_census_data_3
+
+
+```
+
+
+```{r}
+
+
+pred_expected <- posterior_epred(
+    brms_poisson_3,
+    newdata = test_census_data_3
+)
+
+
+```
+
+```{r}
+
+
+pred_counts <- posterior_predict(
+    brms_poisson_3,
+    newdata = test_census_data_3
+)
+
+
+```
+
+
+```{r}
+
+
+
+test_predictions <- test_census_data_3 |> 
+    mutate(
+        pred_mean = colMeans(pred_expected),
+        pred_lower = apply(pred_counts, 2, quantile, probs = 0.025),
+        pred_upper = apply(pred_counts, 2, quantile, prob = 0.975)
+    )
+
+
+```
+
+```{r}
+
+
+
+test_predictions |> head()
+
+
+```
+
+```{r}
+
 
 
 
 ```
+
+
+
+Evaluate Model fit on the Test Data
+
+
+```{r}
+
+
+test_actual <- test_census_data_3$accident_count
+y_hat_mean <- colMeans(pred_expected)
+y_hat_med <- apply(pred_counts, 2, median)
+ci_lower_80 = apply(pred_counts, 2, quantile, probs = 0.10)
+ci_upper_80 = apply(pred_counts, 2, quantile, prob = 0.90)
+ci_lower_95 = apply(pred_counts, 2, quantile, probs = 0.025)
+ci_upper_95 = apply(pred_counts, 2, quantile, prob = 0.975)
+
+
+```
+
+```{r}
+
+rmse_test <- sqrt(mean(test_actual - y_hat_mean))
+mae_test <- mean(abs(test_actual - y_hat_med))
+
+
+
+
+
+```
+
+```{r}
+
+cat("Test RMSE: ", round(rmse_test, 3), "\n")
+cat("Test MAE: ", round(mae_test), "\n")
+
+
+
+```
+
+
+
+
+
+
 
 
 
