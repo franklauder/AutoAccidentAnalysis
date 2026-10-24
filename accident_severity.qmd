@@ -10115,19 +10115,7 @@ irr_table_3<- exp(fixef_summary_3[, c("Estimate", "Q2.5", "Q97.5")])
 
 <br><br>
 
-```{r}
 
-
-
-
-```
-
-```{r}
-
-exp()
-
-
-```
 
 ```{r}
 #| code-fold: true
@@ -10992,7 +10980,7 @@ extreme_tract_low_count_plt
 
 
 
-### Predict on Test Data
+### Test Predictions/Model Metrics
 
 
 <br><br>
@@ -11006,6 +10994,10 @@ extreme_tract_low_count_plt
 
 
 <br><br>
+
+
+
+
 
 
 ```{r}
@@ -11013,6 +11005,7 @@ extreme_tract_low_count_plt
 
 
 test_census_data_3 <- test_census_data_2 |> 
+    select(-mean_temp) |> 
     filter(GEOID != "25005646104")
 
 
@@ -11021,10 +11014,12 @@ test_census_data_3 <- test_census_data_2 |>
 ```{r}
 
 
-test_census_data_3
+
 
 
 ```
+
+<br><br>
 
 
 ```{r}
@@ -11049,6 +11044,9 @@ pred_counts <- posterior_predict(
 
 ```
 
+<br><br>
+
+
 
 ```{r}
 
@@ -11063,6 +11061,9 @@ test_predictions <- test_census_data_3 |>
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 
@@ -11099,9 +11100,17 @@ ci_upper_95 = apply(pred_counts, 2, quantile, prob = 0.975)
 
 ```
 
+
+#### RMSE
+
+
+
+
+Test Data
+
 ```{r}
 
-rmse_test <- sqrt(mean(test_actual - y_hat_mean))
+rmse_test <- sqrt(mean((test_actual - y_hat_mean)^2))
 mae_test <- mean(abs(test_actual - y_hat_med))
 
 
@@ -11121,14 +11130,326 @@ cat("Test MAE: ", round(mae_test), "\n")
 
 
 
+ Training Data
+
+
+
+```{r}
+
+
+
+
+pred_expected_train <- posterior_epred(
+    brms_poisson_3,
+    newdata = train_census_data_3
+)
+
+
+```
+
+```{r}
+
+pred_counts_train <- posterior_predict(
+    brms_poisson_3,
+    newdata = train_census_data_3
+)
+
+
+
+```
+
+
+```{r}
+
+
+train_actual <- train_census_data_3$accident_count
+y_hat_mean_train <- colMeans(pred_expected_train)
+y_hat_med_train <- apply(pred_counts_train, 2, median)
+ci_lower_80_train = apply(pred_counts_train, 2, quantile, probs = 0.10)
+ci_upper_80_train= apply(pred_counts_train, 2, quantile, prob = 0.90)
+ci_lower_95_train = apply(pred_counts_train, 2, quantile, probs = 0.025)
+ci_upper_95_train = apply(pred_counts_train, 2, quantile, prob = 0.975)
+
+
+```
+
+
+```{r}
+
+
+rmse_train <- sqrt(mean((train_actual - y_hat_mean_train)^2))
+mae_train <- mean(abs(train_actual - y_hat_med_train))
+
+
+```
+
+```{r}
+
+
+cat("Train RMSE: ", round(rmse_train, 3), "\n")
+cat("Train MAE: ", round(mae_train), "\n")
+
+
+```
+
+Train Test Comparison
+
+
+```{r}
+
+cat("Train RMSE: ", round(rmse_train, 3), "\n")
+
+cat("Test RMSE: ", round(rmse_test, 3), "\n")
+
+
+
+```
+
+```{r}
+
+
+rmse_relative_increase <- rmse_test / rmse_train
+
+```
+
+
+```{r}
+
+
+cat("Relative RMSE Increase: ", round(rmse_relative_increase, 2), "\n")
+
+
+
+```
+
+
+<br><br>
+
+
+The relative RMSE increase value of 1.12 tells us that there is a slight generalization gap.  This means that there is some overfitting of our training data, though not extreme.  A value between 1.0 and 1.10 would have indicated no overfitting. 
+
+
+
+<br><br>
+
+
+
+
+
+#### Uncertainty Calibration
+
+
+
+
+<br><br>
+
+Test Data
+
+<br><br>
+
+
+```{r}
+
+
+cov_95 <- mean(test_actual >= ci_lower_95 & test_actual <= ci_upper_95)
+
+
+```
+
+
+```{r}
+
+
+
+
+```
+
+```{r}
 
 
 
 
 
 
+```
 
 
+<br><br>
+
+```{r}
+
+
+
+
+cat("Nominal 95% Coverage on Test Data: ", round(cov_95 * 100, 1), "%\n")
+
+
+
+
+
+```
+
+<br><br>
+
+
+Training Data
+
+
+<br><br>
+
+
+```{r}
+
+
+cov_95_train <- mean(train_actual >= ci_lower_95_train & train_actual <= ci_upper_95_train)
+
+
+```
+
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+
+```
+
+
+```{r}
+
+
+
+
+cat("Nominal 95% Coverage on Train Data: ", round(cov_95_train * 100, 1), "%\n")
+
+
+```
+
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+
+```
+
+<br><br>
+
+
+```{r}
+
+
+cat("Absolute 95% Interval Coverage Difference: ", round(cov_diff, 2), " percentage points\n")
+
+
+```
+
+
+<br><br>
+
+
+ The absolute 95% coverage difference of -0.01 indicates no overfitting.  Coverage differences between 0.0 and -2.0 indicates no overfitting.  Our model is well calibrated.  Predictive uncertainty generalizes across time and census tracts.  
+
+<br><br>
+
+
+
+
+
+#### Proper Scoring Rules: Continuous Ranked Probability Score (CRPS)
+
+<br><br>
+
+
+
+
+
+```{r}
+
+
+
+library(scoringRules)
+
+
+
+```
+
+
+```{r}
+
+
+
+crps_test <- crps_sample(y = test_actual, dat = t(pred_counts))
+
+mean_crps <- mean(crps_test)
+
+
+```
+
+
+
+```{r}
+
+
+cat("Mean CRPS on Test Data: ", round(mean_crps, 3), "\n")
+
+
+
+```
+
+```{r}
+
+
+crps_train <- crps_sample(y = train_actual, dat = t(pred_counts_train))
+
+mean_crps_train <- mean(crps_train)
+
+
+```
+
+```{r}
+
+
+cat("Mean CRPS on Train Data: ", round(mean_crps_train, 3), "\n")
+
+
+```
+
+
+```{r}
+
+
+
+ (mean_crps - mean_crps_train) / mean_crps
+
+
+```
 
 
 
