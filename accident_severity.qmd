@@ -73,6 +73,7 @@ library(spdep)
 library(posterior)
 library(readr)
 library(plotly)
+library(scoringRules)
 
 
 
@@ -9795,6 +9796,25 @@ common_geoids <- sort(intersect(unique(boundaries_clean$GEOID), unique(train_cen
 
 ```
 
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(common_geoids, "common_geoids.rds")
+
+
+```
+
+```{r}
+
+
+common_geoids <- readRDS("common_geoids.rds")
+
+
+```
+
 <br><br>
 
 Next, we'll subset spattial polygons strictly to common GEOIDs. 
@@ -9816,6 +9836,10 @@ map_statewide <- boundaries_clean |>
 
 ```
 
+
+
+
+
 <br><br>
 
 Spatial neighbor graph will be contructed. 
@@ -9834,6 +9858,10 @@ nb_statewide <- poly2nb(map_statewide, queen = TRUE)
 
 ```
 
+
+
+
+
 <br><br>
 
 
@@ -9850,6 +9878,25 @@ CAR matrices cannot include disconnected islands (0 neighbors). A check will be 
 
 islands <- which(card(nb_statewide) == 0)
 
+
+
+```
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(islands , "islands.rds")
+
+
+```
+
+```{r}
+
+
+islands  <- readRDS("islands.rds")
 
 
 ```
@@ -9878,6 +9925,84 @@ if (length(islands) > 0) {
 }
 
 
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(map_statewide, "map_statewide.rds")
+
+
+```
+
+```{r}
+
+
+map_statewide <- readRDS("map_statewide.rds")
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(nb_statewide, "nb_statewide.rds")
+
+```
+
+```{r}
+
+
+nb_statewide <- readRDS("nb_statewide.rds")
+
+
+```
+
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+comp <- n.comp.nb(nb_statewide)
+
+
+
+
+```
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(comp, "comp.rds")
+
+```
+
+```{r}
+
+
+comp <- readRDS("comp.rds")
+
+
+```
+
+```{r}
+
+
+cat("Number of disjoint graph components:", comp$nc, "\n")
 
 
 ```
@@ -10566,6 +10691,69 @@ W_mainland   <- nb2mat(nb_mainland, style = "B")
 
 ```
 
+
+```{r}
+
+saveRDS(map_mainland ,"map_mainland.rds")
+
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
+
+saveRDS(nb_mainland, "nb_mainland.rds")
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+saveRDS(W_mainland , "W_mainland.rds")
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+```{r}
+
+
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+
+
+```
 
 
 
@@ -11390,16 +11578,6 @@ cat("Absolute 95% Interval Coverage Difference: ", round(cov_diff, 2), " percent
 
 
 
-```{r}
-
-
-
-library(scoringRules)
-
-
-
-```
-
 
 ```{r}
 
@@ -11413,6 +11591,9 @@ mean_crps <- mean(crps_test)
 ```
 
 
+<br><br>
+
+
 
 ```{r}
 
@@ -11422,6 +11603,9 @@ cat("Mean CRPS on Test Data: ", round(mean_crps, 3), "\n")
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 
@@ -11433,6 +11617,9 @@ mean_crps_train <- mean(crps_train)
 
 ```
 
+<br><br>
+
+
 ```{r}
 
 
@@ -11441,16 +11628,7 @@ cat("Mean CRPS on Train Data: ", round(mean_crps_train, 3), "\n")
 
 ```
 
-
-```{r}
-
-
-
- (mean_crps - mean_crps_train) / mean_crps
-
-
-```
-
+<br><br>
 
 
 
@@ -11459,14 +11637,35 @@ cat("Mean CRPS on Train Data: ", round(mean_crps_train, 3), "\n")
 
 
 
-comp <- n.comp.nb(nb_statewide)
+crps_ratio <- round(mean_crps  /  mean_crps_train, 2)
 
-cat("Number of disjoint graph components:", comp$nc, "\n")
+
+```
+
+<br><br>
+
+```{r}
+
+
+
+cat("Mean CRPS Test/Train Ratio; ", round(crps_ratio,3), "\n")
 
 
 ```
 
 
+<br><br>
+
+
+
+
+
+
+
+
+The low CRPS values (< 0.5 on both train and test sets) reflect strong concentration of the predictive mass around the observed accident counts.  The ratio of 1.11 (11% increase in test from training), means the distributional scoring remains tightly aligned. 
+
+<br><br>
 
 
 
@@ -11476,12 +11675,15 @@ cat("Number of disjoint graph components:", comp$nc, "\n")
 ```{r}
 
 
-
-stopifnot(identical(levels(train_census_df_3$GEOID), rownames(W_bin)))
-
-cat("Total connected tracts:", length(rownames(W_bin)), "\n")
-
-cat("Total modeling rows: ", nrow(train_census_df_3), "\n")
+test_results <- test_census_data_3 |> 
+    mutate(actual = test_actual,
+    pred_mean = colMeans(pred_expected),
+    pred_med = apply(pred_counts, 2, median),
+    ci_lower95 = apply(pred_counts, 2, quantile, probs = 0.025),
+    ci_upper95 = apply(pred_counts, 2, quantile, probs = 0.975),
+    error = actual - pred_mean,
+    abs_error = abs(actual - pred_mean),
+    outside_95 = actual < ci_lower95 | actual > ci_upper95)
 
 
 
@@ -11489,12 +11691,25 @@ cat("Total modeling rows: ", nrow(train_census_df_3), "\n")
 ```
 
 
+```{r}
 
 
 
 
 
+tract_error_summary <- test_results |> 
+    group_by(GEOID) |> 
+    summarize(
+       n_obs = n(),
+       total_actual = sum(actual),
+       total_predicted = round(sum(pred_mean), 1),
+       mean_bias = round(mean(error), 3),
+       MAE = round(mean(abs_error), 3),
+       RMSE = round(sqrt(mean(error^2)),3),
+       n_outside_95 = sum(outside_95),
+       pct_outside_95 = round(mean(outside_95) * 100, 1),
+       .groups = "drop"
+    )
 
 
-
-
+```
