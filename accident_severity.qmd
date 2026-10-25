@@ -12108,6 +12108,9 @@ print(top_underpredicted )
 ```
 
 
+
+These tracts had significantly more actual accidents in the test data than the model predicted.  This could be due to contruction zones or increase new businesses opening in or near these census tracts. 
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -12150,6 +12153,8 @@ print(top_overpredicted)
 
 
 ```
+
+These are census tracts where the model expected high accidents due to neighbor spillover or population size, but actual test accidents remained low. 
 
 
 
@@ -12200,6 +12205,10 @@ print(top_volatile)
 
 ```
 
+
+
+
+These census tracts shoe the largest absolute swing in raw accident counts, regardless of direction. 
 
 
 ```{r}
@@ -12294,6 +12303,8 @@ state_wide_bias_plot <- readRDS("state_wide_bias_plot.rds")
 
 ```
 
+
+Mapping of the mean errors reveals whether the model's missies are randomly scattered across the state or clustered around specific highway corridors (like I-93, I-95, I-495)
 
 ```{r}
 
