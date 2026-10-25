@@ -10693,6 +10693,9 @@ W_mainland   <- nb2mat(nb_mainland, style = "B")
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(map_mainland ,"map_mainland.rds")
 
@@ -10701,11 +10704,14 @@ saveRDS(map_mainland ,"map_mainland.rds")
 ```{r}
 
 
-
+map_mainland <- readRDS("map_mainland.rds")
 
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(nb_mainland, "nb_mainland.rds")
 
@@ -10715,12 +10721,15 @@ saveRDS(nb_mainland, "nb_mainland.rds")
 ```{r}
 
 
-
+nb_mainland <- readRDS("nb_mainland.rds")
 
 
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(W_mainland , "W_mainland.rds")
@@ -10731,7 +10740,7 @@ saveRDS(W_mainland , "W_mainland.rds")
 ```{r}
 
 
-
+W_mainland  <- readRDS("W_mainland .rds")
 
 
 ```
@@ -11189,6 +11198,10 @@ extreme_tract_low_count_plt
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -11200,7 +11213,20 @@ test_census_data_3 <- test_census_data_2 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
+
+saveRDS(test_census_data_3 , "test_census_data_3.rds")
+
+
+```
+
+```{r}
+
+
+test_census_data_3  <- readRDS("test_census_data_3.rds")
 
 
 
@@ -11211,9 +11237,13 @@ test_census_data_3 <- test_census_data_2 |>
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
-pred_expected <- posterior_epred(
+
+pred_expected_test <- posterior_epred(
     brms_poisson_3,
     newdata = test_census_data_3
 )
@@ -11222,12 +11252,55 @@ pred_expected <- posterior_epred(
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
-pred_counts <- posterior_predict(
+saveRDS(pred_expected_test, "pred_expected_test.rds")
+
+
+```
+
+```{r}
+
+
+pred_expected_test <- readRDS("pred_expected_test.rds")
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+
+pred_counts_test <- posterior_predict(
     brms_poisson_3,
     newdata = test_census_data_3
 )
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(pred_counts_test, "pred_counts_test.rds")
+
+
+```
+
+```{r}
+
+
+
+pred_counts_test <- readRDS("pred_counts_test")
 
 
 ```
@@ -11237,14 +11310,17 @@ pred_counts <- posterior_predict(
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
 test_predictions <- test_census_data_3 |> 
     mutate(
-        pred_mean = colMeans(pred_expected),
-        pred_lower = apply(pred_counts, 2, quantile, probs = 0.025),
-        pred_upper = apply(pred_counts, 2, quantile, prob = 0.975)
+        pred_mean = colMeans(pred_expected_test),
+        pred_lower = apply(pred_counts_test, 2, quantile, probs = 0.025),
+        pred_upper = apply(pred_counts_test, 2, quantile, prob = 0.975)
     )
 
 
@@ -11275,15 +11351,18 @@ Evaluate Model fit on the Test Data
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 test_actual <- test_census_data_3$accident_count
-y_hat_mean <- colMeans(pred_expected)
-y_hat_med <- apply(pred_counts, 2, median)
-ci_lower_80 = apply(pred_counts, 2, quantile, probs = 0.10)
-ci_upper_80 = apply(pred_counts, 2, quantile, prob = 0.90)
-ci_lower_95 = apply(pred_counts, 2, quantile, probs = 0.025)
-ci_upper_95 = apply(pred_counts, 2, quantile, prob = 0.975)
+y_hat_mean <- colMeans(pred_expected_test)
+y_hat_med <- apply(pred_counts_test, 2, median)
+ci_lower_80 = apply(pred_counts_test, 2, quantile, probs = 0.10)
+ci_upper_80 = apply(pred_counts_test, 2, quantile, prob = 0.90)
+ci_lower_95 = apply(pred_counts_test, 2, quantile, probs = 0.025)
+ci_upper_95 = apply(pred_counts_test, 2, quantile, prob = 0.975)
 
 
 ```
@@ -11297,11 +11376,54 @@ ci_upper_95 = apply(pred_counts, 2, quantile, prob = 0.975)
 Test Data
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 rmse_test <- sqrt(mean((test_actual - y_hat_mean)^2))
 mae_test <- mean(abs(test_actual - y_hat_med))
 
 
+
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(rmse_test, "rmse_test.rds")
+
+
+
+```
+
+```{r}
+
+
+rmse_test <- readRDS("rmse_test.rds")
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(mae_test , "mae_test.rds")
+
+
+```
+
+```{r}
+
+
+mae_test  <- readRDS("mae_test.rds")
 
 
 
@@ -11323,6 +11445,10 @@ cat("Test MAE: ", round(mae_test), "\n")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -11335,7 +11461,30 @@ pred_expected_train <- posterior_epred(
 
 ```
 
+
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(pred_expected_train, "pred_expected_train.rds")
+
+
+```
+
+```{r}
+
+
+pred_expected_train <- readRDS("pred_expected_train.rds")
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 pred_counts_train <- posterior_predict(
     brms_poisson_3,
@@ -11346,8 +11495,31 @@ pred_counts_train <- posterior_predict(
 
 ```
 
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(pred_counts_train, "pred_counts_train.rds")
+
+
+```
+
 
 ```{r}
+
+pred_counts_train <- readRDS("pred_counts_train.rds")
+
+
+
+```
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 train_actual <- train_census_data_3$accident_count
@@ -11363,10 +11535,51 @@ ci_upper_95_train = apply(pred_counts_train, 2, quantile, prob = 0.975)
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 rmse_train <- sqrt(mean((train_actual - y_hat_mean_train)^2))
 mae_train <- mean(abs(train_actual - y_hat_med_train))
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(rmse_train, "rmse_train.rds")
+
+
+```
+
+```{r}
+
+rmse_train <- readRDS("rmse_train.rds")
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(mae_train, "mae_train.rds")
+
+
+```
+
+```{r}
+
+
+
+mae_train  <- readRDS("mae_train.rds")
 
 
 ```
@@ -11394,6 +11607,9 @@ cat("Test RMSE: ", round(rmse_test, 3), "\n")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 rmse_relative_increase <- rmse_test / rmse_train
@@ -11437,18 +11653,25 @@ Test Data
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
-cov_95 <- mean(test_actual >= ci_lower_95 & test_actual <= ci_upper_95)
+
+cov_95_test <- mean(test_actual >= ci_lower_95 & test_actual <= ci_upper_95)
 
 
 ```
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
-
+saveRDS(cov_95_test, "cov_95_test.rds")
 
 ```
 
@@ -11456,7 +11679,7 @@ cov_95 <- mean(test_actual >= ci_lower_95 & test_actual <= ci_upper_95)
 
 
 
-
+cov_95_test  <- readRDS("cov_95_test.rds")
 
 
 ```
@@ -11469,7 +11692,7 @@ cov_95 <- mean(test_actual >= ci_lower_95 & test_actual <= ci_upper_95)
 
 
 
-cat("Nominal 95% Coverage on Test Data: ", round(cov_95 * 100, 1), "%\n")
+cat("Nominal 95% Coverage on Test Data: ", round(cov_95_test * 100, 1), "%\n")
 
 
 
@@ -11487,6 +11710,10 @@ Training Data
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 cov_95_train <- mean(train_actual >= ci_lower_95_train & train_actual <= ci_upper_95_train)
@@ -11496,9 +11723,12 @@ cov_95_train <- mean(train_actual >= ci_lower_95_train & train_actual <= ci_uppe
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
-
+saveRDS(cov_95_train, "cov_95_train.rds")
 
 ```
 
@@ -11506,7 +11736,7 @@ cov_95_train <- mean(train_actual >= ci_lower_95_train & train_actual <= ci_uppe
 
 
 
-
+cov_95_train <- readRDS("cov_95_train.rds")
 
 
 ```
@@ -11524,9 +11754,23 @@ cat("Nominal 95% Coverage on Train Data: ", round(cov_95_train * 100, 1), "%\n")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
+cov_interval_diff <- cov_95_test - cov_95_train
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(cov_interval_diff , "cov_interval_diff.rds")
 
 
 ```
@@ -11535,14 +11779,7 @@ cat("Nominal 95% Coverage on Train Data: ", round(cov_95_train * 100, 1), "%\n")
 
 
 
-
-```
-
-```{r}
-
-
-
-
+cov_interval_diff  <- readRDS("cov_interval_diff.rds")
 
 
 ```
@@ -11553,7 +11790,7 @@ cat("Nominal 95% Coverage on Train Data: ", round(cov_95_train * 100, 1), "%\n")
 ```{r}
 
 
-cat("Absolute 95% Interval Coverage Difference: ", round(cov_diff, 2), " percentage points\n")
+cat("Absolute 95% Interval Coverage Difference: ", round(cov_interval_diff, 2), " percentage points\n")
 
 
 ```
@@ -11562,7 +11799,7 @@ cat("Absolute 95% Interval Coverage Difference: ", round(cov_diff, 2), " percent
 <br><br>
 
 
- The absolute 95% coverage difference of -0.01 indicates no overfitting.  Coverage differences between 0.0 and -2.0 indicates no overfitting.  Our model is well calibrated.  Predictive uncertainty generalizes across time and census tracts.  
+The absolute 95% coverage difference of -0.01 indicates no overfitting.  Coverage differences between 0.0 and -2.0 (Interval Coverage >= 93%) indicates no overfitting.  Our model is well calibrated.  Predictive uncertainty generalizes across time and census tracts.  
 
 <br><br>
 
@@ -11580,12 +11817,34 @@ cat("Absolute 95% Interval Coverage Difference: ", round(cov_diff, 2), " percent
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
-crps_test <- crps_sample(y = test_actual, dat = t(pred_counts))
 
-mean_crps <- mean(crps_test)
+crps_test <- crps_sample(y = test_actual, dat = t(pred_counts_test))
+
+mean_crps_test <- mean(crps_test)
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(mean_crps_test, "mean_crps_test.rds")
+
+
+```
+
+```{r}
+
+
+mean_crps_test <- readRDS("mean_crps_test.rds")
 
 
 ```
@@ -11598,7 +11857,7 @@ mean_crps <- mean(crps_test)
 ```{r}
 
 
-cat("Mean CRPS on Test Data: ", round(mean_crps, 3), "\n")
+cat("Mean CRPS on Test Data: ", round(mean_crps_test, 3), "\n")
 
 
 
@@ -11608,11 +11867,34 @@ cat("Mean CRPS on Test Data: ", round(mean_crps, 3), "\n")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 crps_train <- crps_sample(y = train_actual, dat = t(pred_counts_train))
 
 mean_crps_train <- mean(crps_train)
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(mean_crps_train, "mean_crps_train.rds")
+
+
+```
+
+```{r}
+
+
+
+mean_crps_train <- readRDS("mean_crps_train.rds")
 
 
 ```
@@ -11634,10 +11916,32 @@ cat("Mean CRPS on Train Data: ", round(mean_crps_train, 3), "\n")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
-crps_ratio <- round(mean_crps  /  mean_crps_train, 2)
+
+crps_ratio <- mean_crps_test  /  mean_crps_train
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(crps_ratio, "crps_ratio.rds")
+
+
+```
+
+```{r}
+
+
+crps_ratio <- readRDS("crps_ratio.rds")
 
 
 ```
@@ -11648,7 +11952,7 @@ crps_ratio <- round(mean_crps  /  mean_crps_train, 2)
 
 
 
-cat("Mean CRPS Test/Train Ratio; ", round(crps_ratio,3), "\n")
+cat("Mean CRPS Test/Train Ratio; ", round(crps_ratio,2), "\n")
 
 
 ```
@@ -11673,25 +11977,51 @@ The low CRPS values (< 0.5 on both train and test sets) reflect strong concentra
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 test_results <- test_census_data_3 |> 
-    mutate(actual = test_actual,
-    pred_mean = colMeans(pred_expected),
-    pred_med = apply(pred_counts, 2, median),
-    ci_lower95 = apply(pred_counts, 2, quantile, probs = 0.025),
-    ci_upper95 = apply(pred_counts, 2, quantile, probs = 0.975),
-    error = actual - pred_mean,
-    abs_error = abs(actual - pred_mean),
-    outside_95 = actual < ci_lower95 | actual > ci_upper95)
+    mutate(actual_test = test_actual,
+    pred_mean_test = colMeans(pred_expected_test),
+    pred_med_test = apply(pred_counts_test, 2, median),
+    ci_lower95_test = apply(pred_counts_test, 2, quantile, probs = 0.025),
+    ci_upper95_test = apply(pred_counts_test, 2, quantile, probs = 0.975),
+    error_test= actual_test - pred_mean_test,
+    abs_error_test = abs(actual_test - pred_mean_test),
+    outside_95_test = actual_test < ci_lower95_test | actual_test > ci_upper95_test)
 
 
 
 
 ```
 
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(test_results, "test_results.rds")
+
+
+```
 
 ```{r}
+
+
+test_results <- readRDS("test_results.rds")
+
+
+```
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
 
 
 
@@ -11701,15 +12031,274 @@ tract_error_summary <- test_results |>
     group_by(GEOID) |> 
     summarize(
        n_obs = n(),
-       total_actual = sum(actual),
-       total_predicted = round(sum(pred_mean), 1),
-       mean_bias = round(mean(error), 3),
-       MAE = round(mean(abs_error), 3),
-       RMSE = round(sqrt(mean(error^2)),3),
-       n_outside_95 = sum(outside_95),
-       pct_outside_95 = round(mean(outside_95) * 100, 1),
+       total_actual = sum(actual_test),
+       total_predicted = round(sum(pred_mean_test), 1),
+       mean_bias = round(mean(error_test), 3),
+       MAE = round(mean(abs_error_test), 3),
+       RMSE = round(sqrt(mean(error_test^2)),3),
+       n_outside_95 = sum(outside_95_test),
+       pct_outside_95 = round(mean(outside_95_test) * 100, 1),
        .groups = "drop"
     )
+
+
+```
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(tract_error_summary, "tract_error_summary.rds")
+
+
+```
+
+```{r}
+
+
+tract_error_summary <- readRDS("tract_error_summary.rds")
+
+```
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+
+
+top_underpredicted <- tract_error_summary |> 
+    arrange(desc(mean_bias)) |> 
+    slice_head(n=10)
+
+
+
+```
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(top_underpredicted ,"top_underpredicted.rds")
+
+
+```
+
+
+```{r}
+
+
+top_underpredicted  <- readRDS("top_underpredicted.rds")
+
+```
+
+
+```{r}
+
+
+print(top_underpredicted )
+
+
+```
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+
+top_overpredicted <- tract_error_summary |> 
+    arrange(mean_bias) |> 
+    slice_head(n = 10)
+
+
+```
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(top_overpredicted, "top_overpredicted.rds")
+
+
+```
+
+
+```{r}
+
+
+top_overpredicted <- readRDS("top_overpredicted.rds")
+
+
+```
+
+
+```{r}
+
+
+print(top_overpredicted)
+
+
+```
+
+
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+
+
+top_volatile <- tract_error_summary |> 
+    arrange(desc(MAE)) |> 
+    slice_head(n = 10)
+
+
+
+```
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+saveRDS(top_volatile, "top_volatile.rds")
+
+
+```
+
+
+```{r}
+
+
+top_volatile <- readRDS("top_volatile.rds")
+
+
+```
+
+
+
+```{r}
+
+
+print(top_volatile)
+
+
+```
+
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+
+map_test_errors <- map_mainland |> 
+    left_join(tract_error_summary, by = "GEOID")
+
+
+```
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(map_test_errors, "map_test_errors.rds")
+
+```
+
+
+```{r}
+
+
+map_test_errors <- readRDS("map_test_errors.rds")
+
+
+
+```
+
+
+We'll plot Massachusetts statewide test bias. 
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+state_wide_bias_plot <- ggplot(map_test_errors) +
+    geom_sf(aes(fill = mean_bias), color = "grey80", linewidth = 0.05) +
+    scale_fill_gradient2(
+        low = "#2166ac", 
+        mid = "#f7f7f7",
+        high = "#b2182b",
+        midpoint = 0,
+        name = "Mean Bias\n(Actual - Predicted)"
+    ) +
+        coord_sf(datum = NA) +
+        theme_void() +
+        labs(
+            title = "Out-of-Sample Prediction Residuals by Census Tract",
+            subtitle = "Red = Accidents exceeded model: Blue = Accidents were lower than model",
+            caption = "Negative Binomial ICAR model evaluated on unseen test data"
+        ) +
+        theme(
+            legend.position = "right",
+            plot.title = element_text(face = "bold", size = 13),
+            plot.subtitle = element_text(color = "grey40", size = 10)
+        )    
+
+
+
+
+```
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
+
+saveRDS(state_wide_bias_plot, "state_wide_bias_plot.rds")
+
+
+```
+
+
+```{r}
+
+
+state_wide_bias_plot <- readRDS("state_wide_bias_plot.rds")
+
+
+```
+
+
+```{r}
+
+
+state_wide_bias_plot
 
 
 ```
