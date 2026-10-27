@@ -10226,6 +10226,9 @@ fixef_summary_3 <- fixef(brms_poisson_3)
 
 ```
 
+<br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -10279,6 +10282,8 @@ pp_checl(brms_poisson_3)
 
 ```
 
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -10294,7 +10299,8 @@ loo_compare(loo(brms_poisson_2), loo(brms_poisson_3)
 
 ```
 
-
+<br><br>
+<br><br>
  
  ### Model Visualization
 
@@ -10450,6 +10456,9 @@ spatial_risk_df <- icar_summary %>%
 
 ```
 
+<br><br>
+
+
 ```{r}
 #| echo: false
 #| include: false
@@ -10569,6 +10578,9 @@ extremes_df <- spatial_risk_df %>%
 
 ```
 
+<br><br>
+
+
 ```{r}
 #| echo: false
 #| include: false
@@ -10588,6 +10600,10 @@ extremes_df <- readRDS("extremes_df.rds")
 ```
 
 
+<br><br>
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -10597,6 +10613,9 @@ print(extremes_df, n=80)
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 
@@ -10608,6 +10627,8 @@ print(extremes_df |>
 
 ```
 
+
+<br><br>
 
 
 ```{r}
@@ -10657,6 +10678,9 @@ high_low_tract_risk_plt  <- readRDS("high_low_tract_risk_plt.rds")
 
 ```
 
+<br><br>
+
+
 ```{r}
 
 
@@ -10666,10 +10690,10 @@ high_low_tract_risk_plt
 ```
 
 
+<br><br>
 
 
-
-
+<br><br>
 
 
 
@@ -10691,6 +10715,8 @@ W_mainland   <- nb2mat(nb_mainland, style = "B")
 
 ```
 
+
+<br><br>
 
 ```{r}
 #| echo: false
@@ -10740,7 +10766,7 @@ saveRDS(W_mainland , "W_mainland.rds")
 ```{r}
 
 
-W_mainland  <- readRDS("W_mainland .rds")
+W_mainland  <- readRDS("W_mainland.rds")
 
 
 ```
@@ -10783,6 +10809,8 @@ map_icar <- map_mainland %>%
 
 ```
 
+<br><br>
+
 ```{r}
 #| echo: false
 #| include: false
@@ -10822,6 +10850,8 @@ map_leaflet_icar <- st_transform(map_icar, 4326)
 
 ```
 
+<br><br>
+
 
 ```{r}
 #| echo: false
@@ -10837,7 +10867,7 @@ saveRDS(map_leaflet_icar, "map_leaflet_icar.rds")
 ```{r}
 
 
-map_leaflet_icar <- reawdRDS("map_leaflet_icar.rds")
+map_leaflet_icar <- readRDS("map_leaflet_icar.rds")
 
 
 ```
@@ -10856,6 +10886,8 @@ max_val <- max(abs(log(map_icar$spatial_RR)), na.rm = TRUE)
 
 ```
 
+<br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -10872,6 +10904,8 @@ pal_car <- colorNumeric(
 
 ```
 
+<br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -10882,6 +10916,10 @@ pal_car <- colorNumeric(
 map_icar_sf <- st_transform(map_icar, 4326)
 
 ```
+
+
+<br>
+
 
 ```{r}
 #| echo: false
@@ -10922,7 +10960,7 @@ labels_car <- sprintf(
 
 ```
 
-
+<br><br>
 
 ```{r}
 #| code-fold: true
@@ -10978,7 +11016,7 @@ extreme_tract_high_count_plt <- map_icar_sf|> leaflet(options = leafletOptions(m
 ```
 
 
-    
+<br><br>
 
 ```{r}
 #| echo: false
@@ -11145,6 +11183,9 @@ extreme_tract_low_count_plt <- map_icar_sf|> leaflet(options = leafletOptions(mi
 
 ```
 
+<br><br>
+
+
 ```{r}
 #| echo: false
 #| include: false
@@ -11174,6 +11215,9 @@ extreme_tract_low_count_plt
 
 ```
 
+<br><br>
+<br><br>
+
 
 
 
@@ -11185,13 +11229,6 @@ extreme_tract_low_count_plt
 
 
 <br><br>
-
-
-
-
-
-<br><br>
-
 
 
 
@@ -11211,6 +11248,8 @@ test_census_data_3 <- test_census_data_2 |>
 
 
 ```
+
+<br><br>
 
 ```{r}
 #| echo: false
@@ -11251,6 +11290,9 @@ pred_expected_test <- posterior_epred(
 
 ```
 
+<br><br>
+
+
 ```{r}
 #| echo: false
 #| include: false
@@ -11284,6 +11326,9 @@ pred_counts_test <- posterior_predict(
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 #| echo: false
@@ -11329,6 +11374,9 @@ test_predictions <- test_census_data_3 |>
 <br><br>
 
 
+
+
+
 ```{r}
 
 
@@ -11338,6 +11386,8 @@ test_predictions |> head()
 
 ```
 
+<br><br>
+
 ```{r}
 
 
@@ -11345,9 +11395,12 @@ test_predictions |> head()
 
 ```
 
-
+<br><br>
 
 Evaluate Model fit on the Test Data
+
+<br><br>
+
 
 
 ```{r}
@@ -11367,8 +11420,12 @@ ci_upper_95 = apply(pred_counts_test, 2, quantile, prob = 0.975)
 
 ```
 
+<br><br>
+
 
 #### RMSE
+
+<br><br>
 
 
 
@@ -11389,6 +11446,9 @@ mae_test <- mean(abs(test_actual - y_hat_med))
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 #| echo: false
@@ -11438,11 +11498,11 @@ cat("Test MAE: ", round(mae_test), "\n")
 
 ```
 
-
+<br><br>
 
  Training Data
 
-
+<br><br>
 
 ```{r}
 #| code-fold: true
@@ -11460,6 +11520,9 @@ pred_expected_train <- posterior_epred(
 
 
 ```
+
+
+<br><br>
 
 
 ```{r}
@@ -11494,6 +11557,9 @@ pred_counts_train <- posterior_predict(
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 #| echo: false
@@ -11533,6 +11599,8 @@ ci_upper_95_train = apply(pred_counts_train, 2, quantile, prob = 0.975)
 
 ```
 
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -11546,6 +11614,10 @@ mae_train <- mean(abs(train_actual - y_hat_med_train))
 
 
 ```
+
+
+<br><br>
+
 
 ```{r}
 #| echo: false
@@ -11593,7 +11665,12 @@ cat("Train MAE: ", round(mae_train), "\n")
 
 ```
 
+<br><br>
+
 Train Test Comparison
+
+<br><br>
+
 
 
 ```{r}
@@ -11606,6 +11683,9 @@ cat("Test RMSE: ", round(rmse_test, 3), "\n")
 
 ```
 
+<br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -11615,6 +11695,9 @@ cat("Test RMSE: ", round(rmse_test, 3), "\n")
 rmse_relative_increase <- rmse_test / rmse_train
 
 ```
+
+<br><br>
+
 
 
 ```{r}
@@ -11663,6 +11746,8 @@ cov_95_test <- mean(test_actual >= ci_lower_95 & test_actual <= ci_upper_95)
 
 
 ```
+
+<br><br>
 
 
 ```{r}
@@ -11721,6 +11806,8 @@ cov_95_train <- mean(train_actual >= ci_lower_95_train & train_actual <= ci_uppe
 
 ```
 
+<br><br>
+
 
 ```{r}
 #| echo: false
@@ -11751,6 +11838,9 @@ cat("Nominal 95% Coverage on Train Data: ", round(cov_95_train * 100, 1), "%\n")
 
 
 ```
+
+<br><br>
+
 
 
 ```{r}
@@ -11831,6 +11921,8 @@ mean_crps_test <- mean(crps_test)
 
 ```
 
+<br><br>
+
 ```{r}
 #| echo: false
 #| include: false
@@ -11880,6 +11972,10 @@ mean_crps_train <- mean(crps_train)
 
 ```
 
+
+<br><br>
+
+
 ```{r}
 #| echo: false
 #| include: false
@@ -11927,6 +12023,11 @@ crps_ratio <- mean_crps_test  /  mean_crps_train
 
 
 ```
+
+
+<br><br>
+
+
 
 ```{r}
 #| echo: false
@@ -11998,6 +12099,9 @@ test_results <- test_census_data_3 |>
 
 ```
 
+
+<br><br>
+
 ```{r}
 #| echo: false
 #| include: false
@@ -12044,6 +12148,10 @@ tract_error_summary <- test_results |>
 
 ```
 
+
+<br><br>
+
+
 ```{r}
 #| echo: false
 #| include: false
@@ -12073,11 +12181,14 @@ tract_error_summary <- readRDS("tract_error_summary.rds")
 
 top_underpredicted <- tract_error_summary |> 
     arrange(desc(mean_bias)) |> 
-    slice_head(n=10)
+    slice_head(n=20)
 
 
 
 ```
+
+
+<br><br>
 
 
 ```{r}
@@ -12102,14 +12213,16 @@ top_underpredicted  <- readRDS("top_underpredicted.rds")
 ```{r}
 
 
-print(top_underpredicted )
+print(top_underpredicted, n=20)
 
 
 ```
 
-
+<br><br>
 
 These tracts had significantly more actual accidents in the test data than the model predicted.  This could be due to contruction zones or increase new businesses opening in or near these census tracts. 
+
+<br><br>
 
 ```{r}
 #| code-fold: true
@@ -12120,11 +12233,13 @@ These tracts had significantly more actual accidents in the test data than the m
 
 top_overpredicted <- tract_error_summary |> 
     arrange(mean_bias) |> 
-    slice_head(n = 10)
+    slice_head(n = 20)
 
 
 ```
 
+
+<br><br>
 
 ```{r}
 #| echo: false
@@ -12149,12 +12264,16 @@ top_overpredicted <- readRDS("top_overpredicted.rds")
 ```{r}
 
 
-print(top_overpredicted)
+print(top_overpredicted, n=20)
 
 
 ```
 
+<br><br>
+
 These are census tracts where the model expected high accidents due to neighbor spillover or population size, but actual test accidents remained low. 
+
+<br><br>
 
 
 
@@ -12169,11 +12288,14 @@ These are census tracts where the model expected high accidents due to neighbor 
 
 top_volatile <- tract_error_summary |> 
     arrange(desc(MAE)) |> 
-    slice_head(n = 10)
+    slice_head(n = 40)
 
 
 
 ```
+
+
+<br><br>
 
 
 ```{r}
@@ -12195,21 +12317,25 @@ top_volatile <- readRDS("top_volatile.rds")
 
 ```
 
-
+<br><br>
 
 ```{r}
 
 
-print(top_volatile)
+print(top_volatile |> 
+    arrange(desc(mean_bias)), n=40)
 
 
 ```
 
+<br><br>
 
 
 
-These census tracts shoe the largest absolute swing in raw accident counts, regardless of direction. 
 
+These census tracts show the largest absolute swing in raw accident counts, regardless of direction. 
+
+<br><br>
 
 ```{r}
 #| code-fold: true
@@ -12223,6 +12349,8 @@ map_test_errors <- map_mainland |>
 
 
 ```
+
+<br><br>
 
 
 ```{r}
@@ -12246,7 +12374,72 @@ map_test_errors <- readRDS("map_test_errors.rds")
 ```
 
 
+
+
+
+
+
 We'll plot Massachusetts statewide test bias. 
+
+
+
+
+<br><br>
+
+
+First, we'll confirm our test errors dataframe has the correct coordinate system. 
+
+
+<br><br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+map_test_errors_cls <- st_crs(map_test_errors)
+
+
+```
+
+<br><br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+map_test_errors_cls$input
+
+
+
+```
+
+<br><br>
+
+"NAD83" is not compatible with the leaflet map we will be builidng. As with our other data for mapping, we will transform the dataframe to the correct coordinate system. 
+
+<br><br>
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+map_test_errors_4326 <- st_transform(map_test_errors, 4326)
+
+
+```
+
+
+<br><br>
+
+We'll also remove any NAs from our mean_bias feature. 
+
+<br><br>
 
 
 ```{r}
@@ -12255,32 +12448,14 @@ We'll plot Massachusetts statewide test bias.
 #| eval: false
 
 
-state_wide_bias_plot <- ggplot(map_test_errors) +
-    geom_sf(aes(fill = mean_bias), color = "grey80", linewidth = 0.05) +
-    scale_fill_gradient2(
-        low = "#2166ac", 
-        mid = "#f7f7f7",
-        high = "#b2182b",
-        midpoint = 0,
-        name = "Mean Bias\n(Actual - Predicted)"
-    ) +
-        coord_sf(datum = NA) +
-        theme_void() +
-        labs(
-            title = "Out-of-Sample Prediction Residuals by Census Tract",
-            subtitle = "Red = Accidents exceeded model: Blue = Accidents were lower than model",
-            caption = "Negative Binomial ICAR model evaluated on unseen test data"
-        ) +
-        theme(
-            legend.position = "right",
-            plot.title = element_text(face = "bold", size = 13),
-            plot.subtitle = element_text(color = "grey40", size = 10)
-        )    
-
-
+map_test_errors_4326 <- map_test_errors_4326|> 
+    filter(!is.na(mean_bias))
 
 
 ```
+
+<br><br>
+
 
 
 ```{r}
@@ -12289,14 +12464,192 @@ state_wide_bias_plot <- ggplot(map_test_errors) +
 #| eval: false
 
 
+saveRDS(map_test_errors_4326, "map_test_errors_4326.rds")
+
+
+```
+
+```{r}
+
+
+map_test_errors_4326  <- readRDS("map_test_errors_4326.rds")
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+map_test_errors4326_cls <- st_crs(map_test_errors_4326)
+
+
+
+```
+
+<br><br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+map_test_errors4326_cls$input
+
+
+```
+
+<br><br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+
+
+map_test_errors_4326 |> 
+    filter(is.na(mean_bias))
+
+
+```
+
+<br><br>
+
+Our data frame has the correct coordinate system and NAs have been dropped. 
+
+<br><br>
+
+
+
+
+
+
+
+<br><br>
+
+
+
+
+
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+bins<-c(-8.7,-4.0,-1.0,-0.5, 0.0,0.5,1.0,2.0,3.5, 4.0,7.0,Inf)
+
+
+```
+<br>
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+pal<-colorBin(palette="RdYlBu",
+            domain=map_test_errors_4326$mean_bias,bins=bins)
+
+
+```
+
+<br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+labels_car <- sprintf(
+  "<strong>Tract GEOID:</strong> %s<br/>
+   <strong>Total Actual Accidents:</strong> %s<br/>
+   <strong>Total Predicted Accidents:</strong> %s",
+  map_test_errors_4326$GEOID,
+  map_test_errors_4326$total_actual,
+  map_test_errors_4326$total_predicted
+) %>% lapply(htmltools::HTML)
+
+
+
+```
+
+<br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+
+state_wide_bias_plt <- map_test_errors_4326 |> leaflet(options = leafletOptions(minZoom = 9.4, maxZoom = 18)) |> 
+  addProviderTiles(providers$Esri.WorldStreetMap) |> 
+  setView(lng = -071.9402820, lat = 42.3116934, zoom = 10) |> 
+  addPolygons(
+ fillColor = ~pal(mean_bias),
+ weight= 0.5,
+ opacity= 1,
+ color= "white",
+ dashArray = "1",
+ fillOpacity = 0.7,
+ highlightOptions = highlightOptions(
+    weight = 2,
+    color = "#444",
+    fillOpacity = 0.9,
+    bringToFront = TRUE),
+    label = labels_car,
+    labelOptions = labelOptions(
+        style = list("font-weight" = "normal", padding = "3px 8px"),
+        textsize = "13px",
+        direction = "auto"
+    ) 
+)|> 
+ addMarkers(
+    data = subset(census_tract_df, GEOID %in% c("25021418201", "25025081001", "25025090100", "25009211402", "25017358400", "25017367200", "25025071201", "25017316102",         "25009213100","25021403100","25013802101","25025170302","25017335100", "25009254402","25025100700", "25017315200", "25009209100", "25017374500","25021413100","25009254403", "25017315100", "25025092101","25017334100","25025010600", "25009210302","25009260900", "25025091001", "25017331102", "25005614102", "25009252300","25027732002", "25017316500","25021456200", "25017332402","25017383600", "25025080601","25017359100", "25017316400","25009254100","25009254401")),
+    lng = ~LONGITUDE,
+    lat = ~LATITUDE,
+    popup = ~paste("Accident ID: ", ID,
+                   "<br>City: ", City,
+                   "<br>Road Type: ", road_category,
+                   "<br>Junction: ", Junction)
+  ) |> 
+    addLegend(
+        pal = pal,
+        values = ~mean_bias,
+        opacity = 0.7,
+        title = "Mean Bias",
+        position = "bottomright"
+    )
+
+
+
+```
+
+<br><br>
+
+
+
+```{r}
+#| echo: false
+#| include: false
+#| eval: false
+
 saveRDS(state_wide_bias_plot, "state_wide_bias_plot.rds")
 
 
 ```
 
-
 ```{r}
-
 
 state_wide_bias_plot <- readRDS("state_wide_bias_plot.rds")
 
@@ -12304,12 +12657,34 @@ state_wide_bias_plot <- readRDS("state_wide_bias_plot.rds")
 ```
 
 
+<br><br>
+
 Mapping of the mean errors reveals whether the model's missies are randomly scattered across the state or clustered around specific highway corridors (like I-93, I-95, I-495)
+
+<br><br>
+
+
+
+
+
+
 
 ```{r}
 
 
-state_wide_bias_plot
+
+state_wide_bias_plt
 
 
 ```
+
+
+
+<br><br>
+
+
+
+
+<br><br>
+
+
