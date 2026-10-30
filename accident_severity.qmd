@@ -179,7 +179,7 @@ saveRDS(MA_accidents, "MA_accidents.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-4"
 
 
@@ -424,7 +424,7 @@ saveRDS(MA_accidents_2, "MA_accidents_2.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-18"
 
 
@@ -497,7 +497,7 @@ saveRDS(ma_accidents_16_21, "ma_accidents_16_21.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-23"
 
 
@@ -554,7 +554,7 @@ saveRDS(ma_accidents_22, "ma_accidents_22.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-27"
 
 
@@ -597,6 +597,19 @@ ma_accidents_16_21_2 <- ma_accidents_16_21 |>
     mutate(Start_Time = ymd_hms(Start_Time)) |> 
     mutate(End_Time = ymd_hms(End_Time))
 ```
+
+```{r}
+
+
+ma_accidents_22_2 <- ma_accidents_22 |> 
+    mutate(Start_Time = ymd_hms(Start_Time)) |> 
+    mutate(End_Time = ymd_hms(End_Time))
+
+
+```
+
+
+
 
 Before we can calculate the time duration of accidents, we'll first need to convert the start and end times to a date time object that includes year, month, day, hours, minutes, and seconds. 
 
@@ -648,6 +661,15 @@ ma_accidents_16_21_2 <- ma_accidents_16_21_2 |>
 
 ```
 
+```{r}
+
+
+ma_accidents_22_2 <- ma_accidents_22_2 |> 
+    mutate(accident_duration = round(difftime(End_Time,Start_Time, units = "mins"), 0))
+
+
+```
+
 <br><br>
 
 We will also create LATTITUDE and LONGITUDE features from Start_Lat and Start_Lng. These features will be useful for retrieving US Census data and mapping.
@@ -673,6 +695,25 @@ ma_accidents_16_21_2$LONGITUDE <- ma_accidents_16_21_2$Start_Lng
 
 ```
 
+```{r}
+
+
+ma_accidents_22_2$LATITUDE <- ma_accidents_22_2$Start_Lat
+
+ma_accidents_22_2$LONGITUDE <- ma_accidents_22_2$Start_Lng
+
+
+
+```
+
+```{r}
+
+
+saveRDS(ma_accidents_22_2, "ma_accidents_22_2.rds")
+
+
+```
+
 
 ```{r}
 #| echo: false
@@ -687,7 +728,7 @@ saveRDS(ma_accidents_16_21_2, "ma_accidents_16_21_2.rds")
 
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-35"
 
 
@@ -942,6 +983,141 @@ This will be acomplished by using the call_geolocator_latlon function from the t
 
 
 
+```{r}
+
+options(tigris_use_cache = TRUE)
+
+
+```
+
+
+
+```{r}
+
+
+ma_accidents_22_3 <- ma_accidents_22_2 |> 
+    filter(LATITUDE != 42.02411 & LONGITUDE != -71.86039)
+
+
+```
+
+```{r}
+
+saveRDS(ma_accidents_22_3, "ma_accidents_22_3.rds")
+
+
+```
+
+```{r}
+
+ma_accidents_22_3 <- readRDS("ma_accidents_22_3.rds")
+
+
+```
+
+```{r}
+
+
+df_lon_lat<- ma_accidents_22_3 |>  
+    select(LATITUDE , LONGITUDE)
+
+
+```
+
+```{r}
+
+
+saveRDS(df_lon_lat, "df_lon_lat.rds")
+
+
+```
+
+
+```{r}
+
+
+boundaries <- tracts(state = "MA", year = 2022) |> 
+    select(GEOID) |> 
+    st_transform(4326)
+
+```
+
+```{r}
+
+saveRDS(boundaries, "boundaries.rds")
+
+
+```
+
+```{r}
+
+df_points <- st_as_sf(
+    df_lon_lat, coords = c("LONGITUDE", "LATITUDE"), crs = 4326, remove = TRUE)
+
+
+```
+
+```{r}
+
+
+saveRDS(df_points, "df_points.rds")
+
+
+```
+
+```{r}
+
+
+joined_sf <- st_join(df_points, boundaries, join = st_intersects, left = TRUE)
+
+
+```
+
+```{r}
+
+saveRDS(joined_sf , "joined_sf.rds")
+
+
+```
+
+
+
+```{r}
+
+df_final <- st_drop_geometry(joined_sf)
+
+
+```
+
+```{r}
+
+saveRDS(df_final, "df_final.rds") 
+
+
+
+```
+
+
+
+
+```{r}
+
+
+ma_accidents_22_4 <- cbind(ma_accidents_22_3, df_final)
+
+
+```
+
+```{r}
+
+
+saveRDS(ma_accidents_22_4 , "ma_accidents_22_4.rds")
+
+
+```
+
+
+
 
 ```{r}
 #| code-fold: true
@@ -988,7 +1164,7 @@ saveRDS(long_lat, "long_lat.rds")
 
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-43"
 
 
@@ -1044,7 +1220,7 @@ saveRDS(census_geo, "census_geo.rds")
 
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-47"
 
 census_geo <- readRDS("census_geo.rds")
@@ -1061,10 +1237,9 @@ census_geo <- readRDS("census_geo.rds")
 #| code-summary: "Show Code"
 #| label: "ck-48"
 
-
-
-
 census_geo |> head()
+
+
 ```
 
 <br><br>
@@ -1089,6 +1264,15 @@ ma_accidents_16_21_3 <- cbind(ma_accidents_16_21_2, census_geo)
 ```
 
 ```{r}
+
+
+ma_accidents_16_21_3 <- ma_accidents_16_21_3 |> 
+    select(-census_code)
+
+
+```
+
+```{r}
 #| echo: false
 #| include: false
 #| eval: false
@@ -1103,7 +1287,7 @@ saveRDS(ma_accidents_16_21_3, "ma_accidents_16_21_3.rds")
 
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-51"
 
 
@@ -1135,6 +1319,8 @@ There are five mssing values in the newly created GEOID.  These missing values (
 
 
 
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1142,8 +1328,47 @@ There are five mssing values in the newly created GEOID.  These missing values (
 #| label: "ck-53"
 
 
-ma_accidents_16_21_4 <- ma_accidents_16_21_3 |> 
+ma_accidents_5 <- ma_accidents_16_21_3 |> 
     filter(!is.na(GEOID))
+
+
+```
+
+```{r}
+
+
+saveRDS(ma_accidents_5 , "ma_accidents_5.rds")
+
+```
+
+```{r}
+
+
+ma_accidents_5 <- readRDS("ma_accidents_5.rds")
+
+
+```
+
+```{r}
+
+
+
+ma_accidents_6 <- rbind(ma_accidents_5, ma_accidents_22_4)
+
+
+```
+
+```{r}
+
+
+saveRDS(ma_accidents_6, "ma_accidents_6.rds")
+
+```
+
+```{r}
+
+
+ma_accidents_6 <- readRDS("ma_accidents_6.rds")
 
 
 ```
@@ -1156,12 +1381,13 @@ ma_accidents_16_21_4 <- ma_accidents_16_21_3 |>
 
 
 
-The Wind_Speed.mph featues has 3,324 missinf values.  We will drop this feature from our dataset. 
+The Wind_Speed.mph featues has 3,3263missinf values.  We will drop this feature from our dataset. 
 
 
 
 
 <br><br>
+
 
 
 ```{r}
@@ -1171,8 +1397,9 @@ The Wind_Speed.mph featues has 3,324 missinf values.  We will drop this feature 
 #| eval: false
 
 
-ma_accidents_16_21_4 <- ma_accidents_16_21_4 |> 
+ma_accidents_7 <- ma_accidents_6 |> 
     select(-Start_Lat, -End_Lat, -Start_Lng, -End_Lng, -State, -Zipcode, -Country, -Timezone, -Airport_Code, -Weather_Timestamp, -Wind_Chill.F., -Visibility.mi., -Precipitation.in., -Wind_Speed.mph., -Humidity...)
+
 
 
 ```
@@ -1185,16 +1412,16 @@ ma_accidents_16_21_4 <- ma_accidents_16_21_4 |>
 #| label: "ck-55"
 
 
-saveRDS(ma_accidents_16_21_4, "ma_accidents_16_21_4.rds")
+saveRDS(ma_accidents_7, "ma_accidents_7.rds")
 
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-56"
 
 
-ma_accidents_16_21_4 <- readRDS("ma_accidents_16_21_4.rds")
+ma_accidents_7 <- readRDS("ma_accidents_7.rds")
 
 
 ```
@@ -1208,7 +1435,7 @@ ma_accidents_16_21_4 <- readRDS("ma_accidents_16_21_4.rds")
 #| label: "ck-57"
 
 
-ma_accidents_16_21_4 |> 
+ma_accidents_7 |> 
     summary()
 
 
@@ -1221,13 +1448,15 @@ Remove NAs fron Temperature feature.
 
 <br><br>
 
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| label: "ck-58"
 
 
-ma_accidents_16_21_5 <- ma_accidents_16_21_4|>
+ma_accidents_8 <- ma_accidents_7 |>
     filter(!is.na(Temperature.F.)) 
 
 
@@ -1240,14 +1469,15 @@ The accident_duration feature has mins at the end.  We will drop this by transfo
 
 <br><br>
 
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| label: "ck-59"
 
 
-
-ma_accidents_16_21_5$accident_duration <- as.numeric(ma_accidents_16_21_5$accident_duration)
+ma_accidents_8$accident_duration <- as.numeric(ma_accidents_8$accident_duration)
 
 
 ```
@@ -1261,7 +1491,7 @@ ma_accidents_16_21_5$accident_duration <- as.numeric(ma_accidents_16_21_5$accide
 #| label: "ck-60"
 
 
-ma_accidents_16_21_5 |> 
+ma_accidents_8 |> 
     count(County)
 
 
@@ -1276,14 +1506,14 @@ The Dukes and Nantucket counties have single digits counts, thus we will remove 
 
 
 
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| label: "ck-61"
 
 
-
-ma_accidents_16_21_5 <- ma_accidents_16_21_5 |> 
+ma_accidents_8 <- ma_accidents_8 |> 
     filter(County  %in% c("Barnstable", "Berkshire", "Bristol", "Essex", "Franklin", "Hampden", "Hampshire", "Middlesex", "Norfolk", "Plymouth", "Suffolk", "Worcester"))
 
 
@@ -1296,7 +1526,7 @@ ma_accidents_16_21_5 <- ma_accidents_16_21_5 |>
 #| label: "ck-62"
 
 
-saveRDS(ma_accidents_16_21_5, "ma_accidents_16_21_5.rds")
+saveRDS(ma_accidents_8, "ma_accidents_8.rds")
 
 
 ```
@@ -1305,27 +1535,23 @@ saveRDS(ma_accidents_16_21_5, "ma_accidents_16_21_5.rds")
 
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-63"
 
 
-ma_accidents_16_21_5  <- readRDS("ma_accidents_16_21_5.rds")
+ma_accidents_8  <- readRDS("ma_accidents_8.rds")
 
 
 ```
 
 
-```{r}
-
-
-ma_accidents_16_21_5 |> glimpse()
-
-
-```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
-ma_accidents_16_21_5 |> 
+ma_accidents_8 |> 
     select(ID, Start_Time, End_Time, Street, City, GEOID) |> 
     filter(ID == "A-7680343")
 
@@ -1335,6 +1561,9 @@ ma_accidents_16_21_5 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 ma_accidents_16_21_5 |> 
@@ -1358,7 +1587,7 @@ ma_accidents_16_21_5 |>
 #| code-summary: "Show Code"
 #| label: "ck-64"
 
-ma_accidents_16_21_5 |> 
+ma_accidents_8 |> 
     count(County)
 
 
@@ -1376,7 +1605,7 @@ ma_accidents_16_21_5 |>
 
 
 
-ma_accidents_16_21_5 |> select(accident_duration, Severity, Start_Time,End_Time, City, LONGITUDE, LATITUDE, Street, Sunrise_Sunset, Civil_Twilight,Street)  |> 
+ma_accidents_8 |> select(accident_duration, Severity, Start_Time,End_Time, City, LONGITUDE, LATITUDE, Street, Sunrise_Sunset, Civil_Twilight,Street)  |> 
   filter(accident_duration > 5000)  |> head()
 
 
@@ -1394,7 +1623,7 @@ ma_accidents_16_21_5 |> select(accident_duration, Severity, Start_Time,End_Time,
 
 
 
-ma_accidents_16_21_5  |> select(accident_duration, Severity, Start_Time,End_Time, City, LONGITUDE, LATITUDE, Street, Sunrise_Sunset, Civil_Twilight,Street)  |> 
+ma_accidents_8  |> select(accident_duration, Severity, Start_Time,End_Time, City, LONGITUDE, LATITUDE, Street, Sunrise_Sunset, Civil_Twilight,Street)  |> 
   filter(City == "Milton" & Street == "Adams St")  |> head()
 
 
@@ -1410,7 +1639,7 @@ ma_accidents_16_21_5  |> select(accident_duration, Severity, Start_Time,End_Time
 
 
 
-ma_accidents_16_21_5  |> select(accident_duration, Severity, Start_Time,End_Time, Year, Month, day_of_week, City, LONGITUDE, LATITUDE, Street, Sunrise_Sunset, Civil_Twilight,Street)  |> 
+ma_accidents_8  |> select(accident_duration, Severity, Start_Time,End_Time, Year, Month, day_of_week, City, LONGITUDE, LATITUDE, Street, Sunrise_Sunset, Civil_Twilight,Street)  |> 
   filter(Year == "2021" & Month == "4" & day_of_week == "4")  |> tail()
 
 ```
@@ -1426,7 +1655,7 @@ ma_accidents_16_21_5  |> select(accident_duration, Severity, Start_Time,End_Time
 
 
 
-ma_accidents_16_21_5 |> 
+ma_accidents_8 |> 
     select_if(is.numeric) |> 
     glimpse()
 
@@ -1437,6 +1666,7 @@ ma_accidents_16_21_5 |>
 <br><br>
 
 
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1444,7 +1674,7 @@ ma_accidents_16_21_5 |>
 #| label: "ck-69"
  
 
-ma_accidents_16_21_6 <- ma_accidents_16_21_5 |> 
+ma_accidents_9 <- ma_accidents_8 |> 
     rename(temperature = Temperature.F.)
 
 
@@ -1460,7 +1690,7 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_5 |>
  
 
 
-ma_accidents_16_21_5 |> 
+ma_accidents_9 |> 
     count(Wind_Direction)
 
 
@@ -1470,31 +1700,33 @@ ma_accidents_16_21_5 |>
  <br><br>
 
 
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
 #| label: "ck-71"
-
  
 
-ma_accidents_16_21_6$Wind_Direction[trimws(ma_accidents_16_21_6$Wind_Direction) == ""] <- "NR"
+ma_accidents_9$Wind_Direction[trimws(ma_accidents_9$Wind_Direction) == ""] <- "NR"
+
 
 
  ```
 
  <br><br>
 
+ 
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
 #| label: "ck-72"
-
  
 
-
-ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
+ma_accidents_9 <- ma_accidents_9 |> 
     mutate(Wind_Direction = as.factor(Wind_Direction))
 
 
@@ -1506,6 +1738,7 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
 
  <br><br>
 
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1513,18 +1746,17 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
 #| label: "ck-73"
  
 
-
-
-
-ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
+ma_accidents_9 <- ma_accidents_9 |> 
     mutate(Wind_Direction = recode(Wind_Direction,  "CALM" = "Calm", "NR" = "Calm", "ENE" = "E", "ESE" = "E", "East" = "E", "NE" = "N", "NNE" = "N", "NNW" = "N", "NW" = "N", "North" = "N", "SE" = "S", 
                                                     "SSE" = "S", "SSW" ="S", "SW" = "S", "South" = "S", "VAR" = "Variable", "WNW" = "W", "WSW" = "W", "West" = "W"))
-
 
 
  ```
 
  <br><br>
+
+
+
 
 
 
@@ -1535,13 +1767,15 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
 #| label: "ck-74"
  
 
-ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
+ma_accidents_9 <- ma_accidents_9 |> 
     select(-Source, -Start_Time, -End_Time, -Distance.mi., -Pressure.in.)
 
 
  ```
 
  <br><br>
+
+
 
  ```{r}
 #| code-fold: true
@@ -1550,7 +1784,7 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
 #| label: "ck-75"
  
 
-ma_accidents_16_21_6 <- ma_accidents_16_21_6 |> 
+ma_accidents_9 <- ma_accidents_9 |> 
     mutate(Wind_Direction = as.factor(Wind_Direction),
             Weather_Condition = as.factor(Weather_Condition),
             Amenity = as.factor(Amenity),
@@ -1572,6 +1806,7 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
             Astronomical_Twilight = as.factor(Astronomical_Twilight))
 
 
+
  ```
 
  ```{r}
@@ -1581,7 +1816,7 @@ ma_accidents_16_21_6 <- ma_accidents_16_21_6 |>
 #| label: "ck-76"
  
 
-saveRDS(ma_accidents_16_21_6 , "ma_accidents_16_21_6.rds")
+saveRDS(ma_accidents_9 , "ma_accidents_9.rds")
 
 
  ```
@@ -1591,7 +1826,7 @@ saveRDS(ma_accidents_16_21_6 , "ma_accidents_16_21_6.rds")
 #| label: "ck-77"
  
 
-ma_accidents_16_21_6  <- readRDS("ma_accidents_16_21_6.rds")
+ma_accidents_9  <- readRDS("ma_accidents_9.rds")
 
 
 
@@ -1607,7 +1842,7 @@ ma_accidents_16_21_6  <- readRDS("ma_accidents_16_21_6.rds")
 
  
 
-ma_accidents_16_21_6 |> 
+ma_accidents_9 |> 
     select_if(is.factor) |> 
     summary()
 
@@ -1642,7 +1877,7 @@ ma_accidents_16_21_6 |>
 #| label: "ck-80"
  
 
-ma_accidents_16_21_6 |> 
+ma_accidents_9 |> 
     count(Wind_Direction) |> 
     mutate(perc = round(n/sum(n),2)) |> 
     arrange(desc(perc))
@@ -1690,6 +1925,7 @@ ma_accidents_16_21_6 |>
  <br><br>
 
 
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1697,8 +1933,7 @@ ma_accidents_16_21_6 |>
 #| label: "ck-83"
  
 
-
-ma_accidents_16_21_7 <- ma_accidents_16_21_6 |> 
+ma_accidents_10 <- ma_accidents_9 |> 
     mutate(Street = recode(Street,  "Mass Pike" = "I-90"))
 
 
@@ -1713,52 +1948,54 @@ We will create a new feature which will include the types of road categories, su
 
  
 
- ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
-#| eval: false
-#| label: "ck-84"
  
-
-col_to_check <- ma_accidents_16_21_7$Street
-
-ma_accidents_16_21_7$road_category <- "Uncategorized"
-
-
-ma_accidents_16_21_7$road_category[grepl("\\b(I|Interstate)[-\\s]?\\d+", col_to_check, ignore.case = TRUE)] <- "Interstate"
-ma_accidents_16_21_7$road_category[grepl("\\b(Route|Rte|Rt|State Route|SR|State Hwy|MA)[. -]*\\d+", col_to_check, ignore.case = TRUE)] <- "MA Highway"
-ma_accidents_16_21_7$road_category[grepl("\\b(US)[-\\s]?\\d+", col_to_check, ignore.case = TRUE)] <- "US Route"
-ma_accidents_16_21_7$road_category[grepl("\\b(Rd|Road)\\b", col_to_check, ignore.case = TRUE)] <- "Road"
-ma_accidents_16_21_7$road_category[grepl("way(\\b|[ .]+(N|S|E|W|NE|NW|SE|SW|North|South|East|West)?$)", col_to_check, ignore.case = TRUE)] <- "Way"
-ma_accidents_16_21_7$road_category[grepl("\\b(St|Street)\\b", col_to_check, ignore.case = TRUE)] <- "Street"
-ma_accidents_16_21_7$road_category[grepl("\\b(Ave|Avenue)\\b", col_to_check, ignore.case = TRUE)] <- "Avenue"
-ma_accidents_16_21_7$road_category[grepl("\\b(Blvd|Boulevard)\\b", col_to_check, ignore.case = TRUE)] <- "Boulevard"
-ma_accidents_16_21_7$road_category[grepl("\\b(Dr|Drive)\\b", col_to_check, ignore.case = TRUE)] <- "Drive"
-ma_accidents_16_21_7$road_category[grepl("\\b(Ln|Lane)\\b", col_to_check, ignore.case = TRUE)] <- "Lane"
-ma_accidents_16_21_7$road_category[grepl("\\b(Hwy|Highway)\\b", col_to_check, ignore.case = TRUE)] <- "Highway"
-ma_accidents_16_21_7$road_category[grepl("\\b(Pkwy|Parkway)\\b", col_to_check, ignore.case = TRUE)] <- "Parkway"
-ma_accidents_16_21_7$road_category[grepl("\\b(Brg|Bridge)\\b", col_to_check, ignore.case = TRUE)] <- "Bridge"
-ma_accidents_16_21_7$road_category[grepl("\\b(Cir|Circle)\\b", col_to_check, ignore.case = TRUE)] <- "Circle"
-ma_accidents_16_21_7$road_category[grepl("\\b(Trl|Trail)\\b", col_to_check, ignore.case = TRUE)] <- "Trail"
-ma_accidents_16_21_7$road_category[grepl("\\b(Ct|Cor|Court)\\b", col_to_check, ignore.case = TRUE)] <- "Court"
-ma_accidents_16_21_7$road_category[grepl("\\b(Ter|Terrace)\\b", col_to_check, ignore.case = TRUE)] <- "Terrace"
-ma_accidents_16_21_7$road_category[grepl("\\b(Pl|Place)\\b", col_to_check, ignore.case = TRUE)] <- "Place"
-ma_accidents_16_21_7$road_category[grepl("\\b(Tpke|Turnpike)\\b", col_to_check, ignore.case = TRUE)] <- "Turnpike"
-ma_accidents_16_21_7$road_category[grepl("\\b(Sq|Square)\\b", col_to_check, ignore.case = TRUE)] <- "Square"
-ma_accidents_16_21_7$road_category[grepl("\\b(Pth|Path)\\b", col_to_check, ignore.case = TRUE)] <- "Path"
-ma_accidents_16_21_7$road_category[grepl("\\b(Conn|Connector)\\b", col_to_check, ignore.case = TRUE)] <- "Connector"
-ma_accidents_16_21_7$road_category[grepl("\\b(Ext|Exit)\\b", col_to_check, ignore.case = TRUE)] <- "Exit"
-ma_accidents_16_21_7$road_category[grepl("\\b(Rty|Rotary)\\b", col_to_check, ignore.case = TRUE)] <- "Rotary"
-ma_accidents_16_21_7$road_category[grepl("\\b(Expy|Expressway)\\b", col_to_check, ignore.case = TRUE)] <- "Expressway"
-ma_accidents_16_21_7$road_category[grepl("\\b(Tunl|Tunnel)\\b", col_to_check, ignore.case = TRUE)] <- "Tunnel"
-
-
- ```
 
    <br><br>
 
 
 
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+#| label: "ck-84"
+
+
+col_to_check <- ma_accidents_10$Street
+
+ma_accidents_10$road_category <- "Uncategorized"
+
+
+ma_accidents_10$road_category[grepl("\\b(I|Interstate)[-\\s]?\\d+", col_to_check, ignore.case = TRUE)] <- "Interstate"
+ma_accidents_10$road_category[grepl("\\b(Route|Rte|Rt|State Route|SR|State Hwy|MA)[. -]*\\d+", col_to_check, ignore.case = TRUE)] <- "MA Highway"
+ma_accidents_10$road_category[grepl("\\b(US)[-\\s]?\\d+", col_to_check, ignore.case = TRUE)] <- "US Route"
+ma_accidents_10$road_category[grepl("\\b(Rd|Road)\\b", col_to_check, ignore.case = TRUE)] <- "Road"
+ma_accidents_10$road_category[grepl("way(\\b|[ .]+(N|S|E|W|NE|NW|SE|SW|North|South|East|West)?$)", col_to_check, ignore.case = TRUE)] <- "Way"
+ma_accidents_10$road_category[grepl("\\b(St|Street)\\b", col_to_check, ignore.case = TRUE)] <- "Street"
+ma_accidents_10$road_category[grepl("\\b(Ave|Avenue)\\b", col_to_check, ignore.case = TRUE)] <- "Avenue"
+ma_accidents_10$road_category[grepl("\\b(Blvd|Boulevard)\\b", col_to_check, ignore.case = TRUE)] <- "Boulevard"
+ma_accidents_10$road_category[grepl("\\b(Dr|Drive)\\b", col_to_check, ignore.case = TRUE)] <- "Drive"
+ma_accidents_10$road_category[grepl("\\b(Ln|Lane)\\b", col_to_check, ignore.case = TRUE)] <- "Lane"
+ma_accidents_10$road_category[grepl("\\b(Hwy|Highway)\\b", col_to_check, ignore.case = TRUE)] <- "Highway"
+ma_accidents_10$road_category[grepl("\\b(Pkwy|Parkway)\\b", col_to_check, ignore.case = TRUE)] <- "Parkway"
+ma_accidents_10$road_category[grepl("\\b(Brg|Bridge)\\b", col_to_check, ignore.case = TRUE)] <- "Bridge"
+ma_accidents_10$road_category[grepl("\\b(Cir|Circle)\\b", col_to_check, ignore.case = TRUE)] <- "Circle"
+ma_accidents_10$road_category[grepl("\\b(Trl|Trail)\\b", col_to_check, ignore.case = TRUE)] <- "Trail"
+ma_accidents_10$road_category[grepl("\\b(Ct|Cor|Court)\\b", col_to_check, ignore.case = TRUE)] <- "Court"
+ma_accidents_10$road_category[grepl("\\b(Ter|Terrace)\\b", col_to_check, ignore.case = TRUE)] <- "Terrace"
+ma_accidents_10$road_category[grepl("\\b(Pl|Place)\\b", col_to_check, ignore.case = TRUE)] <- "Place"
+ma_accidents_10$road_category[grepl("\\b(Tpke|Turnpike)\\b", col_to_check, ignore.case = TRUE)] <- "Turnpike"
+ma_accidents_10$road_category[grepl("\\b(Sq|Square)\\b", col_to_check, ignore.case = TRUE)] <- "Square"
+ma_accidents_10$road_category[grepl("\\b(Pth|Path)\\b", col_to_check, ignore.case = TRUE)] <- "Path"
+ma_accidents_10$road_category[grepl("\\b(Conn|Connector)\\b", col_to_check, ignore.case = TRUE)] <- "Connector"
+ma_accidents_10$road_category[grepl("\\b(Ext|Exit)\\b", col_to_check, ignore.case = TRUE)] <- "Exit"
+ma_accidents_10$road_category[grepl("\\b(Rty|Rotary)\\b", col_to_check, ignore.case = TRUE)] <- "Rotary"
+ma_accidents_10$road_category[grepl("\\b(Expy|Expressway)\\b", col_to_check, ignore.case = TRUE)] <- "Expressway"
+ma_accidents_10$road_category[grepl("\\b(Tunl|Tunnel)\\b", col_to_check, ignore.case = TRUE)] <- "Tunnel"
+
+
+```
  
 
  ```{r}
@@ -1766,7 +2003,7 @@ ma_accidents_16_21_7$road_category[grepl("\\b(Tunl|Tunnel)\\b", col_to_check, ig
 #| code-summary: "Show Code" 
 #| label: "ck-85"
  
-ma_accidents_16_21_6 |> count(Weather_Condition)
+ma_accidents_9 |> count(Weather_Condition)
 
 
  ```
@@ -1785,14 +2022,19 @@ ma_accidents_16_21_6 |> count(Weather_Condition)
 #| label: "ck-86"
  
 
-ma_accidents_16_21_6 |> select(Weather_Condition, City) |> 
+ma_accidents_9 |> select(Weather_Condition, City) |> 
     filter(Weather_Condition == "") |> 
     head(15)
 
 
  ```
 
+
+
+
    <br><br>
+
+
 
 
  ```{r}
@@ -1801,13 +2043,16 @@ ma_accidents_16_21_6 |> select(Weather_Condition, City) |>
 #| eval: false
 #| label: "ck-87"
  
-ma_accidents_16_21_7 <- ma_accidents_16_21_7 |> 
+
+ma_accidents_10 <- ma_accidents_10 |> 
     mutate(Weather_Condition = as.character(Weather_Condition))
 
 
  ```
 
    <br><br>
+
+
 
 
  ```{r}
@@ -1817,12 +2062,13 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7 |>
 #| label: "ck-88"
  
 
-ma_accidents_16_21_7$Weather_Condition[trimws(ma_accidents_16_21_7$Weather_Condition) == ""] <- "NR"
+ma_accidents_10$Weather_Condition[trimws(ma_accidents_10$Weather_Condition) == ""] <- "NR"
 
 
  ```
 
    <br><br>
+
 
 
 
@@ -1833,13 +2079,15 @@ ma_accidents_16_21_7$Weather_Condition[trimws(ma_accidents_16_21_7$Weather_Condi
 #| label: "ck-89"
  
 
-ma_accidents_16_21_7 <- ma_accidents_16_21_7 |> 
+ma_accidents_10 <- ma_accidents_10 |> 
     mutate(Weather_Condition = as.factor(Weather_Condition))
 
 
  ```
 
    <br><br>
+
+
 
 
  ```{r}
@@ -1849,7 +2097,7 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7 |>
 #| label: "ck-90"
  
 
-ma_accidents_16_21_7 <- ma_accidents_16_21_7 |> 
+ma_accidents_10 <- ma_accidents_10 |> 
     mutate(Weather_Condition = recode(Weather_Condition,  "NR" = "Fair Partley Cloudy", "Light Rain / Windy" = "Light Rain", "Light Rain Shower" = "Light Rain", "Light Rain with Thunder" = "Light Rain", "Light Drizzle" = "Light Rain","Rain / Windy" = "Rain", "Thunderstorms and Rain" = "Rain", "Thunderstorm" = "Rain", "T-Storm" = "Rain","Thunder" = "Overcast", "Cloudy" = "Overcast", "Thunder / Windy" = "Overcast", "Thunder in the Vicinity" = "Overcast","Cloudy / Windy" = "Overcast", "Mostly Cloudy" = "Overcast", "Mostly Cloudy / Windy" = "Overcast","Light Thunderstorms and Rain" = "Rain","Heavy Rain / Windy" = "Heavy Rain", "Heavy Thunderstorms and Rain" = "Heavy Rain","Heavy T-Storm / Windy" = "Heavy Rain","Heavy T-Storm" = "Heavy Rain", "Light Snow / Windy" = "Light Snow", "Light Snow and Sleet" = "Light Snow", "Clear" = "Fair Partley Cloudy","Blowing Snow" = "Heavy Snow", "Heavy Snow / Windy" = "Heavy Snow", "Light Drizzle / Windy" = "Light Rain", "Mist" = "Light Rain", "Drizzle and Fog" = "Light Rain", "Fair / Windy" = "Fair Partley Cloudy", "Partly Cloudy" = "Fair Partley Cloudy", "Partly Cloudy / Windy" = "Fair Partley Cloudy", "Fair" = "Fair Partley Cloudy", "Scattered Clouds" = "Fair Partley Cloudy",
    "Fog / Windy" = "Fog", "Patches of Fog" = "Fog","Shallow Fog" = "Fog","Wintry Mix / Windy" = "Wintry Mix", "Light Freezing Drizzle" = "Wintry Mix" , "Light Freezing Rain" = "Wintry Mix","Smoke" = "Haze", "Squalls" = "Snow",
    "Light Freezing Fog" = "Wintry Mix", "Ice Pellets" = "Wintry Mix","Small Hail" = "Wintry Mix",  "Snow / Windy" = "Snow", "N/A Precipitation" = "Fair Partley Cloudy") )
@@ -1865,6 +2113,7 @@ Next, we create a new feature hour_day_sextion.  This will be done by binning an
 
   <br><br>
 
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1872,9 +2121,7 @@ Next, we create a new feature hour_day_sextion.  This will be done by binning an
 #| label: "ck-91"
  
 
-
-
-ma_accidents_16_21_7 <- ma_accidents_16_21_7|> 
+ma_accidents_10 <- ma_accidents_10|> 
     mutate(hour_day_sections = case_when(
         between(hour_of_day,5,6) ~ "Dawn",
         between(hour_of_day,6,9) ~ "Early Morning",
@@ -1894,6 +2141,9 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7|>
    <br><br>
 
 
+
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1901,8 +2151,7 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7|>
 #| label: "ck-92"
  
 
-
-ma_accidents_16_21_7 <- ma_accidents_16_21_7 |> 
+ma_accidents_10 <- ma_accidents_10 |> 
     mutate(hour_day_sections = as.factor(hour_day_sections))
 
 
@@ -1916,6 +2165,8 @@ We can remove the hour_of_day feature now that hour_day_sections feature has bee
 <br><br>
 
 
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -1923,7 +2174,7 @@ We can remove the hour_of_day feature now that hour_day_sections feature has bee
 #| label: "ck-93"
  
 
-ma_accidents_16_21_7 <- ma_accidents_16_21_7 |> 
+ma_accidents_10 <- ma_accidents_10 |> 
     select(-hour_of_day)
 
 
@@ -1939,7 +2190,7 @@ ma_accidents_16_21_7 <- ma_accidents_16_21_7 |>
 #| label: "ck-94"
  
 
-saveRDS(ma_accidents_16_21_7, "ma_accidents_16_21_7.rds")
+saveRDS(ma_accidents_10, "ma_accidents_10.rds")
 
 
 
@@ -1947,11 +2198,11 @@ saveRDS(ma_accidents_16_21_7, "ma_accidents_16_21_7.rds")
 
 
  ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-95"
  
 
-ma_accidents_16_21_7 <- readRDS("ma_accidents_16_21_7.rds")
+ma_accidents_10 <- readRDS("ma_accidents_10.rds")
 
 
  ```
@@ -1960,10 +2211,13 @@ ma_accidents_16_21_7 <- readRDS("ma_accidents_16_21_7.rds")
 
 
  ```{r}
+#| echo: false
+#| include: false
+#| eval: false
  
 
 
-print(ma_accidents_16_21_7 |> 
+print(ma_accidents_16_21_10 |> 
     select(Year, road_category, accident_duration) |> 
     filter(Year == "2016") |> 
     group_by(road_category) |> 
@@ -1974,6 +2228,9 @@ print(ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| echo: false
+#| include: false
+#| eval: false
  
 
 print(ma_accidents_16_21_7 |> 
@@ -1987,6 +2244,9 @@ print(ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| echo: false
+#| include: false
+#| eval: false
  
 
 
@@ -2001,6 +2261,9 @@ print(ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| echo: false
+#| include: false
+#| eval: false
  
 
 
@@ -2015,6 +2278,9 @@ print(ma_accidents_16_21_7 |>
 
 
  ```{r}
+#| echo: false
+#| include: false
+#| eval: false
  
 
 
@@ -2029,6 +2295,9 @@ print(ma_accidents_16_21_7 |>
  ```
 
  ```{r}
+#| echo: false
+#| include: false
+#| eval: false
  
 
 print(ma_accidents_16_21_7 |> 
@@ -2049,7 +2318,7 @@ print(ma_accidents_16_21_7 |>
 #| label: "ck-96"
  
 
-ma_accidents_16_21_7 |> 
+ma_accidents_10 |> 
     count(hour_day_sections) |> 
     mutate(perc = round(n/sum(n),3)*100) |> 
     arrange(desc(perc))
@@ -2074,7 +2343,7 @@ ma_accidents_16_21_7 |>
 #| label: "ck-97"
  
 
-ma_accidents_16_21_7 |> 
+ma_accidents_10 |> 
     count(road_category)
 
 
@@ -2090,7 +2359,7 @@ ma_accidents_16_21_7 |>
 #| label: "ck-98"
  
 
-print(ma_accidents_16_21_7 |> 
+print(ma_accidents_10 |> 
     group_by(road_category) |> 
     summarise(median_acc_duration_road = median(accident_duration)) |> 
     arrange(desc(median_acc_duration_road)), n=27)
@@ -2124,7 +2393,7 @@ ma_accidents_16_21_7 |>
 
  
 
-print(ma_accidents_16_21_7 |> 
+print(ma_accidents_10 |> 
     group_by(Weather_Condition) |> 
     summarise(median_acc_duration_weather = median(accident_duration)) |> 
     arrange(desc(median_acc_duration_weather)), n=11)
@@ -2511,6 +2780,8 @@ The features No_Exit, Traffic_calming, Give_Way, Railway, Bump, Roundabout, and 
  <br><br>
 
 
+
+
  ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -2518,8 +2789,9 @@ The features No_Exit, Traffic_calming, Give_Way, Railway, Bump, Roundabout, and 
 #| label: "ck-123"
  
 
-ma_accidents_16_21_8 <- ma_accidents_16_21_7 |> 
+ma_accidents_11 <- ma_accidents_10 |> 
     select(-No_Exit, -Traffic_Calming, -Nautical_Twilight, -Astronomical_Twilight, -Give_Way, -Railway, -Description, -Street, -Bump, -Roundabout, -Turning_Loop)
+
 
 
  ```
@@ -2532,19 +2804,19 @@ ma_accidents_16_21_8 <- ma_accidents_16_21_7 |>
 #| eval: false
 #| label: "ck-124"
  
-saveRDS(ma_accidents_16_21_8, "ma_accidents_16_21_8.rds")
+saveRDS(ma_accidents_11, "ma_accidents_11.rds")
 
 
  ```
 
  ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-125"
 
  
 
 
-ma_accidents_16_21_8 <- readRDS("ma_accidents_16_21_8.rds")
+ma_accidents_11 <- readRDS("ma_accidents_11.rds")
 
  ```
 
@@ -2554,7 +2826,7 @@ ma_accidents_16_21_8 <- readRDS("ma_accidents_16_21_8.rds")
 #| label: "ck-126"
  
 
-ma_accidents_16_21_8 |> 
+ma_accidents_11|> 
     glimpse()
 
 
@@ -2665,7 +2937,7 @@ saveRDS(ma_county, "ma_county.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-132"
 
 
@@ -2751,7 +3023,7 @@ saveRDS(ma_county_shape , "ma_county_shape.rds")
 
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-138"
 
 
@@ -2818,7 +3090,7 @@ saveRDS(ma_county_shape_2, "ma_county_shape_2.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-143"
 
 
@@ -2858,7 +3130,7 @@ saveRDS(census_county_urban, "census_county_urban.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-146"
 
 census_county_urban <- readRDS("census_county_urban.rds")
@@ -2926,7 +3198,7 @@ saveRDS(ma_county_urban , "ma_county_urban.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-151"
 
 
@@ -3033,7 +3305,7 @@ saveRDS(ma_county_urban_2, "ma_county_urban_2.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-158"
 
 
@@ -3105,7 +3377,7 @@ saveRDS(ma_county_urban_3, "ma_county_urban_3.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-163"
 
 
@@ -3158,7 +3430,7 @@ saveRDS(county_geo , "county_geo.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-167"
 
 
@@ -3233,7 +3505,7 @@ saveRDS(county_geo_2, "county_geo_2.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-172"
 
 
@@ -3303,7 +3575,7 @@ saveRDS(ma_tracts, "ma_tracts.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-177"
 
 ma_tracts <- readRDS("ma_tracts.rds")
@@ -3390,7 +3662,7 @@ saveRDS(ma_tract_data, "ma_tract_data.rds")
 
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-182"
 
 ma_tract_data <- readRDS("ma_tract_data.rds")
@@ -3467,7 +3739,7 @@ saveRDS(ma_tract_geometry, "ma_tract_geometry.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-187"
 
 
@@ -3508,7 +3780,7 @@ saveRDS(ma_tract_cls, "ma_tract_cls.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-190"
 
 
@@ -3595,7 +3867,7 @@ saveRDS(ma_tract_data_2 , "ma_tract_data_2.rds")
 
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-195"
 
 ma_tract_data_2  <- readRDS("ma_tract_data_2.rds")
@@ -3632,7 +3904,7 @@ saveRDS(ma_tract_data_3 , "ma_tract_data_3.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-198"
 
 
@@ -4188,7 +4460,7 @@ saveRDS(ma_tract_data_4, "ma_tract_data_4.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-227"
 
 
@@ -4446,7 +4718,7 @@ saveRDS(ma_tract_data_6 , "ma_tract_data_6.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-242"
 
 
@@ -4524,7 +4796,7 @@ saveRDS(ma_tract_data_7, "ma_tract_data_7.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-247"
 
 ma_tract_data_7 <- readRDS("ma_tract_data_7.rds")
@@ -4597,6 +4869,24 @@ accident_dur_temp_scatter <- ma_accidents_16_21_7 |>
 
 ```
 
+```{r}
+
+
+
+accident_dur_temp_scatter <- ma_accidents_11 |> 
+    ggplot(aes(x=accident_duration, y=temperature)) +
+    geom_point() +
+    labs(
+    title = "Accident Duration Vs Temperature",
+    x = "Accident Duration",
+    y = "Temperature"
+  ) +
+  theme_minimal(base_size = 12)
+
+
+
+```
+
 
 ```{r}
 #| echo: false
@@ -4611,7 +4901,7 @@ saveRDS(accident_dur_temp_scatter, "accident_dur_temp_scatter.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-251"
 
 
@@ -4627,6 +4917,7 @@ accident_dur_temp_scatter <- readRDS("accident_dur_temp_scatter.rds")
 
 ```{r}
 #| label: "ck-252"
+#| echo: false
 
 
 accident_dur_temp_scatter
@@ -4645,6 +4936,8 @@ Accident duration values are clustered between 0 and 100.  We'll  transform acci
 <br><br>
 
 
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -4654,7 +4947,7 @@ Accident duration values are clustered between 0 and 100.  We'll  transform acci
 
 
 
-log_accDur_temp_scatter <- ma_accidents_16_21_7 |> 
+log_accDur_temp_scatter <- ma_accidents_11 |> 
     ggplot(aes(x=log(accident_duration), y=temperature)) +
     geom_point() +
     labs(
@@ -4680,7 +4973,7 @@ saveRDS(log_accDur_temp_scatter, "log_accDur_temp_scatter.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-255"
 
 
@@ -4694,6 +4987,7 @@ log_accDur_temp_scatter <- readRDS("log_accDur_temp_scatter.rds")
 
 ```{r}
 #| label: "ck-256"
+#| echo: false
 
 
 log_accDur_temp_scatter
@@ -4710,15 +5004,19 @@ Our plot has improved after the log transformation.
 
 
 
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
 #| label: "ck-257"
 
-road_cat_summary <- ma_accidents_16_21_7 |> 
+
+road_cat_summary <- ma_accidents_11 |> 
     group_by(road_category) |> 
     summarize(accident_duration = mean(accident_duration, na.rm = TRUE, n = n()))
+
+
 
 ```
 
@@ -4734,7 +5032,7 @@ saveRDS(road_cat_summary, "road_cat_summary.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-259"
 
 
@@ -4779,7 +5077,7 @@ saveRDS(road_accident_duration_plt, "road_accident_duration_plt.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-262"
 
 
@@ -4793,6 +5091,7 @@ road_accident_duration_plt <- readRDS("road_accident_duration_plt.rds")
 
 ```{r}
 #| label: "ck-263"
+#| echo: false
 
 
 road_accident_duration_plt
@@ -4804,11 +5103,13 @@ road_accident_duration_plt
 <br><br>
 
 
-Trail, Drive, and Highway have a greater separation from the other road categories, with average accident duration greater than 90 minutes. 
+Trail, Highwayt, and Drive have a greater separation from the other road categories, with average accident duration greater than 90 minutes. 
 
 
 
 <br><br>
+
+
 
 ```{r}
 #| code-fold: true
@@ -4817,7 +5118,7 @@ Trail, Drive, and Highway have a greater separation from the other road categori
 #| label: "ck-264"
 
 
-hour_day_summary <- ma_accidents_16_21_7 |> 
+hour_day_summary <- ma_accidents_11 |> 
     group_by(hour_day_sections) |> 
     summarize(accident_duration = mean(accident_duration, na.rm = TRUE, n = n()))
 
@@ -4838,7 +5139,7 @@ saveRDS(hour_day_summary, "hour_day_summary.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-266"
 
 hour_day_summary <- readRDS("hour_day_summary.rds")
@@ -4884,7 +5185,7 @@ saveRDS(hour_day_acc_dur_plt, "hour_day_acc_dur_plt.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-269"
 
 
@@ -4901,6 +5202,7 @@ hour_day_acc_dur_plt <-readRDS("hour_day_acc_dur_plt.rds")
 
 ```{r}
 #| label: "ck-270"
+#| echo: false
 
 hour_day_acc_dur_plt
 
@@ -4922,6 +5224,8 @@ hour_day_acc_dur_plt
 
 
 
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -4929,7 +5233,8 @@ hour_day_acc_dur_plt
 #| label: "ck-271"
 
 
-weather_summary <- ma_accidents_16_21_7 |> 
+
+weather_summary <- ma_accidents_11 |> 
     group_by(Weather_Condition) |> 
     summarize(accident_duration = mean(accident_duration, na.rm = TRUE, n = n()))
 
@@ -4949,7 +5254,7 @@ saveRDS(weather_summary , "weather_summary.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-273"
 
 
@@ -4993,7 +5298,7 @@ saveRDS(weather_acc_dur_plt , "weather_acc_dur_plt.rds")
 
 
 ```{r}
-#| invlude: false
+#| echo: false
 #| label: "ck-276"
 
 
@@ -5008,6 +5313,7 @@ weather_acc_dur_plt  <- readRDS("weather_acc_dur_plt.rds")
 
 ```{r}
 #| label: "ck-277"
+#| echo: false
 
 
 
@@ -5020,7 +5326,7 @@ weather_acc_dur_plt
 <br><br>
 
 
-Unsurprisingly, the weather condition “Heavy Snow” has the greatest average accident duration. 
+Unsurprisingly, the weather condition “Heavy Snow” has the greatest average accident duration with all but three of the other categories falling bewteen 60 and 70 minutes. 
 
 <br><br>
 
@@ -5038,6 +5344,8 @@ Now we'll focus on plots dealing with the number of accidents (count).
 
 
 
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -5046,7 +5354,7 @@ Now we'll focus on plots dealing with the number of accidents (count).
 
 
 
-road_prop <- ggplot(ma_accidents_16_21_7, aes(x = road_category, y = after_stat(prop), group = 1)) +
+road_prop <- ggplot(ma_accidents_11, aes(x = road_category, y = after_stat(prop), group = 1)) +
     geom_bar() +
     coord_flip() +
     labs(
@@ -5071,7 +5379,7 @@ saveRDS(road_prop , "road_prop.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-280"
 
 
@@ -5084,6 +5392,7 @@ road_prop  <- readRDS("road_prop.rds")
 
 ```{r}
 #| label: "ck-281"
+#| echo: false
 
 
 road_prop
@@ -5093,6 +5402,7 @@ road_prop
 
 <br><br>
 
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -5100,7 +5410,7 @@ road_prop
 #| label: "ck-282"
 
 
-day_time_prop <- ggplot(ma_accidents_16_21_7, aes(x = hour_day_sections, y = after_stat(prop), group = 1)) +
+day_time_prop <- ggplot(ma_accidents_11, aes(x = hour_day_sections, y = after_stat(prop), group = 1)) +
     geom_bar() +
     coord_flip() +
     labs(
@@ -5109,6 +5419,7 @@ day_time_prop <- ggplot(ma_accidents_16_21_7, aes(x = hour_day_sections, y = aft
     y = "Time of Day"
   ) +
   theme_minimal(base_size = 12)
+
 
 
 ```
@@ -5126,7 +5437,7 @@ saveRDS(day_time_prop , "day_time_prop.rds")
 
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-284"
 
 day_time_prop  <- readRDS("day_time_prop.rds")
@@ -5142,6 +5453,7 @@ day_time_prop  <- readRDS("day_time_prop.rds")
 
 ```{r}
 #| label: "ck-285"
+#| echo: false
 
 
 
@@ -5159,6 +5471,8 @@ Approximately a little over half of all accidents occur during the early morning
 
 <br><br>
 
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -5166,7 +5480,7 @@ Approximately a little over half of all accidents occur during the early morning
 #| label: "ck-286"
 
 
-weather_prop_plt <- ggplot(ma_accidents_16_21_7, aes(x = Weather_Condition, y = after_stat(prop), group = 1)) +
+weather_prop_plt <- ggplot(ma_accidents_11, aes(x = Weather_Condition, y = after_stat(prop), group = 1)) +
     geom_bar() +
     coord_flip() +
     labs(
@@ -5175,6 +5489,7 @@ weather_prop_plt <- ggplot(ma_accidents_16_21_7, aes(x = Weather_Condition, y = 
     y = "Weather Condition"
   ) +
   theme_minimal(base_size = 12)
+
 
 
 ```
@@ -5191,7 +5506,7 @@ saveRDS(weather_prop_plt, "weather_prop_plt.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-288"
 
 weather_prop_plt <- readRDS("weather_prop_plt.rds")
@@ -5208,12 +5523,15 @@ weather_prop_plt <- readRDS("weather_prop_plt.rds")
 
 ```{r}
 #| label: "ck-289"
+#| echo: false
 
 
 weather_prop_plt
 
 
 ```
+
+
 
 
 
@@ -5224,7 +5542,8 @@ weather_prop_plt
 #| label: "ck-290"
 
 
-hour_day_type_plt <- ma_accidents_16_21_7 |> 
+
+hour_day_type_plt <- ma_accidents_11 |> 
 ggplot(aes(x=hour_day_sections, fill = day_type)) +
     geom_bar(position = "fill") +
     labs(
@@ -5234,7 +5553,6 @@ ggplot(aes(x=hour_day_sections, fill = day_type)) +
     fill = "Day Type"
   ) +
   theme_minimal(base_size = 12)
-
 
 
 ```
@@ -5253,7 +5571,7 @@ saveRDS(hour_day_type_plt, "hour_day_type_plt.rds")
 
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-292"
 
 
@@ -5268,6 +5586,7 @@ hour_day_type_plt <- readRDS("hour_day_type_plt.rds")
 
 ```{r}
 #| label: "ck-293"
+#| echo: false
 
 hour_day_type_plt
 
@@ -5281,6 +5600,8 @@ Weekends appear to have their greatest percentage of accidents at night.
 
 <br><br>
 
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -5288,7 +5609,7 @@ Weekends appear to have their greatest percentage of accidents at night.
 #| label: "ck-294"
 
 
-road_day_type_plt <- ma_accidents_16_21_7 |> 
+road_day_type_plt <- ma_accidents_11 |> 
 ggplot(aes(x=road_category, fill = day_type)) +
     geom_bar(position = "fill") +
     labs(
@@ -5299,7 +5620,6 @@ ggplot(aes(x=road_category, fill = day_type)) +
   ) +
   theme_minimal(base_size = 12) +
     coord_flip()
-
 
 
 ```
@@ -5317,7 +5637,7 @@ saveRDS(road_day_type_plt, "road_day_type_plt.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-296"
 
 
@@ -5333,6 +5653,7 @@ road_day_type_plt <- readRDS("road_day_type_plt.rds")
 
 ```{r}
 #| label: "ck-297"
+#| echo: false
 
 
 road_day_type_plt
@@ -5345,11 +5666,12 @@ road_day_type_plt
 
 
 
-Expressways and Trails   to have a greater percentage of accidents on weekends compared to the other road categories. 
+Expressways and Trails have a greater percentage of accidents on weekends compared to the other road categories. 
 
 
 
 <br><br>
+
 
 
 
@@ -5361,9 +5683,11 @@ Expressways and Trails   to have a greater percentage of accidents on weekends c
 #| eval: false
 #| label: "ck-298"
 
-road_count_summary <- ma_accidents_16_21_7 |> 
+
+road_count_summary <- ma_accidents_11 |> 
     count(road_category) |> 
     mutate(perc = n/sum(n))
+
 
 
 ```
@@ -5391,7 +5715,7 @@ saveRDS(road_count_summary, "road_count_summary.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-301"
 
 road_count_summary <- readRDS("road_count_summary.rds")
@@ -5435,7 +5759,7 @@ saveRDS(road_accident_count_plt, "road_accident_count_plt.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-304"
 
 road_accident_count_plt <- readRDS("road_accident_count_plt.rds")
@@ -5448,6 +5772,7 @@ road_accident_count_plt <- readRDS("road_accident_count_plt.rds")
 
 ```{r}
 #| label: "ck-305"
+#| echo: false
 
 
 road_accident_count_plt
@@ -5468,6 +5793,7 @@ Interstate highways and Streets account for 58% of all accidents compared to all
 
 
 
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -5475,9 +5801,7 @@ Interstate highways and Streets account for 58% of all accidents compared to all
 #| label: "ck-306"
 
 
-
-
-road_day_accident_count_summary <- ma_accidents_16_21_7 |> 
+road_day_accident_count_summary <- ma_accidents_11 |> 
     count(hour_day_sections, road_category, name = "count") |> 
     group_by(hour_day_sections) |> 
     mutate(prop = count / sum(count)) |> 
@@ -5509,7 +5833,7 @@ saveRDS(road_day_accident_count_summary, "road_day_accident_count_summary.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-308"
 
 
@@ -5552,7 +5876,7 @@ saveRDS(road_dayTime_count_plt, "road_dayTime_count_plt.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-311"
 
 
@@ -5569,6 +5893,7 @@ road_dayTime_count_plt <- readRDS("road_dayTime_count_plt.rds")
 
 ```{r}
 #| label: "ck-312"
+#| echo: false
 
 
 ggplotly(road_dayTime_count_plt, tooltip = "text")
@@ -5586,6 +5911,8 @@ Accdidents by road category as a proportion of accidents by time of day are rela
 
 
 
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -5593,7 +5920,8 @@ Accdidents by road category as a proportion of accidents by time of day are rela
 #| label: "ck-313"
 
 
-road_month_accident_count_summary <- ma_accidents_16_21_7 |> 
+
+road_month_accident_count_summary <- ma_accidents_11 |> 
     count(Month, road_category, name = "count") |> 
     group_by(Month) |> 
     mutate(prop = count / sum(count)) |> 
@@ -5625,7 +5953,7 @@ saveRDS(road_month_accident_count_summary, "road_month_accident_count_summary.rd
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-315"
 
 road_month_accident_count_summary <- readRDS("road_month_accident_count_summary.rds")
@@ -5673,7 +6001,7 @@ saveRDS(road_month_count_plt, "road_month_count_plt.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-318"
 
 road_month_count_plt <- readRDS("road_month_count_plt.rds")
@@ -5689,6 +6017,7 @@ road_month_count_plt <- readRDS("road_month_count_plt.rds")
 
 ```{r}
 #| label: "ck-319"
+#| echo: false
 
 
 ggplotly(road_month_count_plt, tooltip = "text") 
@@ -5713,7 +6042,6 @@ The number of accidents by road category as a proprtion of month appears relativ
 
 
 
-<br><br>
 
 
 
@@ -5723,7 +6051,8 @@ The number of accidents by road category as a proprtion of month appears relativ
 #| eval: false
 
 
-accident_duration_year <- ma_accidents_16_21_7 |>
+
+accident_duration_year <- ma_accidents_11 |>
     select(Year, road_category, accident_duration) |> 
     group_by(Year, road_category) |> 
     mutate(median_duration = median(accident_duration)) |> 
@@ -5733,8 +6062,8 @@ accident_duration_year <- ma_accidents_16_21_7 |>
             "<br>Median Accident Duration: ", median_duration,
              "<br>Road Category: ", road_category) )
 
-```
 
+```
 <br><br>
 
 
@@ -5750,7 +6079,7 @@ saveRDS(accident_duration_year, "accident_duration_year.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 accident_duration_year <- readRDS("accident_duration_year.rds")
@@ -5797,7 +6126,7 @@ saveRDS(accident_duration_period_plt, "accident_duration_period_plt.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 accident_duration_period_plt <- readRDS("accident_duration_period_plt.rds")
@@ -5806,6 +6135,7 @@ accident_duration_period_plt <- readRDS("accident_duration_period_plt.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 ggplotly(accident_duration_period_plt, tooltip = "text")
@@ -5819,9 +6149,11 @@ ggplotly(accident_duration_period_plt, tooltip = "text")
 <br><br>
 
 
-Viewing this line graph may be difficult due to the number of road categories yet we can observe interesting pattern.  Other than a few categories, many categories have similar median accident durations for a year.  This becomes evident starting in the year 2018, where many categories have a median accident duration near 30.   The years 2019, 2020, and 2021 have many categories with median accident durations near 60.  To make inspecting this plot easier, it has an interactive element.  Hovering over a line you can view the category name and its associated median accident duration. 
+Viewing this line graph may be difficult due to the number of road categories yet we can observe interesting pattern.  Other than a few categories, many categories have similar median accident durations for a year.  This becomes evident starting in the year 2018, where many categories have a median accident duration near 30.   The years 2019, 2020, and 2021 have many categories with median accident durations near 60 and the year 2022 median accident duration of 46.  To make inspecting this plot easier, it has an interactive element.  Hovering over a line you can view the category name and its associated median accident duration. 
 
 <br><br>
+
+
 
 
 ```{r}
@@ -5830,11 +6162,12 @@ Viewing this line graph may be difficult due to the number of road categories ye
 #| eval: false
 
 
-year_med_dur <- ma_accidents_16_21_5 |> 
+
+
+year_med_dur <- ma_accidents_11 |> 
     select(Year, accident_duration) |> 
     group_by(Year) |> 
     summarize(median_duration = median(accident_duration)) 
-
 
 
 ```
@@ -5854,9 +6187,9 @@ saveRDS(year_med_dur, "year_med_dur.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
-year_med_dur <- readRD("year_med_dur.rds")
+year_med_dur <- readRDS("year_med_dur.rds")
 
 
 ```
@@ -5896,7 +6229,7 @@ saveRDS(acc_dur_year_plt, "acc_dur_year_plt.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 acc_dur_year_plt <- readRDS("acc_dur_year_plt.rds")
@@ -5905,6 +6238,7 @@ acc_dur_year_plt <- readRDS("acc_dur_year_plt.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 acc_dur_year_plt
@@ -5912,13 +6246,15 @@ acc_dur_year_plt
 
 ```
 
+
+
 <br><br>
 
 
 
 
 
-Visualizing the median accident duration by year we a dramatic change in values starting in 2019.   Median accident duration for the years 2016, 2017, and 2018 is close to 30 minutes.  The median accident duration doubles to 60 minutes for the years 2019, 2020, and 2021.  Our column plot displays the same changes we observed in our time series plot of road categories.  These differences between the year groups might be due to a change on how an accidents end time is determines, though  we have no documentation to support this. 
+Visualizing the median accident duration by year we a dramatic change in values starting in 2019.   Median accident duration for the years 2016 through 2018 is close to 30 minutes.  The median accident duration doubles to 60 minutes for th years 2019 through 2021. Median accident duration drops to 45 minutes for the 2022 year.   Our column plot displays the same changes we observed in our time series plot of road categories.  These differences between the year groups might be due to a change on how an accidents end time is determinesd though  we have no documentation to support this. 
 
 <br><br>
 
@@ -5950,6 +6286,8 @@ Our first map we’ll create is will be population of Massachusetts counties.  B
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 county_geo_stcrs <- st_crs(county_geo)
@@ -5966,12 +6304,16 @@ county_geo_stcrs <- st_crs(county_geo)
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 county_geo_stcrs$input
 
 
 ```
+
+
 
 <br><br>
 
@@ -6016,7 +6358,7 @@ saveRDS(ma_county_geo_4326, "ma_county_geo_4326.rds")
 
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-322"
 
 
@@ -6137,7 +6479,7 @@ saveRDS(ma_county_formated , "ma_county_formated.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-329"
 
 
@@ -6215,7 +6557,7 @@ saveRDS(map_county_pop_density_plt, "map_county_pop_density_plt.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-333"
 
 
@@ -6255,7 +6597,7 @@ saveRDS(county_map_pop_density, "county_map_pop_density.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-336"
 
 
@@ -6269,6 +6611,7 @@ county_map_pop_density <- readRDS("county_map_pop_density.rds")
 
 ```{r}
 #| label: "ck-337"
+#| echo: false
 
 county_map_pop_density
 
@@ -6305,13 +6648,15 @@ Tract accident count will be created for inclusion on the census tract map.
 
 
 
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
 #| label: "ck-338"
 
-tract_accident_count <- ma_accidents_16_21_8 |> 
+
+tract_accident_count <- ma_accidents_11 |> 
     count(GEOID, name = "tract_accident_count")
 
 
@@ -6328,7 +6673,7 @@ saveRDS(tract_accident_count, "tract_accident_count.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-340"
 
 
@@ -6406,7 +6751,7 @@ Tract_accident_count  will be joined with our accident dataset.
 
 
 
-ma_accidents_16_21_10 <- ma_accidents_16_21_8 |> 
+ma_accidents_12<- ma_accidents_11 |> 
     full_join(tract_accident_count, by = "GEOID")
 
 
@@ -6420,13 +6765,13 @@ ma_accidents_16_21_10 <- ma_accidents_16_21_8 |>
 #| label: "ck-345"
 
 
-saveRDS(ma_accidents_16_21_10, "ma_accidents_16_21_10.rds")
+saveRDS(ma_accidents_12, "ma_accidents_12.rds")
 
 
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-346"
 
 
@@ -6472,10 +6817,6 @@ ma_accidents_16_21_10 |>
 #| label: "ck-348"
 
 
-
-
-
-
  
 
 ma_accidents_16_21_10 |> 
@@ -6498,6 +6839,8 @@ ma_accidents_16_21_10 |>
 
 
 
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -6505,12 +6848,8 @@ ma_accidents_16_21_10 |>
 #| label: "ck-349"
 
 
-
-
-
-
 ma_tract_accident <- ma_tract_data_6 |> 
-    full_join(ma_accidents_16_21_10, by = "GEOID")
+    full_join(ma_accidents_12, by = "GEOID")
 
 
 ```
@@ -6529,7 +6868,7 @@ saveRDS(ma_tract_accident, "ma_tract_accident.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-351"
 
 
@@ -6656,7 +6995,7 @@ saveRDS(ma_tract_accident_2, "ma_tract_accident_2.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-358"
 
 
@@ -6712,7 +7051,7 @@ saveRDS(ma_tract_accident_3, "ma_tract_accident_3.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-362"
 
 ma_tract_accident_3 <- readRDS("ma_tract_accident_3.rds")
@@ -6810,7 +7149,7 @@ saveRDS(ma_census4326, "ma_census4326.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-368"
 
 
@@ -6988,7 +7327,7 @@ saveRDS(map_tract_population_plt, "map_tract_population_plt.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-379"
 
 map_tract_population_plt <- readRDS("map_tract_population_plt.rds")
@@ -7026,7 +7365,7 @@ saveRDS(tract_map_population, "tract_map_population.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-382"
 
 
@@ -7042,6 +7381,7 @@ tract_map_population <- readRDS("tract_map_population.rds")
 
 ```{r}
 #| label: "ck-383"
+#| echo: false
 
 
 tract_map_population
@@ -7084,11 +7424,7 @@ ma_census4326 |>
 # Preprocessing
 
 
-```{r}
 
-
-
-```
 
 
 <br><br>
@@ -7107,7 +7443,7 @@ We’ll now prepare our data for modeling.  This includes select predictor featu
 #| eval: false
 
 
-census_tract_df <- ma_accidents_16_21_8 |> 
+census_tract_df <- ma_accidents_11 |> 
     left_join(ma_tract_data_7, by = "GEOID")
 
 ```
@@ -7126,7 +7462,7 @@ saveRDS(census_tract_df, "census_tract_df.rds")
 
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 census_tract_df <- readRDS("census_tract_df.rds")
@@ -7179,7 +7515,7 @@ census_tract_df |> filter(total_tract_housing_unitsE == 0) |> head(10)
 
 
 census_tract_df_2 <- census_tract_df |> 
-    select(-ID, -Severity, -City, -County, -Year, -LATITUDE, -LONGITUDE, -census_code, -tract_house_density_sqmi, -Stop,-Amenity, -Crossing,-Junction ,-Station,-Traffic_Signal,-Sunrise_Sunset,-Civil_Twilight, -day_of_week, -total_tract_housing_unitsE, -total_vehicles_tractE, -total_population_tractE, -avg_cars_per_household, -total_households_tractE, -tract_pop_density_sqmi)
+    select(-ID, -Severity, -City, -County, -Year, -LATITUDE, -LONGITUDE, -tract_house_density_sqmi, -Stop,-Amenity, -Crossing,-Junction ,-Station,-Traffic_Signal,-Sunrise_Sunset,-Civil_Twilight, -day_of_week, -total_tract_housing_unitsE, -total_vehicles_tractE, -total_population_tractE, -avg_cars_per_household, -total_households_tractE, -tract_pop_density_sqmi)
 
 
 ```
@@ -7197,7 +7533,7 @@ saveRDS(census_tract_df_2, "census_tract_df_2.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 census_tract_df_2 <- readRDS("census_tract_df_2.rds")
@@ -7224,7 +7560,7 @@ Our next data preparation will be for a poisson regression model.  Unlike our li
 
 
 census_tract_df_3 <- census_tract_df |> 
-    select(-ID, -Severity, -City, -County, -Year, -LATITUDE, -LONGITUDE, -census_code, -tract_house_density_sqmi, -Stop,-Amenity, -Crossing,-Junction ,-Station,-Traffic_Signal,-Sunrise_Sunset,-Civil_Twilight, -day_of_week, -total_tract_housing_unitsE, -total_vehicles_tractE, -avg_cars_per_household, -total_households_tractE, -tract_pop_density_sqmi)
+    select(-ID, -Severity, -City, -County, -Year, -LATITUDE, -LONGITUDE, -tract_house_density_sqmi, -Stop,-Amenity, -Crossing,-Junction ,-Station,-Traffic_Signal,-Sunrise_Sunset,-Civil_Twilight, -day_of_week, -total_tract_housing_unitsE, -total_vehicles_tractE, -avg_cars_per_household, -total_households_tractE, -tract_pop_density_sqmi)
 
 
 
@@ -7241,7 +7577,7 @@ saveRDS(census_tract_df_3 , "census_tract_df_3.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 census_tract_df_3  <- readRDS("census_tract_df_3.rds")
 
@@ -7267,7 +7603,7 @@ census_tract_df_3 |> summary()
 
 <br><br>
 
-The total_population_tractE feature has 787 missing values (NAs).  Our model does not accept missing values; thus, we will remove them from the data. 
+The total_population_tractE feature has 9 missing values (NAs).  Our model does not accept missing values; thus, we will remove them from the data. 
 
 
 
@@ -7296,7 +7632,7 @@ saveRDS(census_tract_df_4, "census_tract_df_4.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 census_tract_df_4 <- readRDS("census_tract_df_4.rds")
 
@@ -7380,7 +7716,7 @@ saveRDS(tract_pop , "tract_pop.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 tract_pop <- readRDS("tract_pop.rds")
@@ -7440,6 +7776,7 @@ saveRDS(agg_observed, "agg_observed.rds")
 
 ```{r}
 #| include: false
+#| echo: false
 
 
 
@@ -7492,7 +7829,7 @@ saveRDS(census_poi_df, "census_poi_df.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 
@@ -7549,7 +7886,7 @@ saveRDS(census_poi_df_2, "census_poi_df_2.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 census_poi_df_2 <- readRDS("census_poi_df_2.rds")
@@ -7656,6 +7993,7 @@ saveRDS(acci_census_df, "acci_census_df.rds")
 
 ```{r}
 #| include: false
+#| echo: false
 
 
 acci_census_df <- readRDS("acci_census_df.rds")
@@ -7704,7 +8042,7 @@ saveRDS(acci_census_df_2, "acci_census_df_2.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 acci_census_df_2 <- readRDS("acci_census_df_2.rds")
@@ -7745,7 +8083,7 @@ saveRDS(train_census_data , "train_census_data.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 train_census_data  <- readRDS("train_census_data.rds")
@@ -7785,7 +8123,7 @@ saveRDS(test_census_data, "test_census_data.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 test_census_data <- readRDS("test_census_data.rds")
@@ -7833,9 +8171,50 @@ test_census_data |>
 
 ```
 
+Our results show 40 FALSE counts, meaning these census tracts from our testing data are not in our training data.  We’ll drop these rows from the testing data.  
+
+
+```{r}
+
+test_census_data_clean <- test_census_data |> 
+    filter(Exists == TRUE)
+
+
+```
+
+```{r}
+
+
+test_census_data_clean |> 
+    count(Exists)
+
+
+```
+
+```{r}
+
+test_census_data_clean <- test_census_data_clean |> 
+    select(-Exists)
+
+
+```
+
+```{r}
+
+saveRDS(test_census_data_clean , "test_census_data_clean.rds")
+
+
+```
+
+```{r}
+
+test_census_data_clean <- readRDS("test_census_data_clean.rds")
+
+
+```
+
 <br><br>
 
-Our results show 42 FALSE counts, meaning these census tracts from our testing data are not in our training data.  We’ll drop these rows from the testing data when we are ready to predict. 
 
 
 <br><br>
@@ -7873,7 +8252,7 @@ saveRDS(train_census_data_2, "train_census_data_2.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 train_census_data_2 <- readRDS("train_census_data_2.rds")
 
@@ -7892,6 +8271,10 @@ test_census_data_2 <- testing(acci_census_df_2)
 
 ```
 
+All census tracts in our testing data are in the training data. 
+
+
+
 ```{r}
 #| echo: false
 #| include: false
@@ -7902,13 +8285,15 @@ saveRDS(test_census_data_2, "test_census_data_2.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 test_census_data_2 <- readRDS("test_census_data_2.rds")
 
 
 ```
+
+
 
 
 
@@ -7922,6 +8307,9 @@ Since we performed a different split of our data for the poison model, we’ll a
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 test_census_data_2$Exists <- test_census_data_2$GEOID %in% train_census_data_2$GEOID
@@ -7933,6 +8321,9 @@ test_census_data_2$Exists <- test_census_data_2$GEOID %in% train_census_data_2$G
 <br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 test_census_data_2 |> 
     count(Exists)
@@ -7940,14 +8331,43 @@ test_census_data_2 |>
 
 ```
 
+<br><br>
 
 
+The result shows a count of only TRUE.  This means that for our poisson test data, all its GEOIDs are in the poisson training data and thus no rows must be dropped before predicting. 
 
 
 <br><br>
 
 
-The result shows a count of only TRUE.  This means that for our poisson test data, all its GEOIDs are in the poisson training data and thus no rows must be dropped before predicting. 
+
+
+```{r}
+
+test_census_data_2_clean <- test_census_data_2 |> 
+    select(-Exists)
+
+
+```
+
+```{r}
+
+
+saveRDS(test_census_data_2_clean , "test_census_data_2_clean.rds")
+
+
+```
+
+```{r}
+
+
+test_census_data_2_clean  <- readRDS("test_census_data_2_clean.rds")
+
+
+```
+
+
+
 
 
 <br><br>
@@ -7989,8 +8409,8 @@ saveRDS(census_rec, "census_rec.rds")
 ```
 
 ```{r}
-#| include: false
-#| 
+#| echo: false
+
 census_rec  <- reawdRDS("census_rec.rds")
 
 
@@ -8023,7 +8443,7 @@ saveRDS(scaled_census_train, "scaled_census_train.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 scaled_census_train <- readRDS("scaled_census_train.rds")
@@ -8074,7 +8494,7 @@ saveRDS(lr, "lr.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 lr <- readRDS("lr.rds")
@@ -8218,7 +8638,7 @@ lr_rse <- lr |>
 <br><br>
 
 
-The RSE of 0.64, translates into 64% standard deviation in error around our predicted values. This means that individual predictions will typically vary by about +/- 64% from actual market prices.
+The RSE of 0.62, translates into 64% standard deviation in error around our predicted values. This means that individual predictions will typically vary by about +/- 64% from actual market prices.
 
 
 
@@ -8243,7 +8663,7 @@ We'll add the county feature as a predictor and evaluate if this improves model 
 #| eval: false
 
 
-lr_2 <- lm(log(accident_duration) ~ . -GEOID, data = train_census_data_2)
+lr_2 <- lm(log(accident_duration) ~ . -GEOID, data = train_census_data)
 
 
 ```
@@ -8262,7 +8682,7 @@ saveRDS(lr_2, "lr_2.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 lr_2 <- readRDS("lr_2.rds")
@@ -8448,7 +8868,7 @@ saveRDS(lr_2_qq, "lr_2_qq.rds")
 
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 
@@ -8458,6 +8878,7 @@ lr_2_qq <- readRDS("lr_2_qq.rds")
 ```
 
 ```{r}
+#| echo: false
 
 lr_2_qq
 
@@ -8557,7 +8978,7 @@ saveRDS(brms_model, "brms_model.rds")
 
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 brms_model <- readRDS("brms_model.rds")
@@ -8648,7 +9069,7 @@ saveRDS(brms_model_2, "brms_model_2.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 brms_model_2 <- readRDS("brms_model_2.rds")
@@ -8853,6 +9274,7 @@ saveRDS(brms_model_cat_plot_top_100, "brms_model_cat_plot_top_100.rds")
 
 
 ```{r}
+#| echo: false
 
 
 
@@ -8863,6 +9285,9 @@ brms_model_cat_plot_top_100 <- readRDS("brms_model_cat_plot_top_100.rds")
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 brms_count <- brms_model_2 %>%
   spread_draws(r_GEOID[GEOID, Intercept]) %>%
@@ -8874,6 +9299,9 @@ brms_count <- brms_model_2 %>%
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 print(brms_count, n=100)
@@ -8901,6 +9329,7 @@ Because of the large number of census tracts (1,462), our plot will only include
 
 
 ```{r}
+#| echo: false
 
 
 
@@ -9013,7 +9442,7 @@ saveRDS(map_population_extreme_tract_high, "map_population_extreme_tract_high.rd
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 
@@ -9054,7 +9483,7 @@ saveRDS(tract_map_extreme_higher_plt , "tract_map_extreme_higher_plt.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 tract_map_extreme_higher_plt  <- readRDS("tract_map_extreme_higher_plt.rds")
@@ -9063,6 +9492,7 @@ tract_map_extreme_higher_plt  <- readRDS("tract_map_extreme_higher_plt.rds")
 ```
 
 ```{r}
+#| echo: false
 
 tract_map_extreme_higher_plt 
 
@@ -9123,6 +9553,7 @@ saveRDS(map_population_extreme_tract_lower , "map_population_extreme_tract_lower
 ```
 
 ```{r}
+#| echo: false
 
 map_population_extreme_tract_lower  <- readRDS("map_population_extreme_tract_lower.rds")
 
@@ -9152,7 +9583,7 @@ saveRDS(tract_map_extreme_lower_plt, "tract_map_extreme_lower_plt.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 
 tract_map_extreme_lower_plt <- readRDS("tract_map_extreme_lower_plt.rds")
@@ -9162,6 +9593,7 @@ tract_map_extreme_lower_plt <- readRDS("tract_map_extreme_lower_plt.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 tract_map_extreme_lower_plt
@@ -9172,6 +9604,9 @@ tract_map_extreme_lower_plt
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 print(ma_census4326 |> 
@@ -9182,6 +9617,9 @@ print(ma_census4326 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 print(ma_census4326 |> 
@@ -9194,6 +9632,9 @@ print(ma_census4326 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 ma_census4326 |> glimpse()
@@ -9203,6 +9644,9 @@ ma_census4326 |> glimpse()
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 ma_census4326 |>
     filter(GEOID == "25009254401") |> 
@@ -9213,6 +9657,9 @@ ma_census4326 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -9226,6 +9673,9 @@ ma_census4326 |>
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 median_acc_dur <- ma_census4326 |> 
@@ -9241,6 +9691,9 @@ median_acc_dur <- ma_census4326 |>
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 print(median_acc_dur |> 
@@ -9252,6 +9705,9 @@ print(median_acc_dur |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -9346,6 +9802,7 @@ saveRDS(brms_poisson_2, "brms_poisson_2.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 brms_poisson_2 <- readRDS("brms_poisson_2.rds")
@@ -9366,6 +9823,7 @@ ppcheck_poi_2 <- pp_check(brms_poisson_2, type = "dens_overlay", ndraws = 50)
 ```
 
 ```{r}
+#| echo: false
 
 
 ppcheck_poi_2
@@ -9429,6 +9887,7 @@ saveRDS(tract_ranef, "tract_ranef.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 tract_ranef <- rreadRDS("tract_ranef.rds")
@@ -9471,6 +9930,7 @@ saveRDS(boundaries, "boundaries.rds")
 ```
 
 ```{r}
+#| echo: false
 
 boundaries <- readRDS("boundaries.rds")
 
@@ -9500,6 +9960,7 @@ saveRDS(boundaries_clean, "boundaries_clean.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 boundaries_clean <- readRDS("boundaries_clean.rds")
@@ -9537,6 +9998,7 @@ saveRDS(map_sf, "map_sf.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 map_sf <- readRDS("map_sf.rds")
@@ -9586,6 +10048,7 @@ saveRDS(map_analysis, "map_analysis.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 map_analysis <- readRDS("map_analysis.rds")
@@ -9634,6 +10097,7 @@ saveRDS(neighbors, "neighbors.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 neighbors <- readRDS("neighbors.rds")
@@ -9682,6 +10146,7 @@ saveRDS(weights_list, "weights_list.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 weights_list <- readeRDS("weights_list.rds")
@@ -9731,6 +10196,7 @@ saveRDS(moran_analytical, "moran_analytical.rds")
 ```
 
 ```{r}
+#| echo: false
 
 moran_analytical <- readRDS("moran_analytical.rds")
 
@@ -9808,6 +10274,7 @@ saveRDS(common_geoids, "common_geoids.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 common_geoids <- readRDS("common_geoids.rds")
@@ -9894,6 +10361,7 @@ saveRDS(islands , "islands.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 islands  <- readRDS("islands.rds")
@@ -9941,6 +10409,7 @@ saveRDS(map_statewide, "map_statewide.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 map_statewide <- readRDS("map_statewide.rds")
@@ -9959,6 +10428,7 @@ saveRDS(nb_statewide, "nb_statewide.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 nb_statewide <- readRDS("nb_statewide.rds")
@@ -9992,6 +10462,7 @@ saveRDS(comp, "comp.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 comp <- readRDS("comp.rds")
@@ -10081,6 +10552,7 @@ saveRDS(train_census_data_3, "train_census_data_3.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 train_census_data_3 <- readRDS("train_census_data_3.rds")
@@ -10178,6 +10650,7 @@ saveRDS(brms_poisson_3 , "brms_poisson_3.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 brms_poisson_3  <- readRDS("brms_poisson_3.rds")
@@ -10352,6 +10825,7 @@ saveRDS(icar_draws, "icar_draws.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 icar_draws <- readRDS("icar_draws.rds")
@@ -10406,6 +10880,7 @@ saveRDS(icar_summary, "icar_summary.rds")
 
 
 ```{r}
+#| echo: false
 
 icar_summary <- readRDS("icar_summary.rds")
 
@@ -10470,6 +10945,7 @@ saveRDS(spatial_risk_df, "spatial_risk_df.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 plot_df <- readRDS("spatial_risk_df.rds")
@@ -10542,7 +11018,7 @@ saveRDS(tract_spatial_risk_plt, "tract_spatial_risk_plt.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 
 tract_spatial_risk_plt <- readRDS("tract_spatial_risk_plt.rds")
 
@@ -10550,6 +11026,7 @@ tract_spatial_risk_plt <- readRDS("tract_spatial_risk_plt.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 
@@ -10592,6 +11069,7 @@ saveRDS(extremes_df, "extremes_df.rds")
 ```
 
 ```{r}
+#| echo: false
 
 extremes_df <- readRDS("extremes_df.rds")
 
@@ -10618,6 +11096,9 @@ print(extremes_df, n=80)
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 print(extremes_df |>
@@ -10669,6 +11150,7 @@ saveRDS(high_low_tract_risk_plt , "high_low_tract_risk_plt.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 
@@ -10682,6 +11164,7 @@ high_low_tract_risk_plt  <- readRDS("high_low_tract_risk_plt.rds")
 
 
 ```{r}
+#| echo: false
 
 
 high_low_tract_risk_plt
@@ -10728,6 +11211,7 @@ saveRDS(map_mainland ,"map_mainland.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 map_mainland <- readRDS("map_mainland.rds")
@@ -10745,6 +11229,7 @@ saveRDS(nb_mainland, "nb_mainland.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 nb_mainland <- readRDS("nb_mainland.rds")
@@ -10764,6 +11249,7 @@ saveRDS(W_mainland , "W_mainland.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 W_mainland  <- readRDS("W_mainland.rds")
@@ -10822,6 +11308,7 @@ saveRDS(map_icar, "map_icar.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 map_icar <- readRDS("map_icar.rds")
@@ -10865,6 +11352,7 @@ saveRDS(map_leaflet_icar, "map_leaflet_icar.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 map_leaflet_icar <- readRDS("map_leaflet_icar.rds")
@@ -10933,6 +11421,7 @@ saveRDS(map_icar_sf , "map_icar_sf.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 map_icar_sf  <- readRDS("map_icar_sf.rds")
@@ -11031,6 +11520,7 @@ saveRDS(extreme_tract_high_count_plt, "extreme_tract_high_count_plt.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 extreme_tract_high_count_plt <- readRDS("extreme_tract_high_count_plt.rds")
@@ -11105,6 +11595,7 @@ We’ve also added the individual accidents from our “Top 40 Highest & Lowest 
 <br><br>
 
 ```{r}
+#| echo: false
 
 
 
@@ -11198,6 +11689,7 @@ saveRDS(extreme_tract_low_count_plt, "extreme_tract_low_count_plt.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 
@@ -11208,6 +11700,7 @@ extreme_tract_low_count_plt <- readRDS("extreme_tract_low_count_plt.rds")
 <br><br>
 
 ```{r}
+#| echo: false
 
 
 extreme_tract_low_count_plt
@@ -11263,6 +11756,7 @@ saveRDS(test_census_data_3 , "test_census_data_3.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 test_census_data_3  <- readRDS("test_census_data_3.rds")
@@ -11305,6 +11799,7 @@ saveRDS(pred_expected_test, "pred_expected_test.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 pred_expected_test <- readRDS("pred_expected_test.rds")
@@ -11342,6 +11837,7 @@ saveRDS(pred_counts_test, "pred_counts_test.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 
@@ -11375,9 +11871,13 @@ test_predictions <- test_census_data_3 |>
 
 
 
+Test Predictions
 
+<br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 
@@ -11462,6 +11962,7 @@ saveRDS(rmse_test, "rmse_test.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 rmse_test <- readRDS("rmse_test.rds")
@@ -11481,6 +11982,7 @@ saveRDS(mae_test , "mae_test.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 mae_test  <- readRDS("mae_test.rds")
@@ -11490,6 +11992,7 @@ mae_test  <- readRDS("mae_test.rds")
 ```
 
 ```{r}
+#| echo: false
 
 cat("Test RMSE: ", round(rmse_test, 3), "\n")
 cat("Test MAE: ", round(mae_test), "\n")
@@ -11536,6 +12039,7 @@ saveRDS(pred_expected_train, "pred_expected_train.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 pred_expected_train <- readRDS("pred_expected_train.rds")
@@ -11574,6 +12078,7 @@ saveRDS(pred_counts_train, "pred_counts_train.rds")
 
 
 ```{r}
+#| echo: false
 
 pred_counts_train <- readRDS("pred_counts_train.rds")
 
@@ -11630,6 +12135,7 @@ saveRDS(rmse_train, "rmse_train.rds")
 ```
 
 ```{r}
+#| echo: false
 
 rmse_train <- readRDS("rmse_train.rds")
 
@@ -11648,6 +12154,7 @@ saveRDS(mae_train, "mae_train.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 
@@ -11657,6 +12164,7 @@ mae_train  <- readRDS("mae_train.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 cat("Train RMSE: ", round(rmse_train, 3), "\n")
@@ -11674,6 +12182,7 @@ Train Test Comparison
 
 
 ```{r}
+#| echo: false
 
 cat("Train RMSE: ", round(rmse_train, 3), "\n")
 
@@ -11701,6 +12210,7 @@ rmse_relative_increase <- rmse_test / rmse_train
 
 
 ```{r}
+#| echo: false
 
 
 cat("Relative RMSE Increase: ", round(rmse_relative_increase, 2), "\n")
@@ -11761,6 +12271,7 @@ saveRDS(cov_95_test, "cov_95_test.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 
@@ -11773,6 +12284,7 @@ cov_95_test  <- readRDS("cov_95_test.rds")
 <br><br>
 
 ```{r}
+#| echo: false
 
 
 
@@ -11820,6 +12332,7 @@ saveRDS(cov_95_train, "cov_95_train.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 
@@ -11866,6 +12379,7 @@ saveRDS(cov_interval_diff , "cov_interval_diff.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 
@@ -11878,6 +12392,7 @@ cov_interval_diff  <- readRDS("cov_interval_diff.rds")
 
 
 ```{r}
+#| echo: false
 
 
 cat("Absolute 95% Interval Coverage Difference: ", round(cov_interval_diff, 2), " percentage points\n")
@@ -11934,6 +12449,7 @@ saveRDS(mean_crps_test, "mean_crps_test.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 mean_crps_test <- readRDS("mean_crps_test.rds")
@@ -11947,6 +12463,7 @@ mean_crps_test <- readRDS("mean_crps_test.rds")
 
 
 ```{r}
+#| echo: false
 
 
 cat("Mean CRPS on Test Data: ", round(mean_crps_test, 3), "\n")
@@ -11987,6 +12504,7 @@ saveRDS(mean_crps_train, "mean_crps_train.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 
@@ -11999,6 +12517,7 @@ mean_crps_train <- readRDS("mean_crps_train.rds")
 
 
 ```{r}
+#| echo: false
 
 
 cat("Mean CRPS on Train Data: ", round(mean_crps_train, 3), "\n")
@@ -12040,6 +12559,7 @@ saveRDS(crps_ratio, "crps_ratio.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 crps_ratio <- readRDS("crps_ratio.rds")
@@ -12050,6 +12570,7 @@ crps_ratio <- readRDS("crps_ratio.rds")
 <br><br>
 
 ```{r}
+#| echo: false
 
 
 
@@ -12113,6 +12634,7 @@ saveRDS(test_results, "test_results.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 test_results <- readRDS("test_results.rds")
@@ -12164,6 +12686,7 @@ saveRDS(tract_error_summary, "tract_error_summary.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 tract_error_summary <- readRDS("tract_error_summary.rds")
@@ -12203,6 +12726,7 @@ saveRDS(top_underpredicted ,"top_underpredicted.rds")
 
 
 ```{r}
+#| echo: false
 
 
 top_underpredicted  <- readRDS("top_underpredicted.rds")
@@ -12211,6 +12735,8 @@ top_underpredicted  <- readRDS("top_underpredicted.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 print(top_underpredicted, n=20)
@@ -12253,6 +12779,7 @@ saveRDS(top_overpredicted, "top_overpredicted.rds")
 
 
 ```{r}
+#| echo: false
 
 
 top_overpredicted <- readRDS("top_overpredicted.rds")
@@ -12262,6 +12789,8 @@ top_overpredicted <- readRDS("top_overpredicted.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 print(top_overpredicted, n=20)
@@ -12310,6 +12839,7 @@ saveRDS(top_volatile, "top_volatile.rds")
 
 
 ```{r}
+#| echo: false
 
 
 top_volatile <- readRDS("top_volatile.rds")
@@ -12320,6 +12850,8 @@ top_volatile <- readRDS("top_volatile.rds")
 <br><br>
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
 
 
 print(top_volatile |> 
@@ -12365,6 +12897,7 @@ saveRDS(map_test_errors, "map_test_errors.rds")
 
 
 ```{r}
+#| echo: false
 
 
 map_test_errors <- readRDS("map_test_errors.rds")
@@ -12470,6 +13003,7 @@ saveRDS(map_test_errors_4326, "map_test_errors_4326.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 map_test_errors_4326  <- readRDS("map_test_errors_4326.rds")
@@ -12650,6 +13184,7 @@ saveRDS(state_wide_bias_plot, "state_wide_bias_plot.rds")
 ```
 
 ```{r}
+#| echo: false
 
 state_wide_bias_plot <- readRDS("state_wide_bias_plot.rds")
 
@@ -12670,6 +13205,10 @@ Mapping of the mean errors reveals whether the model's missies are randomly scat
 
 
 ```{r}
+#| fig-cap: Bias Map
+#| fig-height: 10
+#| fig-width: 10
+#| echo: false
 
 
 
