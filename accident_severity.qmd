@@ -10,6 +10,7 @@ format:
     number-sections: false
     toc-location: left
     embed-resources: true
+    theme: sandstone
 ---
 
 # Introduction
@@ -984,6 +985,9 @@ This will be acomplished by using the call_geolocator_latlon function from the t
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 options(tigris_use_cache = TRUE)
 
@@ -993,6 +997,9 @@ options(tigris_use_cache = TRUE)
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 ma_accidents_22_3 <- ma_accidents_22_2 |> 
@@ -1002,6 +1009,9 @@ ma_accidents_22_3 <- ma_accidents_22_2 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(ma_accidents_22_3, "ma_accidents_22_3.rds")
 
@@ -1009,6 +1019,9 @@ saveRDS(ma_accidents_22_3, "ma_accidents_22_3.rds")
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 ma_accidents_22_3 <- readRDS("ma_accidents_22_3.rds")
 
@@ -1016,6 +1029,9 @@ ma_accidents_22_3 <- readRDS("ma_accidents_22_3.rds")
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 df_lon_lat<- ma_accidents_22_3 |>  
@@ -1025,6 +1041,9 @@ df_lon_lat<- ma_accidents_22_3 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(df_lon_lat, "df_lon_lat.rds")
@@ -1034,6 +1053,9 @@ saveRDS(df_lon_lat, "df_lon_lat.rds")
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 boundaries <- tracts(state = "MA", year = 2022) |> 
@@ -1043,6 +1065,9 @@ boundaries <- tracts(state = "MA", year = 2022) |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(boundaries, "boundaries.rds")
 
@@ -1050,6 +1075,9 @@ saveRDS(boundaries, "boundaries.rds")
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 df_points <- st_as_sf(
     df_lon_lat, coords = c("LONGITUDE", "LATITUDE"), crs = 4326, remove = TRUE)
@@ -1058,6 +1086,9 @@ df_points <- st_as_sf(
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(df_points, "df_points.rds")
@@ -1066,6 +1097,9 @@ saveRDS(df_points, "df_points.rds")
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 joined_sf <- st_join(df_points, boundaries, join = st_intersects, left = TRUE)
@@ -1074,6 +1108,9 @@ joined_sf <- st_join(df_points, boundaries, join = st_intersects, left = TRUE)
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(joined_sf , "joined_sf.rds")
 
@@ -1083,6 +1120,9 @@ saveRDS(joined_sf , "joined_sf.rds")
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 df_final <- st_drop_geometry(joined_sf)
 
@@ -1090,6 +1130,9 @@ df_final <- st_drop_geometry(joined_sf)
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(df_final, "df_final.rds") 
 
@@ -1101,6 +1144,9 @@ saveRDS(df_final, "df_final.rds")
 
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 ma_accidents_22_4 <- cbind(ma_accidents_22_3, df_final)
@@ -1109,9 +1155,21 @@ ma_accidents_22_4 <- cbind(ma_accidents_22_3, df_final)
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(ma_accidents_22_4 , "ma_accidents_22_4.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+ma_accidents_22_4 <- readRDS("ma_accidents_22_4.rds")
 
 
 ```
@@ -1264,6 +1322,10 @@ ma_accidents_16_21_3 <- cbind(ma_accidents_16_21_2, census_geo)
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+#| label: "ck-49a"
 
 
 ma_accidents_16_21_3 <- ma_accidents_16_21_3 |> 
@@ -1335,6 +1397,9 @@ ma_accidents_5 <- ma_accidents_16_21_3 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(ma_accidents_5 , "ma_accidents_5.rds")
@@ -1342,6 +1407,7 @@ saveRDS(ma_accidents_5 , "ma_accidents_5.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 ma_accidents_5 <- readRDS("ma_accidents_5.rds")
@@ -1350,6 +1416,9 @@ ma_accidents_5 <- readRDS("ma_accidents_5.rds")
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 
@@ -1943,6 +2012,7 @@ ma_accidents_10 <- ma_accidents_9 |>
 
  
 We will create a new feature which will include the types of road categories, such as interstate, Route, etc. To accomplish this, we will use the grep function and regular expressions to extract roads and highways and then consolidate them into categories.  An example is extracting I-90 and I-95 and consolidating them into an interstate category. 
+
   <br><br>
 
 
@@ -2008,7 +2078,7 @@ ma_accidents_9 |> count(Weather_Condition)
 
  ```
 
-   <br><br>
+<br><br>
 
 
    Next, we will reudce the numbre of Weawther_Condition categories through consolidation. 
@@ -6064,6 +6134,9 @@ accident_duration_year <- ma_accidents_11 |>
 
 
 ```
+
+
+
 <br><br>
 
 
@@ -6612,6 +6685,9 @@ county_map_pop_density <- readRDS("county_map_pop_density.rds")
 ```{r}
 #| label: "ck-337"
 #| echo: false
+#| fig-cap: Population Density by County
+#| fig-height: 10
+#| fig-width: 10
 
 county_map_pop_density
 
@@ -7382,6 +7458,9 @@ tract_map_population <- readRDS("tract_map_population.rds")
 ```{r}
 #| label: "ck-383"
 #| echo: false
+#| fig-cap: Population by Census Tract
+#| fig-height: 10
+#| fig-width: 10
 
 
 tract_map_population
@@ -8200,6 +8279,9 @@ test_census_data_clean <- test_census_data_clean |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 saveRDS(test_census_data_clean , "test_census_data_clean.rds")
 
@@ -8207,6 +8289,7 @@ saveRDS(test_census_data_clean , "test_census_data_clean.rds")
 ```
 
 ```{r}
+#| echo: false
 
 test_census_data_clean <- readRDS("test_census_data_clean.rds")
 
@@ -8351,6 +8434,9 @@ test_census_data_2_clean <- test_census_data_2 |>
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+#| eval: false
 
 
 saveRDS(test_census_data_2_clean , "test_census_data_2_clean.rds")
@@ -8359,6 +8445,7 @@ saveRDS(test_census_data_2_clean , "test_census_data_2_clean.rds")
 ```
 
 ```{r}
+#| echo: false
 
 
 test_census_data_2_clean  <- readRDS("test_census_data_2_clean.rds")
@@ -9189,47 +9276,56 @@ round(fixef(brms_model_2),2)
 
  
 
-Intercept (3.79) This is the baseline log accident duration.  This approximately translates to an accident duration of 44.26. 
+Intercept (3.76) This is the baseline log accident duration.  This approximately translates to an accident duration of 42.95. 
 
 Bayesian estimation does not have p-values to help determine coefficient significance.  It does have credible intervals, which is the probability an estimate falls within the interval.  Credible intervals that include zero, are not considered significant. The lower bound credible interval is column Q2.5 and the upper bound credible interval is Q97.5.    Due to the number of coefficients, we will concentrate on larger estimate vales that are significant. 
 
-Month3 (March):  accident duration is 0.06 log units longer than the reference month of January.  This translates into a 6.2% increase in accident duration over the month of January. 
+Month3 (March):  accident duration is 0.04 log units longer than the reference month of January.  This translates into a 4.1% increase in accident duration over the month of January. 
 
 Month5 (May):  accident duration is 0.07 log units longer than the reference month of January.  This translates into a 7% increase in accident duration over the month of January. 
 
-Month7 (July):  accident duration is 0.07 log units longer than the reference month of January.  This translates into a 7% increase in accident duration over the month of January. 
+Month6 (June):  accident duration is 0.05 log units longer than the reference month of January.  This translates into a 5.1% increase in accident duration over the month of January.
 
-Month8 (August):  accident duration is -0.07 log units shorter than the reference month of January.  This translates into a 6.8% decrease in accident duration over the month of January. 
+Month7 (July):  accident duration is 0.09 log units longer than the reference month of January.  This translates into a 9.4% increase in accident duration over the month of January. 
 
-Month9(September):  accident duration is -0.09 log units shorter than the reference month of January.  This translates into an 8.6% decrease in accident duration over the month of January. 
+Month8 (August):  accident duration is -0.06 log units shorter than the reference month of January.  This translates into a 6% decrease in accident duration over the month of January. 
 
-DaytypeWeekend: accident duration is 0.23 log units longer that the reference DaytypeWeekday.  This translates into a 25.9% increase in accident duration on weekends over weekdays. 
+Month9(September):  accident duration is -0.08 log units shorter than the reference month of January.  This translates into an 8% decrease in accident duration over the month of January. 
 
-Road_categoryBouvevard: accident duration is -0.07 log units shorter than the reference road category Avenue.  This translates into a 6.8% decrease in accident duration compared to road type Avenue. 
+DaytypeWeekend: accident duration is 0.26 log units longer that the reference DaytypeWeekday.  This translates into a 30% increase in accident duration on weekends over weekdays. 
 
-Road_categoryBridge: accident duration is -0.07 log units shorter than the reference road category Avenue.  This translates into a 7.7% decrease in accident duration compared to road type Avenue. 
+Road_categoryConnector: accident duration is -0.09 log units shorter than the reference road category Avenue.  This translates into an 10% decrease in accident duration compared to road type Avenue. 
 
-Road_categoryConnector: accident duration is -0.09 log units shorter than the reference road category Avenue.  This translates into an 8.6% decrease in accident duration compared to road type Avenue. 
-Road_categoryCourt: accident duration is 0.15 log units longer1 than the reference road category Avenue.  This translates into a 16.2% increase in accident duration compared to road type Avenue. 
+Road_categoryCourt: accident duration is 0.17 log units longer1 than the reference road category Avenue.  This translates into a 19% increase in accident duration compared to road type Avenue. 
+
+Road_categoryInterstate: accident duration is 0.3 log units longer1 than the reference road category Avenue.  This translates into a 3% increase in accident duration compared to road type Avenue.
+
+Road_categoryMAHighway: accident duration is -0.06 log units longer1 than the reference road category Avenue.  This translates into a 6% decrease in accident duration compared to road type Avenue.
 
 Road_categorySquare: accident duration is 0.22 log units longer than the reference road category Avenue.  This translates into a 24.6% increase in accident duration compared to road type Avenue. 
 
-Road_categoryTunnel: accident duration is -0.20 log units shorter than the reference road category Avenue.  This translates into a 18.1% decrease in accident duration compared to road type Avenue. 
+Road_categoryTunnel: accident duration is -0.13 log units shorter than the reference road category Avenue.  This translates into a 12.2% decrease in accident duration compared to road type Avenue. 
+
+Road_categoryTurnpike: accident duration is 0.05 log units longer1 than the reference road category Avenue.  This translates into a 5% increase in accident duration compared to road type Avenue.
+
+Road_categoryUSRoute: accident duration is -0.07 log units longer1 than the reference road category Avenue.  This translates into a 7% decrease in accident duration compared to road type Avenue.
+
 hour_day_sectionsEarlyAfternoon: accident duration is 0.12 log units longer than the reference category Dawn.  This translates into a 12.75% increase in accident duration compared to the time-of-day Dawn.
 
+hour_day_sectionsEarlyEvening: accident duration is 0.07 log units longer than the reference category Dawn.  This translates into a 7.3% increase in accident duration compared to the time-of-day Dawn.
 
-hour_day_sectionsLateAfternoon: accident duration is 0.13 log units longer than the reference category Dawn.  This translates into a 13.88% increase in accident duration compared to the time-of-day Dawn.
+hour_day_sectionsLateAfternoon: accident duration is 0.11 log units longer than the reference category Dawn.  This translates into a 11.6% increase in accident duration compared to the time-of-day Dawn.
 
-hour_day_sectionsMiddleofNight: accident duration is 0.17 log units longer than the reference category Dawn.  This translates into a 18.5% increase in accident duration compared to the time-of-day Dawn.
+hour_day_sectionsMiddleofNight: accident duration is 0.18 log units longer than the reference category Dawn.  This translates into a 19.7% increase in accident duration compared to the time-of-day Dawn.
 
-hour_day_sectionsNight: accident duration is 0.12 log units longer than the reference category Dawn.  This translates into a 12.75% increase in accident duration compared to the time-of-day Dawn.
+hour_day_sectionsNight: accident duration is 0.16 log units longer than the reference category Dawn.  This translates into a 17.4% increase in accident duration compared to the time-of-day Dawn.
 
 <br><br>
 
  Group Level Effects. 
 
 Group level effects (Random effects) are found under Multilevel Hyperparameters from the summary ouyput. 
-Sd(Intercept) = 0.10.  After controlling for temperature, Month, day_type, road_category, and hour_day_sections, baseline accident duration still vary by roughly 10% based on the specific census tract an accident occurs in. 
+Sd(Intercept) = 0.09.  After controlling for temperature, Month, day_type, road_category, and hour_day_sections, baseline accident duration still vary by roughly 9.4% based on the specific census tract an accident occurs in. 
 
 
 
@@ -9493,6 +9589,9 @@ tract_map_extreme_higher_plt  <- readRDS("tract_map_extreme_higher_plt.rds")
 
 ```{r}
 #| echo: false
+#| fig-cap: Extreme Census Tracts (Longer Accident Duration)
+#| fig-height: 10
+#| fig-width: 10
 
 tract_map_extreme_higher_plt 
 
@@ -9505,6 +9604,9 @@ tract_map_extreme_higher_plt
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -9562,6 +9664,9 @@ map_population_extreme_tract_lower  <- readRDS("map_population_extreme_tract_low
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 
@@ -9594,6 +9699,9 @@ tract_map_extreme_lower_plt <- readRDS("tract_map_extreme_lower_plt.rds")
 
 ```{r}
 #| echo: false
+#| fig-cap: Extreme Census Tracts (Shorter Accident Duration)
+#| fig-height: 10
+#| fig-width: 10
 
 
 tract_map_extreme_lower_plt
@@ -11596,6 +11704,9 @@ We’ve also added the individual accidents from our “Top 40 Highest & Lowest 
 
 ```{r}
 #| echo: false
+#| fig-cap: Extreme Census Tracts (Higher  Accident Count)
+#| fig-height: 10
+#| fig-width: 10
 
 
 
@@ -11701,6 +11812,9 @@ extreme_tract_low_count_plt <- readRDS("extreme_tract_low_count_plt.rds")
 
 ```{r}
 #| echo: false
+#| fig-cap: Extreme Census Tracts (Lower Accident Count)
+#| fig-height: 10
+#| fig-width: 10
 
 
 extreme_tract_low_count_plt
