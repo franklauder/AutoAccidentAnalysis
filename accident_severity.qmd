@@ -5520,8 +5520,30 @@ ma_accidents_10 |>
 box_2016 <- ma_accidents_10 |> 
     filter(Year == "2016" & accident_duration < 1442) |> 
     ggplot(aes(x = Year, y = accident_duration)) +
-    geom_boxplot()
+    geom_boxplot() +
+    labs(title = "2016") +
+    theme(plot.title = element_text(color = "blue", face = "bold.italic", hjust = 0.5)) +
+    theme(axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.title.x=element_blank(), axis.title.y=element_blank())
    
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+
+saveRDS(box_2016, "box_2016.rds")
+
+```
+
+```{r}
+#| echo: false
+
+
+box_2016 <- readRDS("box_2016.rds")
 
 
 ```
@@ -5532,8 +5554,30 @@ box_2016 <- ma_accidents_10 |>
 box_2017 <- ma_accidents_10 |> 
     filter(Year == "2017" & accident_duration < 1442) |> 
     ggplot(aes(x = Year, y = accident_duration)) +
-    geom_boxplot()
+    geom_boxplot() +
+    labs(title = "2017") +
+    theme(plot.title = element_text(color = "blue", face = "bold.italic", hjust = 0.5)) +
+    theme(axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.title.x=element_blank(), axis.title.y=element_blank())
 
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+
+saveRDS(box_2017, "box_2017.rds")
+
+```
+
+```{r}
+#| echo: false
+
+
+box_2017 <- readRDS("box_2017.rds")
 
 
 ```
@@ -5543,7 +5587,31 @@ box_2017 <- ma_accidents_10 |>
 box_2018 <- ma_accidents_10 |> 
     filter(Year == "2018" & accident_duration < 1442) |> 
     ggplot(aes(x = Year, y = accident_duration)) +
-    geom_boxplot()
+    geom_boxplot() +
+    labs(title = "2018") +
+    theme(plot.title = element_text(color = "blue", face = "bold.italic", hjust = 0.5)) +
+    theme(axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.title.x=element_blank(), axis.title.y=element_blank())
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+
+saveRDS(box_2018, "box_2018.rds")
+
+
+```
+
+
+```{r}
+#| echo: false
+
+
+box_2018 <- readRDS("box_2018.rds")
 
 
 ```
@@ -5554,7 +5622,29 @@ box_2018 <- ma_accidents_10 |>
 box_2019 <- ma_accidents_10 |> 
     filter(Year == "2019" & accident_duration < 1442) |> 
     ggplot(aes(x = Year, y = accident_duration)) +
-    geom_boxplot()
+    geom_boxplot() +
+    labs(title = "2019") +
+    theme(plot.title = element_text(color = "blue", face = "bold.italic", hjust = 0.5)) +
+    theme(axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.title.x=element_blank(), axis.title.y=element_blank())
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+saveRDS(box_2019, "box_2019.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+box_2019 <- readRDS("box_2019.rds")
 
 
 ```
@@ -5566,7 +5656,29 @@ box_2019 <- ma_accidents_10 |>
 box_2020 <- ma_accidents_10 |> 
     filter(Year == "2020" & accident_duration < 1442) |> 
     ggplot(aes(x = Year, y = accident_duration)) +
-    geom_boxplot()
+    geom_boxplot() +
+    labs(title = "2020") +
+    theme(plot.title = element_text(color = "blue", face = "bold.italic", hjust = 0.5)) +
+    theme(axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.title.x=element_blank(), axis.title.y=element_blank())
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+
+saveRDS(box_2020, "box_2020.rds")
+
+```
+
+```{r}
+#| echo: false
+
+
+box_2020 <- readRDS("box_2020.rds")
 
 
 ```
@@ -5577,8 +5689,29 @@ box_2020 <- ma_accidents_10 |>
 box_2021 <- ma_accidents_10 |> 
     filter(Year == "2021" & accident_duration < 1442) |> 
     ggplot(aes(x = Year, y = accident_duration)) +
-    geom_boxplot()
+    geom_boxplot() +
+    labs(title = "2021") +
+    theme(plot.title = element_text(color = "blue", face = "bold.italic", hjust = 0.5)) +
+    theme(axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.title.x=element_blank(), axis.title.y=element_blank())
 
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+saveRDS(box_2021, "box_2021.rds")
+
+```
+
+```{r}
+#| echo: false
+
+
+box_2021 <- readRDS("box_2021.rds")
 
 
 ```
@@ -5588,7 +5721,10 @@ box_2021 <- ma_accidents_10 |>
 box_2022 <- ma_accidents_10 |> 
     filter(Year == "2022" & accident_duration < 1442) |> 
     ggplot(aes(x = Year, y = accident_duration)) +
-    geom_boxplot()
+    geom_boxplot() + 
+    labs(title = "2022") +
+    theme(plot.title = element_text(color = "blue", face = "bold.italic", hjust = 0.5)) +
+    theme(axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.title.x=element_blank(), axis.title.y=element_blank())
 
 
 ```
@@ -5596,9 +5732,38 @@ box_2022 <- ma_accidents_10 |>
 
 
 ```{r}
+#| eval: false
+#| echo: false
+#| include: false
 
 
-grid.arrange(box_2016, box_2017, box_2018, box_2019, box_2020, box_2021, box_2022, nrow=3, ncol=3)
+saveRDS(box_2022, "box_2022.rds")
+
+```
+
+```{r}
+#| echo: false
+
+
+box_2022 <- readRDS("box_2022.rds")
+
+
+```
+
+
+
+```{r}
+#| echo: false
+
+
+grid.arrange(box_2016, box_2017, box_2018, box_2019, box_2020, box_2021, box_2022, nrow=3, ncol=3, top = "Accident Duration Box Plots by Year")
+
+
+```
+
+```{r}
+
+
 
 
 ```
