@@ -96,6 +96,7 @@ library(plotly)
 library(scoringRules)
 library(DescTools)
 library(gridExtra)
+library(patchwork)
 
 
 
@@ -5475,6 +5476,15 @@ ma_accidents_10 |>
 
 ```{r}
 
+ma_accidents_10 |> 
+    group_by(Year) |> 
+    summarize(most_freq_value = Mode(accident_duration, na.rm = TRUE)[1])
+
+
+```
+
+```{r}
+
 
 ma_accidents_10 |> 
     group_by(Year) |> 
@@ -5500,15 +5510,25 @@ ma_accidents_10 |>
 
 ```{r}
 
-ma_accidents_10 |> 
+
+library(gt)
+
+
+```
+
+```{r}
+
+summary_stats <- ma_accidents_10 |> 
     filter(accident_duration < 1442) |> 
     group_by(Year) |> 
     summarize(
-        max_value = max(accident_duration, na.rm=TRUE),
+        min_value = min(accident_duration, na.rm=TRUE),
         q25 = quantile(accident_duration, 0.25, na.rm = TRUE),
-        q95 = quantile(accident_duration, 0.95, na.rm = TRUE),
-        mean_dur = mean(accident_duration, na.rm = TRUE),
-        median_dur = median(accident_duration, na.rm = TRUE),
+        median_duration = median(accident_duration, na.rm = TRUE),
+        q75 = quantile(accident_duration, 0.75, na.rm = TRUE),
+        mean_duration = round(mean(accident_duration, na.rm = TRUE),0),
+        max_value = max(accident_duration, na.rm=TRUE),
+        standard_deviation = round(sd(accident_duration, na.rm = TRUE),0),
         .groups = "drop")
 
 
@@ -5517,17 +5537,59 @@ ma_accidents_10 |>
 ```{r}
 
 
+gt(summary_stats)
+
+
+```
+
+
+```{r}
+
+
+
+get_labels <- function(y) {
+    stats <- quantile(y, probs = c(0.25, 0.5, 0.75))
+    return(data.frame(
+        y = as.numeric(stats),
+        label = round(stats,1)
+    ))
+}
+
+
+```
+
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
 box_2016 <- ma_accidents_10 |> 
     filter(Year == "2016" & accident_duration < 1442) |> 
     ggplot(aes(x = Year, y = accident_duration)) +
     geom_boxplot() +
-    labs(title = "2016") +
-    theme(plot.title = element_text(color = "blue", face = "bold.italic", hjust = 0.5)) +
-    theme(axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.title.x=element_blank(), axis.title.y=element_blank())
+    stat_summary(
+        fun.data = get_labels,
+        geom = "text",
+        vjust = -0.5,
+        hjust = -0.2,
+        color = "darkred",
+        fontface = "bold"        
+    ) +
+    theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
+    coord_flip() 
+    #theme_minimal()
    
 
 
 ```
+
+
+
+
+
 
 ```{r}
 #| eval: false
@@ -5548,16 +5610,67 @@ box_2016 <- readRDS("box_2016.rds")
 
 ```
 
+
+
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+
+hist_2016 <- ma_accidents_10 |> 
+    filter(Year == "2016" & accident_duration < 1442) |>
+    ggplot(aes(x=accident_duration)) +
+    geom_histogram(bins=25) +
+    abs(x = "Accident Duration") +
+    theme(axis.title.y=element_blank())
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+saveRDS(hist_2016 , "hist_2016.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+hist_2016  <- readRDS("hist_2016.rds")
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 box_2017 <- ma_accidents_10 |> 
     filter(Year == "2017" & accident_duration < 1442) |> 
     ggplot(aes(x = Year, y = accident_duration)) +
     geom_boxplot() +
-    labs(title = "2017") +
-    theme(plot.title = element_text(color = "blue", face = "bold.italic", hjust = 0.5)) +
-    theme(axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.title.x=element_blank(), axis.title.y=element_blank())
+    stat_summary(
+        fun.data = get_labels,
+        geom = "text",
+        vjust = -0.5,
+        hjust = -0.2,
+        color = "darkred",
+        fontface = "bold"        
+    ) +
+    #labs(title = "2017") +
+    #theme(plot.title = element_text(color = "blue", face = "bold.italic", size=5,hjust = 0.5)) +
+    theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
+    coord_flip()
 
 
 
@@ -5583,14 +5696,62 @@ box_2017 <- readRDS("box_2017.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+hist_2017 <- ma_accidents_10 |> 
+    filter(Year == "2017" & accident_duration < 1442) |>
+    ggplot(aes(x=accident_duration)) +
+    geom_histogram(bins=25) +
+    labs(x = "Accident Duration") +
+    theme(axis.title.y=element_blank())
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+saveRDS(hist_2017, "hist_2017.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+hist_2017 <- readRDS("hist_2017.rds")
+
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 box_2018 <- ma_accidents_10 |> 
     filter(Year == "2018" & accident_duration < 1442) |> 
     ggplot(aes(x = Year, y = accident_duration)) +
     geom_boxplot() +
-    labs(title = "2018") +
-    theme(plot.title = element_text(color = "blue", face = "bold.italic", hjust = 0.5)) +
-    theme(axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.title.x=element_blank(), axis.title.y=element_blank())
+    stat_summary(
+        fun.data = get_labels,
+        geom = "text",
+        vjust = -0.5,
+        hjust = -0.2,
+        color = "darkred",
+        fontface = "bold"        
+    ) +
+    #labs(title = "2018") +
+    #theme(plot.title = element_text(color = "blue", face = "bold.italic", size=5,hjust = 0.5)) +
+    theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
+    coord_flip()
 
 
 ```
@@ -5617,15 +5778,61 @@ box_2018 <- readRDS("box_2018.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+hist_2018 <- ma_accidents_10 |> 
+    filter(Year == "2018" & accident_duration < 1442) |>
+    ggplot(aes(x=accident_duration)) +
+    geom_histogram(bins=25) +
+    labs(x = "Accident Duration") +
+    theme(axis.title.y=element_blank())
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+saveRDS(hist_2018, "hist_2018.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+hist_2018 <- readRDS("hist_2018.rds")
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 box_2019 <- ma_accidents_10 |> 
     filter(Year == "2019" & accident_duration < 1442) |> 
     ggplot(aes(x = Year, y = accident_duration)) +
     geom_boxplot() +
-    labs(title = "2019") +
-    theme(plot.title = element_text(color = "blue", face = "bold.italic", hjust = 0.5)) +
-    theme(axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.title.x=element_blank(), axis.title.y=element_blank())
+    stat_summary(
+        fun.data = get_labels,
+        geom = "text",
+        vjust = -0.5,
+        hjust = -0.2,
+        color = "darkred",
+        fontface = "bold"        
+    ) +
+    #labs(title = "2019") +
+    #theme(plot.title = element_text(color = "blue", face = "bold.italic", size=5,hjust = 0.5)) +
+    theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
+    coord_flip()
 
 
 ```
@@ -5649,17 +5856,63 @@ box_2019 <- readRDS("box_2019.rds")
 
 ```
 
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+hist_2019 <- ma_accidents_10 |> 
+    filter(Year == "2019" & accident_duration < 1442) |>
+    ggplot(aes(x=accident_duration)) +
+    geom_histogram(bins=25) + labs(x = "Accident Duration") +
+    labs(x = "Accident Duration") +
+    theme(axis.title.y=element_blank())
+
+
+```
 
 ```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+saveRDS(hist_2019, "hist_2019.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+hist_2019 <- readRDS("hist_2019.rds")
+
+
+```
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 box_2020 <- ma_accidents_10 |> 
     filter(Year == "2020" & accident_duration < 1442) |> 
     ggplot(aes(x = Year, y = accident_duration)) +
     geom_boxplot() +
-    labs(title = "2020") +
-    theme(plot.title = element_text(color = "blue", face = "bold.italic", hjust = 0.5)) +
-    theme(axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.title.x=element_blank(), axis.title.y=element_blank())
+    stat_summary(
+        fun.data = get_labels,
+        geom = "text",
+        vjust = -0.5,
+        hjust = -0.2,
+        color = "darkred",
+        fontface = "bold"        
+    ) +
+    #labs(title = "2020") +
+    #theme(plot.title = element_text(color = "blue", face = "bold.italic", size=5,hjust = 0.5)) +
+    theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
+    coord_flip()
 
 
 ```
@@ -5684,15 +5937,63 @@ box_2020 <- readRDS("box_2020.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+hist_2020 <- ma_accidents_10 |> 
+    filter(Year == "2020" & accident_duration < 1442) |>
+    ggplot(aes(x=accident_duration)) +
+    geom_histogram(bins=25) +
+    labs(x = "Accident Duration") +
+    theme(axis.title.y=element_blank())
+
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+saveRDS(hist_2020, "hist_2020.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+
+hist_2020 <- readRDS("hist_2020.rds")
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 box_2021 <- ma_accidents_10 |> 
     filter(Year == "2021" & accident_duration < 1442) |> 
     ggplot(aes(x = Year, y = accident_duration)) +
     geom_boxplot() +
-    labs(title = "2021") +
-    theme(plot.title = element_text(color = "blue", face = "bold.italic", hjust = 0.5)) +
-    theme(axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.title.x=element_blank(), axis.title.y=element_blank())
+    stat_summary(
+        fun.data = get_labels,
+        geom = "text",
+        vjust = -0.5,
+        hjust = -0.2,
+        color = "darkred",
+        fontface = "bold"        
+    ) +
+    #labs(title = "2021") +
+    #theme(plot.title = element_text(color = "blue", face = "bold.italic", size=5,hjust = 0.5)) +
+    theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
+    coord_flip()
 
 
 
@@ -5717,14 +6018,87 @@ box_2021 <- readRDS("box_2021.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+hist_2021 <- ma_accidents_10 |> 
+    filter(Year == "2021" & accident_duration < 1442) |>
+    ggplot(aes(x=accident_duration)) +
+    geom_histogram(bins=25) +
+    labs(x = "Accident Duration") +
+    theme(axis.title.y=element_blank())
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+
+saveRDS(hist_2021, "hist_2021.rds")
+
+```
+
+```{r}
+#| echo: false
+
+
+hist_2021 <- readRDS("hist_2021.rds")
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 box_2022 <- ma_accidents_10 |> 
     filter(Year == "2022" & accident_duration < 1442) |> 
     ggplot(aes(x = Year, y = accident_duration)) +
     geom_boxplot() + 
-    labs(title = "2022") +
-    theme(plot.title = element_text(color = "blue", face = "bold.italic", hjust = 0.5)) +
-    theme(axis.ticks.x=element_blank(), axis.text.x=element_blank(), axis.title.x=element_blank(), axis.title.y=element_blank())
+    stat_summary(
+        fun.data = get_labels,
+        geom = "text",
+        vjust = -0.3,
+        hjust = -0.1,
+        color = "darkred",
+        fontface = "bold"        
+    ) +
+    #labs(title = "2022") +
+    #theme(plot.title = element_text(color = "blue", face = "bold.italic", size=5,hjust = 0.5)) +
+    theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
+    coord_flip()
+
+
+```
+
+```{r}
+
+
+
+box_2022 <- ma_accidents_10 |> 
+    filter(Year == "2022" & accident_duration < 1442) |> 
+    ggplot(aes(x = Year, y = accident_duration)) +
+    geom_boxplot() + 
+    stat_summary(
+        fun.data = get_labels,
+        geom = "text",
+        vjust = -0.3,
+        hjust = -0.1,
+        color = "darkred",
+        fontface = "bold"        
+    ) +
+    #labs(title = "2022") +
+    #theme(plot.title = element_text(color = "blue", face = "bold.italic", size=5,hjust = 0.5)) +
+    theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
+    coord_flip()
+
+
 
 
 ```
@@ -5750,23 +6124,121 @@ box_2022 <- readRDS("box_2022.rds")
 
 ```
 
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
+
+
+hist_2022 <- ma_accidents_10 |> 
+    filter(Year == "2022" & accident_duration < 1442) |>
+    ggplot(aes(x=accident_duration)) +
+    geom_histogram(bins=25) +
+    labs(x = "Accident Duration") +
+    theme(axis.title.y=element_blank())
+
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+saveRDS(hist_2022, "hist_2022.rds")
+
+
+```
 
 ```{r}
 #| echo: false
 
+hist_2022 <- readRDS("hist_2022.rds")
 
-grid.arrange(box_2016, box_2017, box_2018, box_2019, box_2020, box_2021, box_2022, nrow=3, ncol=3, top = "Accident Duration Box Plots by Year")
+
+
+```
+
+
+
+
+
+```{r}
+#| echo: false
+#| fig-cap: Accident Duration Distribution - 2016
+
+box_2016 / hist_2016
 
 
 ```
 
 ```{r}
+#| echo: false
+#| fig-cap: Accident Duration Distribution - 2017
+
+box_2017 / hist_2017
+
+
+```
+
+
+
+```{r}
+#| echo: false
+#| fig-cap:  Accident Duration Distribution - 2018
+
+box_2018 / hist_2018
+
+
+```
+
+```{r}
+#| echo: false
+#| fig-cap:  Accident Duration Distribution - 2019
+
+
+box_2019 / hist_2019
+
+
+```
+
+```{r}
+#| echo: false
+#| fig-cap:  Accident Duration Distribution - 2020
+
+
+box_2020 / hist_2020
+
+
+```
+
+```{r}
+#| echo: false
+#| fig-cap:  Accident Duration Distribution - 2021
+
+box_2021 / hist_2021
 
 
 
 
 ```
+
+```{r}
+#| echo: false
+#| fig-cap:  Accident Duration Distribution - 2022
+
+box_2022 / hist_2022
+
+
+
+```
+
+
+
+
+
 
 
 
@@ -7338,6 +7810,19 @@ census_tract_df_2 |>
 ## Train/Test Split
 
 ### Linear and Linear Mized Effect Split
+
+
+
+```{r}
+
+
+census_tract_df_2 <- census_tract_df_2 |> 
+    filter(accident_duration < 1441)
+
+
+```
+
+<br><br>
 
 ```{r}
 #| code-fold: true
