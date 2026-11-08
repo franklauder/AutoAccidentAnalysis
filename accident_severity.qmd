@@ -97,6 +97,7 @@ library(scoringRules)
 library(DescTools)
 library(gridExtra)
 library(patchwork)
+library(gt)
 
 
 
@@ -5475,13 +5476,46 @@ ma_accidents_10 |>
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
-ma_accidents_10 |> 
+acc_dur_mode <- ma_accidents_10 |> 
     group_by(Year) |> 
     summarize(most_freq_value = Mode(accident_duration, na.rm = TRUE)[1])
 
 
 ```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+
+saveRDS(acc_dur_mode, "acc_dur_mode.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+acc_dur_mode <- readRDS("acc_dur_mode.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+gt(acc_dur_mode)
+
+
+```
+
+
 
 ```{r}
 
@@ -5496,27 +5530,13 @@ ma_accidents_10 |>
 
 ```
 
-```{r}
-
-ma_accidents_10 |> 
-    group_by(Year) |> 
-    summarize(
-        duration_sd = sd(accident_duration),
-        .groups = "drop")
 
 
-
-```
 
 ```{r}
-
-
-library(gt)
-
-
-```
-
-```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 summary_stats <- ma_accidents_10 |> 
     filter(accident_duration < 1442) |> 
@@ -5535,6 +5555,25 @@ summary_stats <- ma_accidents_10 |>
 ```
 
 ```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+saveRDS(summary_stats, "summary_stats.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+summary_stats <- readRDS("summary_stats.rds")
+
+
+```
+
+```{r}
+#| echo: false
 
 
 gt(summary_stats)
