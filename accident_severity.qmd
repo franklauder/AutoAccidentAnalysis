@@ -9,6 +9,7 @@ format:
     toc_float: true
     number-sections: false
     toc-location: left
+    code-overflow: wrap
     embed-resources: true
     theme: sandstone
 bibliography: references.bib
@@ -34,13 +35,11 @@ Acknowlegements:
 
 <br><br>
 
-
 # Data Dictionary
 
 <br><br>
 
 # Libraries
-
 
 <br><br>
 
@@ -278,9 +277,6 @@ MA_accidents |>
 
 <br><br>
 
-
-
-
 ```{r}
 #| echo: false
 #| eval: false
@@ -322,7 +318,7 @@ class(MA_accidents_2$Severity)
 
 <br><br>
 
-Our analysis  will require year, month, day, and hour of an accident. Since our dataset does not have these features, we will create them from the Start_Time feature.
+Our analysis will require year, month, day, and hour of an accident. Since our dataset does not have these features, we will create them from the Start_Time feature.
 
 <br><br>
 
@@ -358,8 +354,6 @@ MA_accidents_2 |>
 
 ```
 
-
-
 <br><br>
 
 Day of week starts with Sunday (1) and ends with Saturday (7)
@@ -384,7 +378,7 @@ MA_accidents_2 |>
 
 <br><br>
 
-The new features Year, Month, day_of_week, and day_type have  data types of dbl or chr. These will need to be transformed to a factor data type.
+The new features Year, Month, day_of_week, and day_type have data types of dbl or chr. These will need to be transformed to a factor data type.
 
 <br><br>
 
@@ -458,11 +452,9 @@ MA_accidents_2 |>
 
 <br><br>
 
-Before continuing, we will filter our data to exlcude the year 2023  since it only has data through March. 
+Before continuing, we will filter our data to exlcude the year 2023 since it only has data through March.
 
 <br><br>
-
-
 
 ```{r}
 #| code-fold: true
@@ -511,10 +503,6 @@ dim(ma_accidents_16_21)
 ```
 
 <br><br>
-
-
-
-
 
 ```{r}
 #| echo: false
@@ -601,9 +589,6 @@ ma_accidents_22_2 <- ma_accidents_22 |>
 ```
 
 <br><br>
-
-
-
 
 ```{r}
 #| code-fold: true
@@ -744,8 +729,7 @@ ma_accidents_16_21_2 |> select(accident_duration) |>  head()
 
 ```
 
-<br><br>
-Accident duration is now in minutes.
+<br><br> Accident duration is now in minutes.
 
 <br><br>
 
@@ -761,8 +745,6 @@ ma_accidents_16_21_2 |> select(LATITUDE, LONGITUDE) |> head()
 ```
 
 <br><br>
-
-
 
 ## Census Tract GEOID
 
@@ -1003,7 +985,7 @@ long_lat$census_code <- apply(long_lat, 1, function(row) call_geolocator_latlon(
 
 <br>
 
-The returned data frame includes  a census code with  the block extension (last four digits).  Using the substr() function from the stringr library, we will extract the first 11 digits, which is our census tract GEOID.
+The returned data frame includes a census code with the block extension (last four digits). Using the substr() function from the stringr library, we will extract the first 11 digits, which is our census tract GEOID.
 
 <br><br>
 
@@ -1056,7 +1038,7 @@ long_lat |>  head()
 
 <br><br>
 
-We now have a  GEOID for each associated latitude and longitude corrdinates.
+We now have a GEOID for each associated latitude and longitude corrdinates.
 
 <br><br>
 
@@ -1176,11 +1158,9 @@ ma_accidents_16_21_3 |>
 
 ```
 
-There are missing values for the newly createded GEOID alng with  Wind_Speed, and Temperaature.  
+There are missing values for the newly createded GEOID alng with Wind_Speed, and Temperaature.
 
-
-
-First, we'll drop the five mssing values  (NAs) from GEOID. 
+First, we'll drop the five mssing values (NAs) from GEOID.
 
 <br><br>
 
@@ -1304,7 +1284,7 @@ ma_accidents_7 |>
 
 <br><br>
 
-We'll drop the 375  NAs fron the Temperature feature.
+We'll drop the 375 NAs fron the Temperature feature.
 
 <br><br>
 
@@ -1515,8 +1495,7 @@ ma_accidents_8 |>
 
 <br><br>
 
-NAs have been droped from GEOID and Temperature. 
-
+NAs have been droped from GEOID and Temperature.
 
 <br><br>
 
@@ -1539,7 +1518,6 @@ ma_accidents_9 <- ma_accidents_8 |>
 Wind_Direction has 25 categories. We will consolidate these categories into 6.
 
 <br><br>
-
 
 ```{r}
 #| code-fold: true
@@ -1568,8 +1546,6 @@ ma_accidents_9 <- ma_accidents_9 |>
 ```
 
 <br><br>
-
-
 
 ```{r}
 #| code-fold: true
@@ -2014,8 +1990,6 @@ ma_accidents_10 <- readRDS("ma_accidents_10.rds")
 
 ```
 
-
-
 <br><br>
 
 ```{r}
@@ -2127,8 +2101,6 @@ ma_accidents_10 |>
 
 
 ```
-
-
 
 <br><br>
 
@@ -5229,6 +5201,79 @@ The number of accidents by road category as a proprtion of month appears relativ
 
 <br><br>
 
+
+```{r}
+
+accident_count_year <- ma_accidents_10 |> 
+    count(Year)
+
+
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+saveRDS(accident_count_year, "accident_count_year.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+accident_count_year <- readRDS("accident_count_year.rds")
+
+```
+
+```{r}
+
+
+year_count_plot <- ggplot(accident_count_year, aes(x=Year, y=n)) +
+    geom_col() +
+    ggtitle("Total Accident Count by Year") +
+    theme(axis.title.x=element_blank(), axis.title.y=element_blank(), plot.title = element_text(color="blue", size=14, face = "bold.italic", hjust = 0.5)) 
+   #theme_minimal()
+
+
+
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+saveRDS(year_count_plot, "year_count_plot.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+year_count_plot <- readRDS("year_count_plot.rds")
+
+```
+
+
+
+
+```{r}
+#| echo: false
+
+
+year_count_plot
+
+```
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -5426,54 +5471,7 @@ Visualizing the median accident duration by year we a dramatic change in values 
 
 <br><br>
 
-```{r}
-
-ma_accidents_10 |> glimpse()
-
-
-```
-
-```{r}
-
-
-ma_accidents_10 |> 
-    filter(accident_duration == 60)
-
-
-```
-
-
-
-```{r}
-
-
-ma_accidents_10 |> 
-    group_by(Year) |> 
-    summarize(most_freq_value = Mode(accident_duration, na.rm = TRUE)[1])
-
-   
-
-
-```
-
-```{r}
-
-ma_accidents_10 |> 
-    filter(Year == "2019" & accident_duration == 30)
-
-
-```
-
-```{r}
-
-
-
-ma_accidents_10 |> 
-    group_by(road_category, Year) |> 
-    summarize(most_freq_value = Mode(accident_duration, na.rm = TRUE)[1])
-
-
-```
+<br><br>
 
 ```{r}
 #| code-fold: true
@@ -5487,6 +5485,8 @@ acc_dur_mode <- ma_accidents_10 |>
 
 ```
 
+<br><br>
+
 ```{r}
 #| eval: false
 #| echo: false
@@ -5499,10 +5499,30 @@ saveRDS(acc_dur_mode, "acc_dur_mode.rds")
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+gt_duration_mode <- acc_dur_mode |> 
+    gt() |> 
+    tab_header(
+        title = md("**Most Frquent Accident Duration Value (Minutes) by Year**")
+    ) |> 
+        cols_label(
+            Year = "Year",
+            most_freq_value = "Mode"
+        )
+
+
+
+```
+
+```{r}
+#| eval: false
 #| echo: false
+#| include: false
 
-acc_dur_mode <- readRDS("acc_dur_mode.rds")
-
+saveRDS(gt_duration_mode,"gt_duration_mode.rds")
 
 ```
 
@@ -5510,14 +5530,30 @@ acc_dur_mode <- readRDS("acc_dur_mode.rds")
 #| echo: false
 
 
-gt(acc_dur_mode)
+gt_duration_mode <- readRDS("gt_duration_mode.rds")
 
 
 ```
 
-
+<br><br>
 
 ```{r}
+#| echo: false
+
+gt_duration_mode
+
+
+```
+
+<br><br>
+
+The above table displays the accident duration most frequent value (known as the Mode) by year. Except for the year 2020, every year has a mode of 30 minutes. The mode value doubles to 60 minutes for 2020. Of course the covid-19 pandemic fell within 2020 though. We’ll investigate our data further by reviewing summary statistics.
+
+<br><br>
+
+```{r}
+#| eval: false
+#| echo: false
 
 
 ma_accidents_10 |> 
@@ -5529,9 +5565,6 @@ ma_accidents_10 |>
 
 
 ```
-
-
-
 
 ```{r}
 #| code-fold: true
@@ -5546,6 +5579,7 @@ summary_stats <- ma_accidents_10 |>
         q25 = quantile(accident_duration, 0.25, na.rm = TRUE),
         median_duration = median(accident_duration, na.rm = TRUE),
         q75 = quantile(accident_duration, 0.75, na.rm = TRUE),
+        iqr = q75 - q25,
         mean_duration = round(mean(accident_duration, na.rm = TRUE),0),
         max_value = max(accident_duration, na.rm=TRUE),
         standard_deviation = round(sd(accident_duration, na.rm = TRUE),0),
@@ -5553,6 +5587,8 @@ summary_stats <- ma_accidents_10 |>
 
 
 ```
+
+<br><br>
 
 ```{r}
 #| eval: false
@@ -5573,16 +5609,101 @@ summary_stats <- readRDS("summary_stats.rds")
 ```
 
 ```{r}
-#| echo: false
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
-
-gt(summary_stats)
+gt_acc_duration_summary <- summary_stats |> 
+    gt() |> 
+    tab_header(
+        title = md("**Summary Statistics of Accident Duration (Minutes)**"),
+        subtitle = "By Year"
+    ) |> 
+    cols_label(
+        Year = "Year",
+        min_value = "Minimum Value",
+        q25 = "Q1",
+        median_duration = "Median",
+        q75 = "Q3",
+        iqr = "IQR",
+        mean_duration = "Mean",
+        max_value = "Maximum Value",
+        standard_deviation = "Standard Deviation"
+    )    
 
 
 ```
 
+<br><br>
 
 ```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+saveRDS(gt_acc_duration_summary , "gt_acc_duration_summary.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+
+gt_acc_duration_summary <- readRDS("gt_acc_duration_summary.rds")
+
+```
+
+```{r}
+#| echo: false
+
+
+gt_acc_duration_summary
+
+
+```
+
+<br><br>
+
+Summary Statistics Review:
+
+-   Minimum Value – Smallest value in our data.
+
+-   Q1 - First Quartile.  Represents the point at which 25% of our observations fall below that value (and thus 75% of our values are above that value.
+
+-   Median – Represents the point at which 50% of our observations fall below that value and 50% of our observations fall above that value.
+
+-   Q3 – Third Quartile. Represents the point at which 75% of our observations fall below that value (and thus 25% of our observations fall above that value).
+
+-   IQR – Interquartile range.  Is the distance between the first and third quartiles and contains 50% (half) of all our observations.
+
+-   Mean – The average value of all our observations.
+
+-   Maximum Value – The largest value in our data.
+
+<br>
+
+We can use the values from our summary statistics table to examine the distribution of our accident duration feature.  We want to know where the center is and how fat or thin it is. 
+
+Central tendency helps us find what values are in the middle of our data.  We’ll use the mean median, and mode for this.  
+
+Variability tells us the extent values are spread around the mean.  Standard deviation will be used for this.  Variability can also help with us with determining the spread of data.  We’ll use the first and second quartile, median, and IQR for this. 
+
+<br>
+
+From our table we observe that the 2016 and 2017 have mean values much larger than their mean, meaning the distribution is heavily skewed right. These same years have larger standard deviations pointing to distributions that are further out from the mean than other years. The years 2019 thru 2021 have a larger IQR, meaning the middle half of all values are more spread out when compared to other years.  
+
+
+<br><br>
+
+
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
 
 
 
@@ -5597,7 +5718,7 @@ get_labels <- function(y) {
 
 ```
 
-
+<br><br>
 
 ```{r}
 #| code-fold: true
@@ -5615,8 +5736,16 @@ box_2016 <- ma_accidents_10 |>
         vjust = -0.5,
         hjust = -0.2,
         color = "darkred",
-        fontface = "bold"        
+        fontface = "bold",
+        size = 6,       
     ) +
+    stat_summary(
+        fun = mean,
+        geom = "point",
+        color = "red",
+        size = 3,
+        shape = 19
+    ) +   
     theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
     coord_flip() 
     #theme_minimal()
@@ -5625,10 +5754,7 @@ box_2016 <- ma_accidents_10 |>
 
 ```
 
-
-
-
-
+<br><br>
 
 ```{r}
 #| eval: false
@@ -5649,9 +5775,6 @@ box_2016 <- readRDS("box_2016.rds")
 
 ```
 
-
-
-
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -5662,12 +5785,14 @@ box_2016 <- readRDS("box_2016.rds")
 hist_2016 <- ma_accidents_10 |> 
     filter(Year == "2016" & accident_duration < 1442) |>
     ggplot(aes(x=accident_duration)) +
-    geom_histogram(bins=25) +
-    abs(x = "Accident Duration") +
+    geom_histogram(bins=35) +
+    labs(x = "Accident Duration") +
     theme(axis.title.y=element_blank())
 
 
 ```
+
+<br><br>
 
 ```{r}
 #| eval: false
@@ -5689,6 +5814,19 @@ hist_2016  <- readRDS("hist_2016.rds")
 ```
 
 ```{r}
+#| echo: false
+#| fig-cap: Accident Duration Distribution - 2016
+#| fig-height: 18
+#| fig-width: 18
+
+box_2016 / hist_2016
+
+
+```
+
+<br><br>
+
+```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
@@ -5704,8 +5842,17 @@ box_2017 <- ma_accidents_10 |>
         vjust = -0.5,
         hjust = -0.2,
         color = "darkred",
-        fontface = "bold"        
-    ) +
+        fontface = "bold",
+        size = 6,       
+    ) + 
+    stat_summary(
+        fun = mean,
+        geom = "point",
+        color = "red",
+        size = 3,
+        shape = 19
+    ) +     
+        
     #labs(title = "2017") +
     #theme(plot.title = element_text(color = "blue", face = "bold.italic", size=5,hjust = 0.5)) +
     theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
@@ -5714,6 +5861,8 @@ box_2017 <- ma_accidents_10 |>
 
 
 ```
+
+<br><br>
 
 ```{r}
 #| eval: false
@@ -5743,12 +5892,14 @@ box_2017 <- readRDS("box_2017.rds")
 hist_2017 <- ma_accidents_10 |> 
     filter(Year == "2017" & accident_duration < 1442) |>
     ggplot(aes(x=accident_duration)) +
-    geom_histogram(bins=25) +
+    geom_histogram(bins=35) +
     labs(x = "Accident Duration") +
     theme(axis.title.y=element_blank())
 
 
 ```
+
+<br><br>
 
 ```{r}
 #| eval: false
@@ -5771,6 +5922,20 @@ hist_2017 <- readRDS("hist_2017.rds")
 ```
 
 ```{r}
+#| echo: false
+#| fig-cap: Accident Duration Distribution - 2017
+#| fig-height: 18
+#| fig-width: 18
+
+
+box_2017 / hist_2017
+
+
+```
+
+<br><br>
+
+```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
@@ -5785,8 +5950,16 @@ box_2018 <- ma_accidents_10 |>
         vjust = -0.5,
         hjust = -0.2,
         color = "darkred",
-        fontface = "bold"        
+        fontface = "bold",
+        size=6,       
     ) +
+    stat_summary(
+        fun = mean,
+        geom = "point",
+        color = "red",
+        size = 3,
+        shape = 19
+    ) +     
     #labs(title = "2018") +
     #theme(plot.title = element_text(color = "blue", face = "bold.italic", size=5,hjust = 0.5)) +
     theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
@@ -5794,6 +5967,8 @@ box_2018 <- ma_accidents_10 |>
 
 
 ```
+
+<br><br>
 
 ```{r}
 #| eval: false
@@ -5805,7 +5980,6 @@ saveRDS(box_2018, "box_2018.rds")
 
 
 ```
-
 
 ```{r}
 #| echo: false
@@ -5832,6 +6006,8 @@ hist_2018 <- ma_accidents_10 |>
 
 ```
 
+<br><br>
+
 ```{r}
 #| eval: false
 #| echo: false
@@ -5851,6 +6027,20 @@ hist_2018 <- readRDS("hist_2018.rds")
 ```
 
 ```{r}
+#| echo: false
+#| fig-cap: Accident Duration Distribution - 2018
+#| fig-height: 16
+#| fig-width: 16
+
+box_2018 / hist_2018
+
+
+
+```
+
+<br><br>
+
+```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
@@ -5866,8 +6056,16 @@ box_2019 <- ma_accidents_10 |>
         vjust = -0.5,
         hjust = -0.2,
         color = "darkred",
-        fontface = "bold"        
+        fontface = "bold",
+        size=6,        
     ) +
+    stat_summary(
+        fun = mean,
+        geom = "point",
+        color = "red",
+        size = 3,
+        shape = 19
+    ) +     
     #labs(title = "2019") +
     #theme(plot.title = element_text(color = "blue", face = "bold.italic", size=5,hjust = 0.5)) +
     theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
@@ -5875,6 +6073,8 @@ box_2019 <- ma_accidents_10 |>
 
 
 ```
+
+<br><br>
 
 ```{r}
 #| eval: false
@@ -5911,6 +6111,8 @@ hist_2019 <- ma_accidents_10 |>
 
 ```
 
+<br><br>
+
 ```{r}
 #| eval: false
 #| echo: false
@@ -5929,6 +6131,18 @@ hist_2019 <- readRDS("hist_2019.rds")
 
 ```
 
+```{r}
+#| echo: false
+#| fig-cap: Accident Duration Distribution - 2019
+#| fig-height: 18
+#| fig-width: 18
+
+box_2019 / hist_2019
+
+
+```
+
+<br><br>
 
 ```{r}
 #| code-fold: true
@@ -5946,8 +6160,16 @@ box_2020 <- ma_accidents_10 |>
         vjust = -0.5,
         hjust = -0.2,
         color = "darkred",
-        fontface = "bold"        
+        fontface = "bold",
+        size=6,        
     ) +
+    stat_summary(
+        fun = mean,
+        geom = "point",
+        color = "red",
+        size = 3,
+        shape = 19
+    ) +     
     #labs(title = "2020") +
     #theme(plot.title = element_text(color = "blue", face = "bold.italic", size=5,hjust = 0.5)) +
     theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
@@ -5955,6 +6177,8 @@ box_2020 <- ma_accidents_10 |>
 
 
 ```
+
+<br><br>
 
 ```{r}
 #| eval: false
@@ -5992,6 +6216,8 @@ hist_2020 <- ma_accidents_10 |>
 
 ```
 
+<br><br>
+
 ```{r}
 #| eval: false
 #| echo: false
@@ -6012,6 +6238,20 @@ hist_2020 <- readRDS("hist_2020.rds")
 ```
 
 ```{r}
+#| echo: false
+#| fig-cap: Accident Duration Distribution - 2020
+#| fig-height: 18
+#| fig-width: 18
+
+
+box_2020 / hist_2020
+
+
+```
+
+<br><br>
+
+```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
@@ -6027,8 +6267,16 @@ box_2021 <- ma_accidents_10 |>
         vjust = -0.5,
         hjust = -0.2,
         color = "darkred",
-        fontface = "bold"        
+        fontface = "bold",
+        size=6       
     ) +
+    stat_summary(
+        fun = mean,
+        geom = "point",
+        color = "red",
+        size = 3,
+        shape = 19
+    ) +     
     #labs(title = "2021") +
     #theme(plot.title = element_text(color = "blue", face = "bold.italic", size=5,hjust = 0.5)) +
     theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
@@ -6037,6 +6285,8 @@ box_2021 <- ma_accidents_10 |>
 
 
 ```
+
+<br><br>
 
 ```{r}
 #| eval: false
@@ -6072,6 +6322,8 @@ hist_2021 <- ma_accidents_10 |>
 
 ```
 
+<br><br>
+
 ```{r}
 #| eval: false
 #| echo: false
@@ -6092,6 +6344,19 @@ hist_2021 <- readRDS("hist_2021.rds")
 ```
 
 ```{r}
+#| echo: false
+#| fig-cap: Accident Duration Distribution - 2021
+#| fig-height: 18
+#| fig-width: 18
+
+box_2021 / hist_2021
+
+
+```
+
+<br><br>
+
+```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
@@ -6106,43 +6371,25 @@ box_2022 <- ma_accidents_10 |>
         vjust = -0.3,
         hjust = -0.1,
         color = "darkred",
-        fontface = "bold"        
+        fontface = "bold",
+        size=6        
     ) +
-    #labs(title = "2022") +
-    #theme(plot.title = element_text(color = "blue", face = "bold.italic", size=5,hjust = 0.5)) +
-    theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
-    coord_flip()
-
-
-```
-
-```{r}
-
-
-
-box_2022 <- ma_accidents_10 |> 
-    filter(Year == "2022" & accident_duration < 1442) |> 
-    ggplot(aes(x = Year, y = accident_duration)) +
-    geom_boxplot() + 
     stat_summary(
-        fun.data = get_labels,
-        geom = "text",
-        vjust = -0.3,
-        hjust = -0.1,
-        color = "darkred",
-        fontface = "bold"        
-    ) +
+        fun = mean,
+        geom = "point",
+        color = "red",
+        size = 3,
+        shape = 19
+    ) +     
     #labs(title = "2022") +
     #theme(plot.title = element_text(color = "blue", face = "bold.italic", size=5,hjust = 0.5)) +
     theme(axis.ticks.x=element_blank(), axis.text.x=element_text(size=8), axis.title.x=element_blank(), axis.title.y=element_blank(), axis.text.y=element_blank()) +
     coord_flip()
 
 
-
-
 ```
 
-
+<br><br>
 
 ```{r}
 #| eval: false
@@ -6200,90 +6447,20 @@ hist_2022 <- readRDS("hist_2022.rds")
 
 ```
 
-
-
-
+<br><br>
 
 ```{r}
 #| echo: false
-#| fig-cap: Accident Duration Distribution - 2016
-
-box_2016 / hist_2016
-
-
-```
-
-```{r}
-#| echo: false
-#| fig-cap: Accident Duration Distribution - 2017
-
-box_2017 / hist_2017
-
-
-```
-
-
-
-```{r}
-#| echo: false
-#| fig-cap:  Accident Duration Distribution - 2018
-
-box_2018 / hist_2018
-
-
-```
-
-```{r}
-#| echo: false
-#| fig-cap:  Accident Duration Distribution - 2019
-
-
-box_2019 / hist_2019
-
-
-```
-
-```{r}
-#| echo: false
-#| fig-cap:  Accident Duration Distribution - 2020
-
-
-box_2020 / hist_2020
-
-
-```
-
-```{r}
-#| echo: false
-#| fig-cap:  Accident Duration Distribution - 2021
-
-box_2021 / hist_2021
-
-
-
-
-```
-
-```{r}
-#| echo: false
-#| fig-cap:  Accident Duration Distribution - 2022
+#| fig-cap: Accident Duration Distribution - 2022
+#| fig-height: 18
+#| fig-width: 18
 
 box_2022 / hist_2022
 
 
-
 ```
 
-
-
-
-
-
-
-
 <br><br>
-
-
 
 <br><br>
 
@@ -7850,8 +8027,6 @@ census_tract_df_2 |>
 
 ### Linear and Linear Mized Effect Split
 
-
-
 ```{r}
 
 
@@ -9244,7 +9419,7 @@ tract_map_extreme_higher_plt
 
 ```
 
-<br><br> 
+<br><br>
 
 <br><br>
 
