@@ -98,6 +98,8 @@ library(gridExtra)
 library(patchwork)
 library(gt)
 
+library(DT)
+
 
 
 
@@ -5203,6 +5205,8 @@ The number of accidents by road category as a proprtion of month appears relativ
 
 
 ```{r}
+#| eval: false
+#| echo: false
 
 accident_count_year <- ma_accidents_10 |> 
     count(Year)
@@ -5230,7 +5234,13 @@ accident_count_year <- readRDS("accident_count_year.rds")
 
 ```
 
+<br><br>
+
+
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 year_count_plot <- ggplot(accident_count_year, aes(x=Year, y=n)) +
@@ -5244,6 +5254,9 @@ year_count_plot <- ggplot(accident_count_year, aes(x=Year, y=n)) +
 
 
 ```
+
+<br><br>
+
 
 ```{r}
 #| eval: false
@@ -5273,6 +5286,16 @@ year_count_plot <- readRDS("year_count_plot.rds")
 year_count_plot
 
 ```
+
+<br><br>
+
+
+The largest accidents counts belong to the years 2020 and 2021 with over 11,000 accidents each.  2016 is the only uear under 6,000 accidents.  It should be noted that the data set did not start collecting accident data until February of 2016, thus 2016 has eleven months of data compared to twelve months for the other years. 
+
+
+
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -5467,7 +5490,7 @@ acc_dur_year_plt
 
 <br><br>
 
-Visualizing the median accident duration by year we a dramatic change in values starting in 2019. Median accident duration for the years 2016 through 2018 is close to 30 minutes. The median accident duration doubles to 60 minutes for th years 2019 through 2021. Median accident duration drops to 45 minutes for the 2022 year. Our column plot displays the same changes we observed in our time series plot of road categories. These differences between the year groups might be due to a change on how an accidents end time is determinesd though we have no documentation to support this.
+Visualizing the median accident duration by year we see a dramatic change in values starting in 2019. Median accident duration for the years 2016 through 2018 is close to 30 minutes. The median accident duration doubles to 60 minutes for th years 2019 through 2021. Median accident duration drops to 45 minutes for the 2022 year. Our column plot displays the same changes we observed in our time series plot of road categories. These differences between years  may be due to a change on how an accidents end time is determinesd though we have no documentation to support this.
 
 <br><br>
 
@@ -5655,14 +5678,7 @@ gt_acc_duration_summary <- readRDS("gt_acc_duration_summary.rds")
 
 ```
 
-```{r}
-#| echo: false
 
-
-gt_acc_duration_summary
-
-
-```
 
 <br><br>
 
@@ -5690,9 +5706,27 @@ Central tendency helps us find what values are in the middle of our data.  We’
 
 Variability tells us the extent values are spread around the mean.  Standard deviation will be used for this.  Variability can also help with us with determining the spread of data.  We’ll use the first and second quartile, median, and IQR for this. 
 
+<br><br>
+
+
+
+```{r}
+#| echo: false
+
+gt_acc_duration_summary
+
+
+```
+
+<br><br>
+
+Reviewing the summary statistics table, a few points jump out.  First, we observe that the years 2016 and 2017 have mean values much larger than their median. This means that their distributions are dramatically skewed right, more so than compared to the other years. These same years also have larger standard deviations pointing to distributions that are further out from the mean than other years. The years 2019 thru 2021 have a larger IQR, meaning the middle half of all values are more spread out when compared to other years. 
+
+
 <br>
 
-From our table we observe that the 2016 and 2017 have mean values much larger than their mean, meaning the distribution is heavily skewed right. These same years have larger standard deviations pointing to distributions that are further out from the mean than other years. The years 2019 thru 2021 have a larger IQR, meaning the middle half of all values are more spread out when compared to other years.  
+
+To better understand the  summary statistics, we’ll use box plots and histograms to visualize the distribution of accident duration. Each provides different information about the distribution of the data. 
 
 
 <br><br>
@@ -5826,6 +5860,13 @@ box_2016 / hist_2016
 
 <br><br>
 
+Our first plot is for the year 2016.  First, let’s look at the histogram (bottom plot).  A histogram takes a bunch of data points and separates them into bins.  The height of the bars represents the number of data points that fall into that bin. The largest peak represents the most frequent duration value, which we know is 30 minutes. The count is roughly around 2,800. Our histogram is not symmetrical with the data piled up on the left with a long tail to the right.  This is called a right skewed right.  The small bin on at just above the 350-minute point is probably outliers which explains the right skew. Now let's look at the box plot (top plot), We see a box with the left line being the first quartile (Q25) and the right line denoting the third quartile (Q75).  The length of the box is the Interquartile Range (IQR).  The IQR helps us determine the spread of the middle of our data.  The IQR is calculated by subtracting the first quartile from the third quartile.  The first and third quartiles numbers appear in red. Using these numbers, we can determine that 50% of all observations fall between 30 and 60 minutes. Normally on a box plot we would find the median, represented by a thick line, somewhere between the left and right ends of the box.  In this case the median and first quartile are the same value at 30 minutes, which is why the thicker median line is overlayed on top of the first quartile line. The first quartile and median are the exact same value due to the high concentration of values at the lower half of the data. Extending out from each end are lines (also known as whiskers).  These lines represent the lower and upper limit of our data.  Think of them as the minimum and maximum values expected from our data.  Any observations falling below the lower limit or above the upper limit are considered outliers are data points that are substantially different from the others.  On our plot, we find many data points above the upper limit (105), with a cluster of data points just above 350 on the x-axis.  These outliers explain why the mean, represented by the red dot, is far from the median.  In fact, it is past the third quartile.  The many observations at the far end of our plots have pulled the mean far outside the box 
+
+
+<br><br>
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -5935,6 +5976,16 @@ box_2017 / hist_2017
 
 <br><br>
 
+
+
+The histogram and box plots for 2017 are similar to 2016 though not as dramatic. The largest peak on the histogram represents the most frequent value of 30 minutes, same as 2016.   We see are large number of observations at the right tail of our histogram,  causing the right skew.  Within the box of the box plot, the first quartile is 30 minutes and the thick line,representing the median, is just a little above it at 32 minutes. The IQR is the same at 30 minutes.  The mean has been pulled to the right, outside the IQR box, though not as dramatically as the 2016 box plot.  The upper limit is 105, same as with our 2016 data.  
+
+
+<br><br>
+
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -6029,8 +6080,8 @@ hist_2018 <- readRDS("hist_2018.rds")
 ```{r}
 #| echo: false
 #| fig-cap: Accident Duration Distribution - 2018
-#| fig-height: 16
-#| fig-width: 16
+#| fig-height: 18
+#| fig-width: 18
 
 box_2018 / hist_2018
 
@@ -6039,6 +6090,11 @@ box_2018 / hist_2018
 ```
 
 <br><br>
+
+The histogram for 2018 has the largest peak at 30 minutes, same as the previous years. Their is a right skew, though the bin at the tail of the plot is not as high as with the previous years.  Also, we can see in our box plot that the mean and median are the same at 30 minutes as in 2016.  The spread of the middle of our data is not as wide as the previous years. Fifty percent of all our observations fall between 30 and 45.   The upper limit, at 67, is less than 2016 and 2017.  Clusters of outliers are closer to the upper limit which may explain why the mean has not been pulled as far to the right as in the previous years. This aligns with our histogram plot.     
+
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -6143,6 +6199,14 @@ box_2019 / hist_2019
 ```
 
 <br><br>
+
+
+We can see from the histogram that the shape of the distribution appears symmetrical, meaning it looks closer to a normal distribution.  There is a right skew, though the tail is shorter than what we have seen from the earlier years.   Checking the box plot, we can see that there is only one data point at the far right of the plot.  This is difficult to see on the histogram.  The upper limit is the largest we’ve seen so far at 147.  Clusters of outliers are closer the upper limit which matches the shorter right tail on the histogram.    The IQR is 47 which is a larger spread in the middle of our data than previous years.  Fifty percent of the observations for 2019 fall between 30 minutes and 77 minutes.  Within the box, the median and mean are closer, separated by only 4 minutes.  The median, denoted by the thick line, is also nearer than the center than previous years and the mean is within the box.  This information helps explain the near symmetrical shape of the histogram.  
+
+
+<br><br>
+
+
 
 ```{r}
 #| code-fold: true
@@ -6251,6 +6315,14 @@ box_2020 / hist_2020
 
 <br><br>
 
+
+Our histogram for 2020 is not as symmetrical compared to 2019. This can be explained by the long thin skew to the right.  The spread of the middle of the data is similar to 2019, with an IQR 5 units less than 2019.  Fifty percent of the observations fall between 35 and 77 units.  The mean and median are close, with only a difference of 6 units.  The upper limit is 140, and we see clusters of outliers close to the upper limit.  The difference is outliers extending sporadically out to the far right of the plot.  This matches the thin tail on the histogram.  These outliers pulled the mean slightly more to the right than in 2019. 
+
+<br><br>
+
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -6353,6 +6425,12 @@ box_2021 / hist_2021
 
 
 ```
+
+<br><br>
+
+
+The plots for 2021 are almost identical to  those of 2020. The histogram has a thin tail to the right.  The box plot shows the difference between mean and median as the same at 6 units.  The spread of the middle of the data is slightly greater, with an IQR of 145.  The outlier pattern is almost the same.  
+
 
 <br><br>
 
@@ -6461,6 +6539,11 @@ box_2022 / hist_2022
 ```
 
 <br><br>
+
+The histogram for 2022 has a thin right skew like what we’ve seen for 2019,2020, and 2021.  The difference is the observations are tightly packed to the left compared to those years. 
+The data for 2022 doesn’t fall into the grouping of years that we’ve seen.  In the box plot, we see clusters of outliers near the upper limit with sporadic outliers further to the right.  The difference between the mean and median is 11 units.  The mean has been pulled further right than 209,2020, and 2021, yet not as dramatically as 2016, 2017, and 2018, which had larger number of outliers to the far right of their plots.  The mean still falls within the box.  The clusters near the upper limit have a greater effect on the mean due to 2022 having 3,000 to 5,000 less observations than 2019,2020, and 2021. 
+
+
 
 <br><br>
 
@@ -7332,7 +7415,7 @@ saveRDS(ma_tract_formated , "ma_tract_formated.rds")
 ```
 
 ```{r}
-#| include: false
+#| echo: false
 #| label: "ck-375"
 
 ma_tract_formated  <- readRDS("ma_tract_formated.rds")
@@ -8978,13 +9061,16 @@ brms_model <- readRDS("brms_model.rds")
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
-summary(brms_model)
+round(summary(brms_model)$spec_pars, 2)
 
 
 
 ```
+
+
 
 <br><br>
 
@@ -9097,22 +9183,52 @@ brms_model_3 <- readRDS("brms_model_3.rds")
 
 <br><br>
 
-Model Summary
+Mixed Effects
 
 <br><br>
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
-summary(brms_model_2)
+brms_2_sigma <- round(summary(brms_model_2)$spec_pars, 2)
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+
+saveRDS(brms_2_sigma, "brms_2_sigma.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+brms_2_sigma  <- readRDS("brms_2_sigma.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+
+brms_2_sigma
 
 
 ```
 
 <br><br>
 
-Our Bayesian mixed effects model is an improvement from the linear regression model fit earlier. Near the end of the output under Further Distributional Parameters, we find sigma, our error term, which is similar to RSE from the linear regression model. It is the variation between census tracts versus the residual variation left over among individual accidents. The sigma estimate of 0.45 means after accounting for temperature, Month, day_type, road_category, and hour_day_sections, the models individual accident duration predictions are typically off target by about +/- 45%. This is large error term for a model, though it is a 19% improvement over the linear regression models RSE of 64%.
+Our Bayesian mixed effects model is an improvement from the linear regression model fit earlier.  Sigma, our error term, which is similar to RSE from the linear regression model. It is the variation between census tracts versus the residual variation left over among individual accidents. The sigma estimate of 0.45 means after accounting for temperature, Month, day_type, road_category, and hour_day_sections, the models individual accident duration predictions are typically off target by about +/- 45%. This is large error term for a model, though it is a 19% improvement over the linear regression models RSE of 64%.
 
 <br><br>
 
@@ -9261,7 +9377,23 @@ print(brms_count, n=100)
 
 <br><br>
 
-Now, let’s evaluate our model’s group-level effects of individual census tracts. We’ll use an interval plot to accomplish this. It visualizes the estimated accident duration adjustments for individual census tracts in our dataset alongside their Bayesian windows. How to read an interval plot: The Vertical Y-Axis (Left): Each row represents a specific census tract. The Horizontal X-Axis (Bottom): This represents the random effect deviation (in log accident duration units) from the global baseline. Remember, the global baseline is the average accident duration of each data point. The Dark Blue Circles: The median posterior estimate for each census tract. The Light Blue Whisker Lines: The 95% Credible Intervals (outer uncertainty window). The Vertical Red Zero Line (0): Represents the overall average census tract in our dataset. Because of the large number of census tracts (1,462), our plot will only include the top one hundred census tracts with the most extreme effects.
+Now, let’s evaluate our model’s group-level effects of individual census tracts. We’ll use an interval plot to accomplish this. It visualizes the estimated accident duration adjustments for individual census tracts in our dataset alongside their Bayesian windows. 
+
+How to read an interval plot: 
+
+The Vertical Y-Axis (Left): Each row represents a specific census tract. 
+
+The Horizontal X-Axis (Bottom): This represents the random effect deviation (in log accident duration units) from the global baseline. Remember, the global baseline is the average accident duration of each data point. 
+
+The Dark Blue Circles: The median posterior estimate for each census tract. 
+
+The Light Blue Whisker Lines: The 95% Credible Intervals (outer uncertainty window). 
+
+The Vertical Red Zero Line (0): Represents the overall average census tract in our dataset. 
+
+<br>
+
+Because of the large number of census tracts (1,462), our plot will only include the top one hundred census tracts with the most extreme effects.
 
 <br><br>
 
@@ -9279,9 +9411,15 @@ brms_model_cat_plot_top_100
 
 <br><br>
 
-Interpreting the interval plot: The dots and intervals span roughly from -0.33 up to +0.48 on the log scale. This shows large variation across these 100 census tracts. Some tracts carry a large baseline accident duration reduction (far left), while others carry a large duration increase (far right). The census tracts whose light blue whisker lines do not cross the vertical 0 line (the ones completely to the far left or far right) are statically significant. This means these census tracts a proven to be significant accident duration drivers. Location alone pushes their duration of accidents far above or below the regional average, independent of temperature, Month, day_type, road_category, and hour_day_sections. <br> Of the 100 census tracts in the plot, 46 crossed the vertical zero line, and thus are not significant. This means that 54 census tracts are significant (34 to the far left and 20 to the far right).
+Interpreting the interval plot: The dots and intervals span roughly from -0.33 up to +0.48 on the log scale. This shows large variation across these 100 census tracts. Some tracts carry a large baseline accident duration reduction (far left), while others carry a large duration increase (far right). The census tracts whose light blue whisker lines do not cross the vertical 0 line (the ones completely to the far left or far right) are statically significant. This means these census tracts a proven to be significant accident duration drivers. Location alone pushes their duration of accidents far above or below the regional average, independent of temperature, Month, day_type, road_category, and hour_day_sections.
 
-<br> Understanding the significance of these census tracts is best done by viewing them on a map.
+ <br> 
+ 
+ Of the 100 census tracts in the plot, 46 crossed the vertical zero line, and thus are not significant. This means that 54 census tracts are significant (34 to the far left and 20 to the far right).
+
+<br> 
+
+Understanding the significance of these census tracts is best done by viewing them on a map.
 
 We’ll create two maps, one for extreme lower census tracts and one for extreme higher census tracts. We’ll recreate our census tract population map from earlier and add the individual accidents of significant census tracts as points on each map.
 
@@ -9320,6 +9458,28 @@ pal<-colorBin(palette="RdYlBu",
 
 
 
+mytext <- paste(
+  "County: ", ma_census4326$County,"<br/>",
+  "Census Tract: ", ma_census4326$GEOID, "<br/>", 
+  "Census Tract Accident Count: ", ma_census4326$tract_accident_count,"<br/>",
+    sep="") %>%
+  lapply(htmltools::HTML)
+
+
+```
+
+
+<br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+
+
 
 
 map_population_extreme_tract_high <- ma_census4326 |> leaflet(options = leafletOptions(minZoom = 9.4, maxZoom = 18)) |> 
@@ -9344,6 +9504,7 @@ map_population_extreme_tract_high <- ma_census4326 |> leaflet(options = leafletO
     lng = ~LONGITUDE,
     lat = ~LATITUDE,
     popup = ~paste("Accident ID: ", ID,
+                   "<br>Road Category: ", road_category, 
                    "<br>City: ", City)
   )
 
@@ -9421,6 +9582,9 @@ tract_map_extreme_higher_plt
 
 <br><br>
 
+
+Our first map includes census tracts that influence accident duration at the higher end. The markers are individual accidents occurring within the extreme census tract.  Clicking on a marker will provide the accident ID, road category, and city.  There are a few points of interest we’ll examine.  First, upper right of the map you’ll find an accident pattern resembling upside down “T”.  Hovering over this area you’ll find the census tract GEOID of 25017350109.  This census tract is within the town of Andover.  Most accidents within this census tract occurred near the junction of I-93 and I-495.  Further up and to the right we find another cluster accidents within census tract 25025080100. These accidents occurred on a stretch of I-495 in the town of Merrimac.  These areas are of interest as they are not urban centers but are on interstate highways near the New Hampshire border.  Inspecting the map, you’ll find extreme census tracts in urban areas such as Boston and Framingham, have accidents occurring on roads and streets.  These are just some interesting points where accident duration is at the high end.  Viewers are encouraged to inspect more points. Inspecting the map, you’ll notice that there are no extreme census reacts on the high end of accident duration west of I-495.  
+
 <br><br>
 
 ```{r}
@@ -9454,6 +9618,7 @@ map_population_extreme_tract_lower <- ma_census4326 |> leaflet(options = leaflet
     lng = ~LONGITUDE,
     lat = ~LATITUDE,
     popup = ~paste("Accident ID: ", ID,
+                   "<br>Road Category: ", road_category,
                    "<br>City: ", City)
   )
      
@@ -9499,7 +9664,9 @@ tract_map_extreme_lower_plt <- map_population_extreme_tract_lower %>%
 
 ```
 
-<br><br> <br><br>
+<br><br> 
+
+<br><br>
 
 ```{r}
 #| echo: false
@@ -9530,6 +9697,179 @@ tract_map_extreme_lower_plt <- readRDS("tract_map_extreme_lower_plt.rds")
 
 tract_map_extreme_lower_plt
 
+
+
+```
+
+
+<br><br>
+
+
+On our map of census tracts influencing a large reduction in accident duration, there are three census tracts west of I-495.  These are in the cities of Worcester, Fitchburg, and the town of Longmeadow.  There are also a greater number of census tract in the Boston metro area.  
+
+An interesting area to investigate is the junction of I-93 and I-495, located near the New Hampshire border.  Recall from our previous map this area was within census tract 25009254402.  On our current map, the junction of I-93 and I-495 fall within census tract 25009254401 which borders census tract 25009254402.  Comparing the maps we notice that the pattern of accidents is different.  
+On our current map viewing census tract 25009254401, most accidents on I-93 are south of I-495 and accidents on I-495 are east of I-93.
+On our map previous map of census tracts influencing increase in duration, viewing census tract 25009254402, most accidents on I-495 are west of I-93 and most accidents on I-93 are north of I-495.  These accidents occurred on the same stretches of I-495 and I-93 yet fall into census tracts that have different impacts on accident duration.  Inspecting both maps, you’ll find other areas that have census tracts of different accident duration impacts in close proximity to each other.  
+
+
+
+<br><br>
+
+
+
+
+```{r}
+#| eval: false
+#| echo: false
+
+
+extreme_tract_df <- ma_accidents_10 |> 
+    filter(GEOID %in% c("25021418004", "25001011802", "25017321500", "25005644200", "25005630202","25017315403", "25021421200","25017373902", "25023520100", "25023507101", "25001010206", "25025140300", "25023502101", "25025051000","25025110105", "25023511702", "25009262100", "25009254402", "25017383600", "25017320102", "25017320105","25021419700","25009254401", "25021419800", "25013802101","25017350105", "25009252101", "25025081001", "25009268200", "25021411200", "25025170301", 
+                                              "25027732500", "25027710200","25017337300", "25017368400", "25005614102", "25027744103", "25017374800", "25017321400", "5017383700", "25027737300","25005631101", "25021403100","25025050901", "25017320106", "25025010802", "25017367200", "25025000806", "25025020305","25023501204", "25017358600", "25025100700", "25025090100", "25021416400"))
+
+
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+
+
+
+extreme_tract_df <- extreme_tract_df |> 
+    select(ID, GEOID, City, Street, County, day_type, Month, road_category, hour_day_sections, Description)
+
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+saveRDS(extreme_tract_df, "extreme_tract_df.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+extreme_tract_df <- readRDS("extreme_tract_df.rds")
+
+
+```
+
+
+
+
+```{r}
+
+colNames <- c("ID", "GEOID", "City", "Street", "County", "Type Day", "Month", "Road Category", "Hour of Day", "Description")
+
+
+
+```
+
+
+```{r}
+
+
+my.options <- list(autoWidth = TRUE,
+                   scrollx=TRUE,
+                   searching=TRUE,
+                   ordering=TRUE,
+                   lengthChange=TRUE,
+                   rownames=TRUE,
+                   lengthMenu= c(10,20,50,100),
+                   pageLength = 10,                   paging=TRUE,
+                   columnDefs = list(list(className = "dt-center", targets = "_all")),
+                   info=TRUE )
+
+
+```
+
+
+```{r}
+
+
+header.style <- "th { font-family: 'Arial'; font-weight: bold; color: white; background-color: #008080;}"
+
+
+```
+
+
+
+
+
+
+```{r}
+
+
+my.container <- withTags(table(
+    style(type = "text/css", header.style),
+    thead(
+        tr(
+            lapply(colnames, th, style = "text-align: border-right-width: 1px; border-right-style: solid; border-right-color:white; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: white")
+        )
+    )
+))
+
+
+```
+
+```{r}
+
+
+dt_extreme <- datatable(extreme_tract_df, options = my.options, class = "cell-border stipe", callback = JS("return table;"),
+                        rownames, colnames = colNames, caption = htmltools::tags$caption(
+                            style = 'caption-side: bottom; text-align: center;',
+                            htmltools::em(('Table: Extreme Census Tracts - Accident Duration')), filter = "top", escape = TRUE, style = "auto", width = '100%', height = '100%', elementId = NULL,
+                            fillContainer = getOption("DT.fillcontainer", NULL), plugins = NULL, editable = FALSE
+                        ))
+
+
+```
+
+```{r}
+
+
+dt_extreme <- formatStyle(dt_extreme, 
+    columns = c('ID', 'GEOID', 'City', 'Street', 'County', 'day_type', 'Month', 'road_category', 'hour_day_sections', 'Description'),
+    backgroundColor = "#008080",
+    borderBottomColor = "#ffffff",
+    borderBottomStyle = "solid",
+    borderBottomWidth = "1px",
+    borderCollapse = "collapse",
+    borderRightColor = "#ffffff",
+    borderRightStyle = "solid",
+    borderRightWidth = "1px",
+    color = "#ffffff",
+    fontFamily = "Arial",
+    fontSize = "12px",
+    fontWeight = "bold",
+    lineHeight = "normal",
+    paddingBottom = "2.6px",
+    paddingLeft = "5.2px",
+    paddingRight = "5.2px",
+    paddingTop = "2.6px",
+    textAlign = "left",
+    verticalAlign = "middle")
+
+
+```
+
+
+
+
+
+```{r}
+
+dt_extreme
 
 
 ```
