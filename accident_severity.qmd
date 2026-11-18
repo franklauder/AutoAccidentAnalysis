@@ -9072,6 +9072,8 @@ round(summary(brms_model)$spec_pars, 2)
 
 
 
+
+
 <br><br>
 
 ```{r}
@@ -9235,6 +9237,14 @@ Our Bayesian mixed effects model is an improvement from the linear regression mo
 ### Model Interpretation
 
 <br><br>
+
+```{r}
+
+
+round(summary(brms_model_2)$random$GEOID,2)
+
+
+```
 
 Fixed Level Effects
 
@@ -9768,6 +9778,9 @@ extreme_tract_df <- readRDS("extreme_tract_df.rds")
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 colNames <- c("ID", "GEOID", "City", "Street", "County", "Type Day", "Month", "Road Category", "Hour of Day", "Description")
 
@@ -9777,6 +9790,9 @@ colNames <- c("ID", "GEOID", "City", "Street", "County", "Type Day", "Month", "R
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 my.options <- list(autoWidth = TRUE,
@@ -9786,7 +9802,8 @@ my.options <- list(autoWidth = TRUE,
                    lengthChange=TRUE,
                    rownames=TRUE,
                    lengthMenu= c(10,20,50,100),
-                   pageLength = 10,                   paging=TRUE,
+                   pageLength = 10,                   
+                   paging=TRUE,
                    columnDefs = list(list(className = "dt-center", targets = "_all")),
                    info=TRUE )
 
@@ -9795,6 +9812,9 @@ my.options <- list(autoWidth = TRUE,
 
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 header.style <- "th { font-family: 'Arial'; font-weight: bold; color: white; background-color: #008080;}"
@@ -9808,6 +9828,8 @@ header.style <- "th { font-family: 'Arial'; font-weight: bold; color: white; bac
 
 
 ```{r}
+#| eval: false
+#| echo: false
 
 
 my.container <- withTags(table(
@@ -9823,6 +9845,9 @@ my.container <- withTags(table(
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 dt_extreme <- datatable(extreme_tract_df, options = my.options, class = "cell-border stipe", callback = JS("return table;"),
@@ -9836,6 +9861,9 @@ dt_extreme <- datatable(extreme_tract_df, options = my.options, class = "cell-bo
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
 
 
 dt_extreme <- formatStyle(dt_extreme, 
@@ -9864,12 +9892,37 @@ dt_extreme <- formatStyle(dt_extreme,
 ```
 
 
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
 
+saveRDS(dt_extreme, "dt_extreme.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+dt_extreme <- readRDS("dt_extreme.rds")
+
+
+```
+
+```{r}
+
+
+dt_extreme
+
+
+```
 
 
 ```{r}
 
-dt_extreme
+
+saveWidget(dt_extreme, file="extreme_tracts_table.html", selfcontained = TRUE)
 
 
 ```
@@ -9991,17 +10044,33 @@ print(ma_census4326 |>
 
 <br><br>
 
-## Poisson Regression
+##  Poisson Regression 
 
 Possion regression models are usefull for modeling count data. For our purposes, we'll be using poisson regression to model rate data, like predicting the count of accidents per unit (per capita). We'd like to predict the count of accidents per census tract (unit).
 
+<br>
+
+Our first model we fit was a poisson regression model (not included in our analysis).  The poisson model depends strongly on the assumption that the response variable (accident count) a poisson distribution.  The mean and variance are equal.  This means that as the mean increases, the spread of the distribution (variance) also increases. This did not happen with our poisson model, as the variance in the data appeared to be much higher than the mean.  This is called over-dispersion. Model over dispersion is where the variance of the target variable is greater than the mean assumed by the model. 
+
+<brt>
+
+To mitigate the effects of over-dispersion, we will use negative binomial model (also known as gamma poisson). A negative binomial model assumes that each poisson count observation has its own rate.  It estimates the shape of a gamma distribution to describe the poisson rate across cases. Predictor variables adjust the shape of this distribution, not the expected value of each observation.   The negative binomial distribution has two parameters, one for the mean (rate) and another for another for the dispersion (scale) of the rates across cases.
+
+  
+
 <br><br>
 
-Since we are predicting accident counts per unit, we need to include an exposure variable that describes the population size or area corresponding to each observation. In regression this is known as an offset. Our offset variable will be the total population of a census tract and we add it to our model by using the offset() function. <br>
+Since we are predicting accident counts per unit, we need to include an exposure variable that describes the population size or area corresponding to each observation. In regression this is known as an offset. Our offset variable will be the total population of a census tract and we add it to our model by using the offset() function. 
 
-In our model, the prior argument includes: prior(normal(0,0.5), class = "b" - this regularizes prior for fixed effects. <br>
+<br>
 
-prior(exponential(1), class = "sd") - This is the prior for census tract varying intercept.
+In our model, the prior argument includes:
+
+ prior(normal(0,0.5), class = "b" - this regularizes prior for fixed effects. 
+ 
+ <br>
+
+ prior(exponential(1), class = "sd") - This is the prior for census tract varying intercept.
 
 <br>
 
@@ -10077,6 +10146,17 @@ ppcheck_poi_2
 
 ```
 
+```{r}
+
+ pp_check(brms_poisson_2, type = "stat", stat = function(y) / mean(y))
+
+  pp_check(brms_poisson_2, type = "stat", stat = function(y) mean(y == 0))
+
+   pp_check(brms_poisson_2, type = "stat", stat = "max")
+
+
+```
+
 <br><br> <br><br>
 
 ### Model Evaluation
@@ -10084,20 +10164,81 @@ ppcheck_poi_2
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
 
-summary(brms_poisson_2)
+brms_pos_shape <- round(summary(brms_poisson_2)$spec_pars, 2)
 
 
 ```
 
-<br><br> <br><br>
 
-### Model Interpretation
 
-<br><br> <br><br>
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+
+pos_shape_estimate <- brms_pos_shape$Estimate
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+
+saveRDS(pos_shape_estimate, "pos_shape_estimate.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+pos_shape_estimate <- readRDS("pos_shape_estimate.rds")
+
+
+```
+
+<br><br> 
+
+```{r}
+#| echo: false
+
+
+cat("Model Shape Estimate: ", pos_shape_estimate, "\n")
+
+
+```
+
+<br><br>
+
+We'r going to test our model for spatial autocorrelation across tracts using Moran's I.  
+
+<br><br> 
+
+```{r}
+#| eval: false
+#| echo: false
+
+round(summary(brms_poisson_2)$random$GEOID,2)
+
+
+```
+
+<br><br>
+
+We first are going to extract the random effects (posterior meawn, error, 95% crI) from our negative binomial model. 
+
+<br><br>
 
 ```{r}
 #| code-fold: true
@@ -10163,6 +10304,25 @@ head(tract_ranef)
 ```
 
 ```{r}
+
+
+high_risk_tracts <- tract_ranef |> 
+    filter(rate_ratio_lower > 1.0) |> 
+    arrange(desc(rate_ratio))
+
+
+```
+
+
+
+
+<br><br>
+
+We'll crerate a boundaries dataset by extracting GEOID, census_tract, and geometry from our census tract dastaset. 
+
+<br><br>
+
+```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
@@ -10172,6 +10332,8 @@ boundaries = ma_tract_data_6 |>
     select(GEOID, census_tract, geometry)
 
 ```
+
+<br><br>
 
 ```{r}
 #| echo: false
@@ -10192,6 +10354,15 @@ boundaries <- readRDS("boundaries.rds")
 
 <br><br>
 
+
+The st_make_valid function from the sf library is used to impose topological validity on our boundaries dataset. 
+
+
+
+<br><br>
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -10203,6 +10374,9 @@ boundaries_clean <- boundaries %>%
   st_make_valid()
 
 ```
+
+<br><br>
+
 
 ```{r}
 #| echo: false
@@ -10275,7 +10449,15 @@ map_sf
 
 <br><br>
 
-We'll filter the map_sf dataset to tracts that have estimated random effects. <br><br>
+
+
+
+<br><br>
+
+From the output of the map_sf dataset, there are NAs in come of the columns.  We will filter the map_sf dataset to tinclude only tracts having estimated random effects. 
+
+<br><br>
+
 
 ```{r}
 #| code-fold: true
@@ -10326,7 +10508,7 @@ map_analysis
 
 <br><br>
 
-We'll use the poly2nb function from the spdep library to build a adjacency list (Queen contiguity: sharing a border or corner point)
+We'll use the poly2nb function from the spdep library to build a adjacency list.  This function takes the boundary points making up the polygon boundaries in the object passed as an sf object (map_analysis) with POLYGON or MULTIPOLYGON (MULTIPLOYGON in our case).  For each observation, the function  checks whether at least one (queen = TRUE), or at least two (rook, queen = FALSE) are wihinin distnace of each other. We're usiong Queen contiguity (sharing at least one border or corner point).  
 
 <br><br>
 
@@ -10379,8 +10561,11 @@ neighbors
 
 <br><br>
 
-We have observations with no neighbors. To handle these islands/isolated tracts (tracts with 0 neighbors). We will use the nb2listw function from the spdep library to allow tracts without neighbors to remain without crashing.
 
+
+From the output, there is one region with no links.  This means we have observations with no neighbors. To handle these islands/isolated tracts (tracts with 0 neighbors) we will use the nb2listw function from the spdep library. 
+
+Setting the zero.policy = TRUE allows tracts without neighbors to remain without causing and error.  Setting style = "W" (row-standardised) up-weights units around the edge of our analysis area that have fewer neighbors.  
 <br><br>
 
 ```{r}
@@ -10430,6 +10615,18 @@ weights_list
 
 <br><br>
 
+We can now calculate the Moran's I test. moran.test is from the spdep library. 
+
+Moran's I evaluates whether high-risk tracts neighbor other high-risk tracts more often than expected by chance:
+
+I > 0 with p < 0.05: Significant positiv spatial clustering.
+
+I approximatley = 0: Independent, random distribution across tracts. 
+
+I < 0: Dispersion/checkerboard pattern. 
+
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -10467,17 +10664,15 @@ moran_analytical <- readRDS("moran_analytical.rds")
 
 ```
 
-<br><br>
+
+
+
 
 ```{r}
-#| code-fold: true
-#| code-summary: "Show Code"
+#| echo: false
 
-
-
-
-
-moran_analytical
+cat("-------Analytical Moran's I -------\n")
+print(moran_analytical)
 
 ```
 
@@ -10485,7 +10680,12 @@ moran_analytical
 
 Analyzing the Moran's I test on log-scale random effects:
 
-The p-valueis less than 0.05 and I is greater than 0: This means there is a statisrically signficant spatital splillover between neighboring census tracts. An independent random intercept treats all tracts as exhangeable (assuming tract A shares no more similarity with its immediate neighbour than with a tract 50 miles away).
+The Moran I statistic of 0.35 is significantly above 0 (null expectation).  High risk tracts are neighboring other high-risk tracts far more frequently than would occur by chance. 
+
+The p-value is less than 0.05. The analytical test is significant. 
+
+
+Because the p-value is less than 0.05 and I is greater than 0: This means there is a statistically signficant spatital splillover between neighboring census tracts. 
 
 <br><br>
 
@@ -10495,7 +10695,12 @@ The p-valueis less than 0.05 and I is greater than 0: This means there is a stat
 
 <br><br> <br><br>
 
-The Moran's I test detected residual spatial clustering in our first Bayesian mixed effects poisson model. As such, we will build a conditional autoregressive (CAR) for our next bayesian mixed effect model
+The Moran's I test detected residual spatial clustering in our first Bayesian mixed effects poisson model. As such, to account for this spatial neighbor structure, we will build a spatial conditional autoregressive (CAR) for our next bayesian mixed effect model. 
+
+A CAR mnodel decomposes tract-level variation into two components:
+
+1. Spatial structure variation: Risk that is smoothed across adjancent neighboring tracts. 
+2. Unstructured variation: Tract specific idiosyncratic (unique or distinctive) risk. 
 
 <br><br> <br><br>
 
@@ -10507,7 +10712,7 @@ Data will be prepared for the CAR model.
 
 <br>
 
-First we'll find common census tracts across boundaries clean and train_cenusus_data_2
+First we'll find common census tracts across boundaries_clean and train_cenusus_data_2
 
 <br><br>
 
@@ -10567,12 +10772,16 @@ map_statewide <- boundaries_clean |>
 
 <br><br>
 
-Spatial neighbor graph will be contructed. <br><br>
+Spatial neighbor graph will be contructed. 
+
+
+<br><br>
 
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
 #| eval: false
+#| message: false
 
 
 
@@ -10645,6 +10854,15 @@ if (length(islands) > 0) {
 
 ```
 
+
+
+<br><br>
+
+The census tract removed is located in Westport, MA. 
+
+<br><br>
+
+
 ```{r}
 #| echo: false
 #| include: false
@@ -10683,6 +10901,27 @@ nb_statewide <- readRDS("nb_statewide.rds")
 
 
 ```
+
+
+```{r}
+#| echo: false
+
+cat("--Summary Structure of neighbor object nb_statewide  --\n")
+print(nb_statewide)
+
+
+```
+
+
+
+<br><br>
+
+We'll check that our spatial  graph is connected using the n.comp.nb() function from spdep library. 
+
+
+<br><br>
+
+
 
 ```{r}
 #| code-fold: true
@@ -10727,7 +10966,17 @@ cat("Number of disjoint graph components:", comp$nc, "\n")
 
 <br><br>
 
-A strictly binary W matrix will be built. nb2mat() function is from spdep library. style = "B" must be used for brms CAR models.
+The result of 1 means that our graph does not contain disconnected regions.  If the value had been greater than 1, then that would have indicatd our graph still contained disconnected regions. 
+
+
+<br><br>
+
+<br><br>
+
+
+
+
+A strictly binary  matrix will be built. nb2mat() function is from spdep library. style = "B" must be used for brms CAR models.  The "B" binary style gives a weight of unity to each neighbor relationship. 
 
 <br><br>
 
@@ -10745,6 +10994,14 @@ W_bin <- nb2mat(nb_statewide, style = "B", zero.policy = TRUE)
 
 ```
 
+
+<br><br>
+
+Creating strictly matching row and col names. 
+
+<br><br>
+
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -10759,9 +11016,45 @@ colnames(W_bin) <- map_statewide$GEOID
 
 ```
 
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+
+saveRDS(W_bin, "W_bin.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+W_bin <- readRDS("W_bin.rds")
+
+
+```
+
+
 <br><br>
 
-The model data will subsetted to strictly to the final connected tracts in W_bin. GEOID factor levels will be forced to match W_bin row order exactly.
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+
+stopifnot(isSymmetric(W_bin))
+stopifnot(all(diag(W_bin) == 0))
+
+
+```
+
+<br><br>
+
+The model data will subsetted to the final connected tracts in W_bin. GEOID factor levels will be forced to match W_bin row order exactly.
 
 <br><br>
 
@@ -10780,6 +11073,12 @@ train_census_data_3 <- train_census_data_2 |>
 
 
 ```
+
+
+<br><br>
+
+
+
 
 ```{r}
 #| echo: false
@@ -10834,6 +11133,8 @@ Results displayed, thus our data passed verification of strict alignment.
 Now that our data is prepared, we can fit the CAR model.
 
 <br><br>
+
+For our brm formula, within the car function we have the argument type = "icar".  This stands for "Intrinsic CAR".  It automatically enforces the sem-to-zero contraint. 
 
 ```{r}
 #| code-fold: true
@@ -10899,6 +11200,23 @@ brms_poisson_3  <- readRDS("brms_poisson_3.rds")
 
 
 summary(brms_poisson_3)
+
+```
+
+```{r}
+
+
+brms_pos_3_shape <- round(summary(brms_poisson_3)$spec_pars, 2)
+
+
+
+```
+
+```{r}
+
+
+brms_pos_3_shape
+
 
 ```
 
