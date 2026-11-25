@@ -5203,7 +5203,6 @@ The number of accidents by road category as a proprtion of month appears relativ
 
 <br><br>
 
-
 ```{r}
 #| eval: false
 #| echo: false
@@ -5236,7 +5235,6 @@ accident_count_year <- readRDS("accident_count_year.rds")
 
 <br><br>
 
-
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -5257,7 +5255,6 @@ year_count_plot <- ggplot(accident_count_year, aes(x=Year, y=n)) +
 
 <br><br>
 
-
 ```{r}
 #| eval: false
 #| echo: false
@@ -5276,9 +5273,6 @@ year_count_plot <- readRDS("year_count_plot.rds")
 
 ```
 
-
-
-
 ```{r}
 #| echo: false
 
@@ -5289,13 +5283,9 @@ year_count_plot
 
 <br><br>
 
-
-The largest accidents counts belong to the years 2020 and 2021 with over 11,000 accidents each.  2016 is the only uear under 6,000 accidents.  It should be noted that the data set did not start collecting accident data until February of 2016, thus 2016 has eleven months of data compared to twelve months for the other years. 
-
-
+The largest accidents counts belong to the years 2020 and 2021 with over 11,000 accidents each. 2016 is the only uear under 6,000 accidents. It should be noted that the data set did not start collecting accident data until February of 2016, thus 2016 has eleven months of data compared to twelve months for the other years.
 
 <br><br>
-
 
 ```{r}
 #| code-fold: true
@@ -5490,7 +5480,7 @@ acc_dur_year_plt
 
 <br><br>
 
-Visualizing the median accident duration by year we see a dramatic change in values starting in 2019. Median accident duration for the years 2016 through 2018 is close to 30 minutes. The median accident duration doubles to 60 minutes for th years 2019 through 2021. Median accident duration drops to 45 minutes for the 2022 year. Our column plot displays the same changes we observed in our time series plot of road categories. These differences between years  may be due to a change on how an accidents end time is determinesd though we have no documentation to support this.
+Visualizing the median accident duration by year we see a dramatic change in values starting in 2019. Median accident duration for the years 2016 through 2018 is close to 30 minutes. The median accident duration doubles to 60 minutes for th years 2019 through 2021. Median accident duration drops to 45 minutes for the 2022 year. Our column plot displays the same changes we observed in our time series plot of road categories. These differences between years may be due to a change on how an accidents end time is determinesd though we have no documentation to support this.
 
 <br><br>
 
@@ -5678,8 +5668,6 @@ gt_acc_duration_summary <- readRDS("gt_acc_duration_summary.rds")
 
 ```
 
-
-
 <br><br>
 
 Summary Statistics Review:
@@ -5700,15 +5688,13 @@ Summary Statistics Review:
 
 <br>
 
-We can use the values from our summary statistics table to examine the distribution of our accident duration feature.  We want to know where the center is and how fat or thin it is. 
+We can use the values from our summary statistics table to examine the distribution of our accident duration feature. We want to know where the center is and how fat or thin it is.
 
-Central tendency helps us find what values are in the middle of our data.  We’ll use the mean median, and mode for this.  
+Central tendency helps us find what values are in the middle of our data. We’ll use the mean median, and mode for this.
 
-Variability tells us the extent values are spread around the mean.  Standard deviation will be used for this.  Variability can also help with us with determining the spread of data.  We’ll use the first and second quartile, median, and IQR for this. 
+Variability tells us the extent values are spread around the mean. Standard deviation will be used for this. Variability can also help with us with determining the spread of data. We’ll use the first and second quartile, median, and IQR for this.
 
 <br><br>
-
-
 
 ```{r}
 #| echo: false
@@ -5720,19 +5706,13 @@ gt_acc_duration_summary
 
 <br><br>
 
-Reviewing the summary statistics table, a few points jump out.  First, we observe that the years 2016 and 2017 have mean values much larger than their median. This means that their distributions are dramatically skewed right, more so than compared to the other years. These same years also have larger standard deviations pointing to distributions that are further out from the mean than other years. The years 2019 thru 2021 have a larger IQR, meaning the middle half of all values are more spread out when compared to other years. 
-
+Reviewing the summary statistics table, a few points jump out. First, we observe that the years 2016 and 2017 have mean values much larger than their median. This means that their distributions are dramatically skewed right, more so than compared to the other years. These same years also have larger standard deviations pointing to distributions that are further out from the mean than other years. The years 2019 thru 2021 have a larger IQR, meaning the middle half of all values are more spread out when compared to other years.
 
 <br>
 
-
-To better understand the  summary statistics, we’ll use box plots and histograms to visualize the distribution of accident duration. Each provides different information about the distribution of the data. 
-
+To better understand the summary statistics, we’ll use box plots and histograms to visualize the distribution of accident duration. Each provides different information about the distribution of the data.
 
 <br><br>
-
-
-
 
 ```{r}
 #| code-fold: true
@@ -5860,12 +5840,9 @@ box_2016 / hist_2016
 
 <br><br>
 
-Our first plot is for the year 2016.  First, let’s look at the histogram (bottom plot).  A histogram takes a bunch of data points and separates them into bins.  The height of the bars represents the number of data points that fall into that bin. The largest peak represents the most frequent duration value, which we know is 30 minutes. The count is roughly around 2,800. Our histogram is not symmetrical with the data piled up on the left with a long tail to the right.  This is called a right skewed right.  The small bin on at just above the 350-minute point is probably outliers which explains the right skew. Now let's look at the box plot (top plot), We see a box with the left line being the first quartile (Q25) and the right line denoting the third quartile (Q75).  The length of the box is the Interquartile Range (IQR).  The IQR helps us determine the spread of the middle of our data.  The IQR is calculated by subtracting the first quartile from the third quartile.  The first and third quartiles numbers appear in red. Using these numbers, we can determine that 50% of all observations fall between 30 and 60 minutes. Normally on a box plot we would find the median, represented by a thick line, somewhere between the left and right ends of the box.  In this case the median and first quartile are the same value at 30 minutes, which is why the thicker median line is overlayed on top of the first quartile line. The first quartile and median are the exact same value due to the high concentration of values at the lower half of the data. Extending out from each end are lines (also known as whiskers).  These lines represent the lower and upper limit of our data.  Think of them as the minimum and maximum values expected from our data.  Any observations falling below the lower limit or above the upper limit are considered outliers are data points that are substantially different from the others.  On our plot, we find many data points above the upper limit (105), with a cluster of data points just above 350 on the x-axis.  These outliers explain why the mean, represented by the red dot, is far from the median.  In fact, it is past the third quartile.  The many observations at the far end of our plots have pulled the mean far outside the box 
-
+Our first plot is for the year 2016. First, let’s look at the histogram (bottom plot). A histogram takes a bunch of data points and separates them into bins. The height of the bars represents the number of data points that fall into that bin. The largest peak represents the most frequent duration value, which we know is 30 minutes. The count is roughly around 2,800. Our histogram is not symmetrical with the data piled up on the left with a long tail to the right. This is called a right skewed right. The small bin on at just above the 350-minute point is probably outliers which explains the right skew. Now let's look at the box plot (top plot), We see a box with the left line being the first quartile (Q25) and the right line denoting the third quartile (Q75). The length of the box is the Interquartile Range (IQR). The IQR helps us determine the spread of the middle of our data. The IQR is calculated by subtracting the first quartile from the third quartile. The first and third quartiles numbers appear in red. Using these numbers, we can determine that 50% of all observations fall between 30 and 60 minutes. Normally on a box plot we would find the median, represented by a thick line, somewhere between the left and right ends of the box. In this case the median and first quartile are the same value at 30 minutes, which is why the thicker median line is overlayed on top of the first quartile line. The first quartile and median are the exact same value due to the high concentration of values at the lower half of the data. Extending out from each end are lines (also known as whiskers). These lines represent the lower and upper limit of our data. Think of them as the minimum and maximum values expected from our data. Any observations falling below the lower limit or above the upper limit are considered outliers are data points that are substantially different from the others. On our plot, we find many data points above the upper limit (105), with a cluster of data points just above 350 on the x-axis. These outliers explain why the mean, represented by the red dot, is far from the median. In fact, it is past the third quartile. The many observations at the far end of our plots have pulled the mean far outside the box
 
 <br><br>
-
-
 
 ```{r}
 #| code-fold: true
@@ -5976,15 +5953,9 @@ box_2017 / hist_2017
 
 <br><br>
 
-
-
-The histogram and box plots for 2017 are similar to 2016 though not as dramatic. The largest peak on the histogram represents the most frequent value of 30 minutes, same as 2016.   We see are large number of observations at the right tail of our histogram,  causing the right skew.  Within the box of the box plot, the first quartile is 30 minutes and the thick line,representing the median, is just a little above it at 32 minutes. The IQR is the same at 30 minutes.  The mean has been pulled to the right, outside the IQR box, though not as dramatically as the 2016 box plot.  The upper limit is 105, same as with our 2016 data.  
-
+The histogram and box plots for 2017 are similar to 2016 though not as dramatic. The largest peak on the histogram represents the most frequent value of 30 minutes, same as 2016. We see are large number of observations at the right tail of our histogram, causing the right skew. Within the box of the box plot, the first quartile is 30 minutes and the thick line,representing the median, is just a little above it at 32 minutes. The IQR is the same at 30 minutes. The mean has been pulled to the right, outside the IQR box, though not as dramatically as the 2016 box plot. The upper limit is 105, same as with our 2016 data.
 
 <br><br>
-
-
-
 
 ```{r}
 #| code-fold: true
@@ -6091,10 +6062,9 @@ box_2018 / hist_2018
 
 <br><br>
 
-The histogram for 2018 has the largest peak at 30 minutes, same as the previous years. Their is a right skew, though the bin at the tail of the plot is not as high as with the previous years.  Also, we can see in our box plot that the mean and median are the same at 30 minutes as in 2016.  The spread of the middle of our data is not as wide as the previous years. Fifty percent of all our observations fall between 30 and 45.   The upper limit, at 67, is less than 2016 and 2017.  Clusters of outliers are closer to the upper limit which may explain why the mean has not been pulled as far to the right as in the previous years. This aligns with our histogram plot.     
+The histogram for 2018 has the largest peak at 30 minutes, same as the previous years. Their is a right skew, though the bin at the tail of the plot is not as high as with the previous years. Also, we can see in our box plot that the mean and median are the same at 30 minutes as in 2016. The spread of the middle of our data is not as wide as the previous years. Fifty percent of all our observations fall between 30 and 45. The upper limit, at 67, is less than 2016 and 2017. Clusters of outliers are closer to the upper limit which may explain why the mean has not been pulled as far to the right as in the previous years. This aligns with our histogram plot.
 
 <br><br>
-
 
 ```{r}
 #| code-fold: true
@@ -6200,13 +6170,9 @@ box_2019 / hist_2019
 
 <br><br>
 
-
-We can see from the histogram that the shape of the distribution appears symmetrical, meaning it looks closer to a normal distribution.  There is a right skew, though the tail is shorter than what we have seen from the earlier years.   Checking the box plot, we can see that there is only one data point at the far right of the plot.  This is difficult to see on the histogram.  The upper limit is the largest we’ve seen so far at 147.  Clusters of outliers are closer the upper limit which matches the shorter right tail on the histogram.    The IQR is 47 which is a larger spread in the middle of our data than previous years.  Fifty percent of the observations for 2019 fall between 30 minutes and 77 minutes.  Within the box, the median and mean are closer, separated by only 4 minutes.  The median, denoted by the thick line, is also nearer than the center than previous years and the mean is within the box.  This information helps explain the near symmetrical shape of the histogram.  
-
+We can see from the histogram that the shape of the distribution appears symmetrical, meaning it looks closer to a normal distribution. There is a right skew, though the tail is shorter than what we have seen from the earlier years. Checking the box plot, we can see that there is only one data point at the far right of the plot. This is difficult to see on the histogram. The upper limit is the largest we’ve seen so far at 147. Clusters of outliers are closer the upper limit which matches the shorter right tail on the histogram. The IQR is 47 which is a larger spread in the middle of our data than previous years. Fifty percent of the observations for 2019 fall between 30 minutes and 77 minutes. Within the box, the median and mean are closer, separated by only 4 minutes. The median, denoted by the thick line, is also nearer than the center than previous years and the mean is within the box. This information helps explain the near symmetrical shape of the histogram.
 
 <br><br>
-
-
 
 ```{r}
 #| code-fold: true
@@ -6315,13 +6281,9 @@ box_2020 / hist_2020
 
 <br><br>
 
-
-Our histogram for 2020 is not as symmetrical compared to 2019. This can be explained by the long thin skew to the right.  The spread of the middle of the data is similar to 2019, with an IQR 5 units less than 2019.  Fifty percent of the observations fall between 35 and 77 units.  The mean and median are close, with only a difference of 6 units.  The upper limit is 140, and we see clusters of outliers close to the upper limit.  The difference is outliers extending sporadically out to the far right of the plot.  This matches the thin tail on the histogram.  These outliers pulled the mean slightly more to the right than in 2019. 
+Our histogram for 2020 is not as symmetrical compared to 2019. This can be explained by the long thin skew to the right. The spread of the middle of the data is similar to 2019, with an IQR 5 units less than 2019. Fifty percent of the observations fall between 35 and 77 units. The mean and median are close, with only a difference of 6 units. The upper limit is 140, and we see clusters of outliers close to the upper limit. The difference is outliers extending sporadically out to the far right of the plot. This matches the thin tail on the histogram. These outliers pulled the mean slightly more to the right than in 2019.
 
 <br><br>
-
-
-
 
 ```{r}
 #| code-fold: true
@@ -6428,9 +6390,7 @@ box_2021 / hist_2021
 
 <br><br>
 
-
-The plots for 2021 are almost identical to  those of 2020. The histogram has a thin tail to the right.  The box plot shows the difference between mean and median as the same at 6 units.  The spread of the middle of the data is slightly greater, with an IQR of 145.  The outlier pattern is almost the same.  
-
+The plots for 2021 are almost identical to those of 2020. The histogram has a thin tail to the right. The box plot shows the difference between mean and median as the same at 6 units. The spread of the middle of the data is slightly greater, with an IQR of 145. The outlier pattern is almost the same.
 
 <br><br>
 
@@ -6540,10 +6500,7 @@ box_2022 / hist_2022
 
 <br><br>
 
-The histogram for 2022 has a thin right skew like what we’ve seen for 2019,2020, and 2021.  The difference is the observations are tightly packed to the left compared to those years. 
-The data for 2022 doesn’t fall into the grouping of years that we’ve seen.  In the box plot, we see clusters of outliers near the upper limit with sporadic outliers further to the right.  The difference between the mean and median is 11 units.  The mean has been pulled further right than 209,2020, and 2021, yet not as dramatically as 2016, 2017, and 2018, which had larger number of outliers to the far right of their plots.  The mean still falls within the box.  The clusters near the upper limit have a greater effect on the mean due to 2022 having 3,000 to 5,000 less observations than 2019,2020, and 2021. 
-
-
+The histogram for 2022 has a thin right skew like what we’ve seen for 2019,2020, and 2021. The difference is the observations are tightly packed to the left compared to those years. The data for 2022 doesn’t fall into the grouping of years that we’ve seen. In the box plot, we see clusters of outliers near the upper limit with sporadic outliers further to the right. The difference between the mean and median is 11 units. The mean has been pulled further right than 209,2020, and 2021, yet not as dramatically as 2016, 2017, and 2018, which had larger number of outliers to the far right of their plots. The mean still falls within the box. The clusters near the upper limit have a greater effect on the mean due to 2022 having 3,000 to 5,000 less observations than 2019,2020, and 2021.
 
 <br><br>
 
@@ -8601,11 +8558,11 @@ scaled_census_train <- readRDS("scaled_census_train.rds")
 
 <br><br>
 
-# Linear Models
+# Linear Regression
 
 <br><br>
 
-## Linear Regression
+## Linear Model 1
 
 <br><br>
 
@@ -8641,6 +8598,9 @@ lr <- readRDS("lr.rds")
 
 
 ```
+
+
+### Model 1 Evaluation
 
 ```{r}
 #| code-fold: true
@@ -8773,6 +8733,12 @@ The r-squared and RSE metrics point to a model that has poor accuracy in predict
 
 <br><br>
 
+
+## Linear Model 2
+
+
+<br><br>
+
 We'll add the county feature as a predictor and evaluate if this improves model performance.
 
 <br><br>
@@ -8808,6 +8774,9 @@ lr_2 <- readRDS("lr_2.rds")
 ```
 
 <br><br>
+
+
+### Model Evaluation
 
 ```{r}
 #| code-fold: true
@@ -8985,7 +8954,7 @@ The data points curves move upwards away from the red line with the right tail d
 
 <br><br>
 
-## Bayesian Linear Mixed Effects
+# Bayesian Linear Mixed Effects
 
 <br><br>
 
@@ -8993,26 +8962,90 @@ Since our linear regression models performed poorly, we'll use bayesian mixeded 
 
 <br>
 
-It should be noted that we fitted a frequentist mixed effect model to our data. The model was unable to calculated variances in both fixed and random effects. The data may be too complex for this approach which is why we have chosen the Bayesian method.
+When building our models, we'll see terms like random effects, fixed effects, prior, and posterior, so before we start, let's review the Bayesian Mixeed Effects theory. 
+
 
 <br><br>
+
+Mixed Effects:
 
 Mixed effects models consist of fixed effects and random effects.
 
 <br>
 
-Fixed effects are predictor valiables that have a constant effect across the same population. They represent relationships you want to test and measure directly. Examples from our data would be temperature and road category.\
-<br>
+Fixed effects are predictor valiables that have a constant effect across the same population. They represent relationships you want to test and measure directly. Examples from our data would be temperature and road category. <br>
 
 Random effects are grouping variables that account for natural variations and non-independent data. They treat group differences as random samples from a larger population, Census tracts (GEOID), are our random effect.
 
 <br><br>
 
-In Bayesian analysis, each parameter of the model is considered as a random variable, meaning they are not fixed. Probability is explicitly used to model this uncertainty. This differs from the Frequentist approach, which considers parameter values fixed but unknown.
+Bayesian:
+
+Let's review Bayes Theorem. Basically it's  a way to update our beliefs: we start with what we know before, add new evidence, and adjust our expectations.
+
+$$
+P(A|B) = [P(B|A) x P(A)] / P(B)
+$$
+
+The above is Bayes equation.
+
+$$
+P(A|B)=
+$$
+
+This is what we want to find out. This is called the posterior probability or our updated belief based after seeing the evidence.
+
+$$
+P(B|A)
+$$
+
+This is read as the the probability of B given A. How likely our evidence is true.
+
+$$
+P(A)
+$$
+
+This is called the prior probability. This is our baseline before seeing any evidence.
+
+$$
+P(B)
+$$
+
+This is total probability of B.
+
+So we could explain this equation as: Updated conclusion = prior assumption times weight of new information divided by how common that information is overall.
+
+We'll now explain how Bayes theorem is used in our analysis. 
+
+
+In Bayesian analysis, each parameter of the model is considered as a random variable, meaning they are not fixed. Probability is explicitly used to model this uncertainty. This differs from the Frequentist approach, which considers parameter values fixed but unknown. The parameters have their own probability distribution, which as mentioned on our Bayes equation review, represent our beliefs about their values before seeing the data. After observing the data, we update these distributions, which get the posterior distribution.  This represents our updated beliefs about the parameters. 
 
 <br>
 
 For our model, the parameters are the coefficient estimates. These include the intercept (accident duration) and our predictor features.
+
+<br>
+
+Our brms model will be using Markov chain Monte Carlo (MCMC).
+
+A Markov chain is an algorithm to simulate a random walk (random steps) and Monte Carlo is an algorithm to sample from the parameter space. The parameter space is the complete map of all possible values for parameters our model is trying to estimate. Let’s use a mountain as an example. The posterior distribution of a parameter can be compared to the entire map of mountain. The top of the mountain is where the parameter value is most likely after combining the likelihood of our data with our prior belief. Put another way, the top of the mountain represents the most likely truth about our data.  
+
+However, the location and shape of the mountain peak is unknown. The goal of an MCMC algorithm is to efficiently explore the mountain peak and its surroundings. An MCMC algorithm takes random samples from the posterior and generates a series of steps that explores the entire range of the posterior distribution. The rules ensure that the sampler stays near the top of the mountain the entire time. Let’s continue with our mountain example. The “Monte Carlo “part means using randomness.  Instead of trying to calculate the whole mountain at once, our algorithm drops an explorer onto a random spot on the mountain.   The “Markov Chain” part means that each step the explorer takes depends entirely on where they are standing right now.   Let’s say that our explorer is blindfolded and cannot see the whole map at once. The size and direction of each step vary. Meaning The explorer takes a small random step to a neighboring spot. If the step goes up the mountain (toward a better fit for our data), the explorer always takes it. If the step goes down, the explorer might take it occasionally just to make sure they aren’t missing an even bigger peak somewhere else. The probability of going downhill depends on how deep the step down is. Small steps downwards are often taken. If the step downwards is very steep, the explorer usually will not go into that direction and take a new step in another direction. After stumbling around like this for thousands of times (making a chain of footsteps where each step only where they are right now), the total path of places the explorer visited maps out the shape of the mountain.  The explorer naturally spends a lot of time around the highest parts of the mountain and barely anytime at the lowest part. In a MCMC algorithm there may be multiple chains.  Let’s say in our mountain example we drop four explorers at different parts of the mountain.  They each take ten thousand steps.  Though their paths may be different, at the end of their journey they should all arrive at the highest part of the mountain.  This is called convergence. 
+
+
+<br>
+
+It should be noted that we fitted a frequentist mixed effect model(lme4 library) to our data. The model was unable to calculate variances in both fixed and random effects. The data may be too complex for this approach which is why we have chosen the Bayesian method.
+
+
+<br><br>
+
+## Bayesian Mixed Effect Model 1
+
+<br><br>
+
+The argument chains = 4  in our model is the  markov chain in mcmc.  The argument iter = 12000 are the number of steps each chain will take. ess
+
 
 <br><br>
 
@@ -9070,10 +9103,6 @@ round(summary(brms_model)$spec_pars, 2)
 
 ```
 
-
-
-
-
 <br><br>
 
 ```{r}
@@ -9104,6 +9133,10 @@ Checking the collinearity of our predictor features, the output shows wind direc
 
 <br><br>
 
+## Bayesian Mixed Effect Model 2
+
+<br><br>
+
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -9114,7 +9147,9 @@ brms_model_2 <- brm(
   log(accident_duration) ~ . -GEOID -Wind_Direction -Weather_Condition + (temperature | GEOID),
   data = scaled_census_train,
   chains = 4,
-  iter = 8000,
+  iter = 16000,
+  warmup = 8000,
+  thin = 2,
   family = student(),
   cores = 40, 
   seed = 42
@@ -9185,7 +9220,269 @@ brms_model_3 <- readRDS("brms_model_3.rds")
 
 <br><br>
 
-Mixed Effects
+Model Convergence
+
+Our parameter estimates are based on a set of samples from the posterior distribution of a parameter. Our parameter estimates will be unreliable if we don’t have enough samples, or if the samples do not represent the population we are trying to understand. This is why we'll check model convergance.
+
+
+<br><br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+
+cat("Number of iterations diverged: ")
+
+rstan::check_divergences(brms_model_2$fit)
+
+
+```
+
+<br><br>
+
+Rhat
+
+
+Rhat tells us whether our chains have converged, and it basically compared how much within-chain variation there is relative to the amount of between-chain overlap.  Preferably, we want our chains to overlap almost entirely in the samples that they span since they are supposed to be sampling the same thing.  Each chain should converge to the same distribution for each parameter.  Going back to our mountain example, we want our four explorers to all end up at the highest part of the mountain. 
+
+Rhat values near 1 are good, and values higher than around 1.1 are a bad sign.  
+
+We can check whether a chain has converged by comparing its behavior with other randomly initiated chains.  The R-hat statistic takes the ratio of the average variance of samples within each chain to the variance of the pooled samples across chains.  If all chains converge to a common distribution, these ratios will equal 1.  If the chains have not converged to a common distribution, the R-hat statistic will be greater than 1.
+
+<br><br>
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+rhat_stat <- any(round(rhat(brms_model_2),0) > 1)
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+#| include: false
+
+saveRDS(rhat_stat, "rhat_stat.rds")
+
+
+
+```
+
+```{r}
+#| echo: false
+
+
+rhat_stat <- readRDS("rhat_stat.rds")
+
+
+```
+
+
+
+<br><br>
+
+
+
+
+```{r}
+#| echo: false
+
+
+cat("RHAT greater than 1: ", rhat_stat, "\n")
+
+```
+
+<br><br>
+
+
+The result of ‘false’ informs us that all our models Rhat values are not greater than one, thus all our chains converged. 
+
+<br><br>
+
+
+Effective Sample Size (ESS)
+
+ESS is an estimate of the number of independent samples we have taken from the posterior distribution for each parameter.  Bulk ESS tells us how many samples the sampler took in the thick part of the density, and Tail ESS indicates how much time the sampler spent in the thin part, in the tails part of the distribution.  Preferably, we would like at least several hundred samples for mean estimates, and thousands to be confident in the 95% credible intervals. 
+
+<br><br>
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+brms_2_distribution_ess <- summary(brms_model_2)$spec_pars
+
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+brms_2_distribution_ess <- brms_2_distribution_ess |> 
+    select(6:7)
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+
+
+
+saveRDS(brms_2_distribution_ess, "brms_2_distribution_ess.rds")
+
+```
+
+```{r}
+#| echo: false
+
+brms_2_distribution_ess <- readRDS("brms_2_distribution_ess.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+cat("** Distributional Parameters ESS **", "\n")
+brms_2_distribution_ess
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+brms_2_random_ess <- summary(brms_model_2)$random$GEOID
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+brms_2_random_ess <- brms_2_random_ess |> 
+    select(6:7)
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+
+
+saveRDS(brms_2_random_ess, "brms_2_random_ess.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+brms_2_random_ess <- readRDS("brms_2_random_ess.rds")
+
+
+```
+
+```{r}
+#| echo
+
+cat("** Multilevel Hyperparameters ESS **", "\n")
+brms_2_random_ess
+
+
+```
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+brms_model_2_fixed_ess <- summary(brms_model_2)
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+brms_model_2_fixed_ess <- brms_model_2_fixed_ess$fixed
+
+
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+brms_model_2_fixed_ess <- brms_model_2_fixed_ess |> 
+    select(6:7)
+
+
+```
+
+```{r}
+#| eval: false
+#| echo: false
+
+
+saveRDS(brms_model_2_fixed_ess, "brms_model_2_fixed_ess.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+brms_model_2_fixed_ess  <- readRDS("brms_model_2_fixed_ess.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+cat("** Fixed Coefficients ESS **", "\n")
+brms_model_2_fixed_ess
+
+```
+
+
+<br><br>
+
+Our results show that the Bulk and Tail ESS for all our parameters are in the thousands.  We can be confident in the 95% credible intervals. 
+
+<br><br>
+
+Model Error
 
 <br><br>
 
@@ -9195,6 +9492,18 @@ Mixed Effects
 #| eval: false
 
 brms_2_sigma <- round(summary(brms_model_2)$spec_pars, 2)
+
+
+```
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+brms_2_sigma <- brms_2_sigma |> 
+    select(1:4)
 
 
 ```
@@ -9221,16 +9530,19 @@ brms_2_sigma  <- readRDS("brms_2_sigma.rds")
 ```{r}
 #| echo: false
 
-
+cat("**********Model Sigma**********", "\n")
 
 brms_2_sigma
 
 
 ```
 
+
+
+
 <br><br>
 
-Our Bayesian mixed effects model is an improvement from the linear regression model fit earlier.  Sigma, our error term, which is similar to RSE from the linear regression model. It is the variation between census tracts versus the residual variation left over among individual accidents. The sigma estimate of 0.45 means after accounting for temperature, Month, day_type, road_category, and hour_day_sections, the models individual accident duration predictions are typically off target by about +/- 45%. This is large error term for a model, though it is a 19% improvement over the linear regression models RSE of 64%.
+Our Bayesian mixed effects model is an improvement from the linear regression model fit earlier. Sigma, our error term, which is similar to RSE from the linear regression model. It is the variation between census tracts versus the residual variation left over among individual accidents. The sigma estimate of 0.45 means after accounting for temperature, Month, day_type, road_category, and hour_day_sections, the models individual accident duration predictions are typically off target by about +/- 45%. This is large error term for a model, though it is a 19% improvement over the linear regression models RSE of 64%.
 
 <br><br>
 
@@ -9238,13 +9550,7 @@ Our Bayesian mixed effects model is an improvement from the linear regression mo
 
 <br><br>
 
-```{r}
 
-
-round(summary(brms_model_2)$random$GEOID,2)
-
-
-```
 
 Fixed Level Effects
 
@@ -9253,13 +9559,46 @@ Fixed Level Effects
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
+#| eval: false
 
 
 
-round(fixef(brms_model_2),2)
+fixed_coefficients <- round(fixef(brms_model_2),2)
 
 
 ```
+
+```{r}
+#| eval: false
+#| echo: false
+
+
+saveRDS(fixed_coefficients, "fixed_coefficients.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+fixed_coefficients <- readRDS("fixed_coefficients.rds")
+
+
+```
+
+
+```{r}
+#| echo: false
+
+cat("********Fixed Coefficients********", "\n")
+fixed_coefficients
+
+
+
+```
+
+
+
 
 <br><br>
 
@@ -9310,6 +9649,68 @@ hour_day_sectionsNight: accident duration is 0.16 log units longer than the refe
 <br><br>
 
 Group Level Effects.
+
+<br><br>
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+group_level_effects <- round(summary(brms_model_2)$random$GEOID,2)
+
+
+
+```
+
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show Code"
+#| eval: false
+
+
+group_level_effects <- group_level_effects |> 
+    select(1:4)
+
+
+```
+
+<br><br>
+
+```{r}
+#| eval: false
+#| echo: false
+
+saveRDS(group_level_effects, "group_level_effects.rds")
+
+
+```
+
+```{r}
+#| echo: false
+
+
+
+group_level_effects <- readRDS("group_level_effects.rds")
+
+
+```
+
+
+
+```{r}
+#| echo: false
+
+cat("********Group Level Effects********", "\n")
+group_level_effects
+
+
+```
+
+<br><br>
 
 Group level effects (Random effects) are found under Multilevel Hyperparameters from the summary ouyput. Sd(Intercept) = 0.09. After controlling for temperature, Month, day_type, road_category, and hour_day_sections, baseline accident duration still vary by roughly 9.4% based on the specific census tract an accident occurs in.
 
@@ -9387,19 +9788,19 @@ print(brms_count, n=100)
 
 <br><br>
 
-Now, let’s evaluate our model’s group-level effects of individual census tracts. We’ll use an interval plot to accomplish this. It visualizes the estimated accident duration adjustments for individual census tracts in our dataset alongside their Bayesian windows. 
+Now, let’s evaluate our model’s group-level effects of individual census tracts. We’ll use an interval plot to accomplish this. It visualizes the estimated accident duration adjustments for individual census tracts in our dataset alongside their Bayesian windows.
 
-How to read an interval plot: 
+How to read an interval plot:
 
-The Vertical Y-Axis (Left): Each row represents a specific census tract. 
+The Vertical Y-Axis (Left): Each row represents a specific census tract.
 
-The Horizontal X-Axis (Bottom): This represents the random effect deviation (in log accident duration units) from the global baseline. Remember, the global baseline is the average accident duration of each data point. 
+The Horizontal X-Axis (Bottom): This represents the random effect deviation (in log accident duration units) from the global baseline. Remember, the global baseline is the average accident duration of each data point.
 
-The Dark Blue Circles: The median posterior estimate for each census tract. 
+The Dark Blue Circles: The median posterior estimate for each census tract.
 
-The Light Blue Whisker Lines: The 95% Credible Intervals (outer uncertainty window). 
+The Light Blue Whisker Lines: The 95% Credible Intervals (outer uncertainty window).
 
-The Vertical Red Zero Line (0): Represents the overall average census tract in our dataset. 
+The Vertical Red Zero Line (0): Represents the overall average census tract in our dataset.
 
 <br>
 
@@ -9423,11 +9824,11 @@ brms_model_cat_plot_top_100
 
 Interpreting the interval plot: The dots and intervals span roughly from -0.33 up to +0.48 on the log scale. This shows large variation across these 100 census tracts. Some tracts carry a large baseline accident duration reduction (far left), while others carry a large duration increase (far right). The census tracts whose light blue whisker lines do not cross the vertical 0 line (the ones completely to the far left or far right) are statically significant. This means these census tracts a proven to be significant accident duration drivers. Location alone pushes their duration of accidents far above or below the regional average, independent of temperature, Month, day_type, road_category, and hour_day_sections.
 
- <br> 
- 
- Of the 100 census tracts in the plot, 46 crossed the vertical zero line, and thus are not significant. This means that 54 census tracts are significant (34 to the far left and 20 to the far right).
+<br>
 
-<br> 
+Of the 100 census tracts in the plot, 46 crossed the vertical zero line, and thus are not significant. This means that 54 census tracts are significant (34 to the far left and 20 to the far right).
+
+<br>
 
 Understanding the significance of these census tracts is best done by viewing them on a map.
 
@@ -9478,9 +9879,7 @@ mytext <- paste(
 
 ```
 
-
 <br>
-
 
 ```{r}
 #| code-fold: true
@@ -9592,8 +9991,7 @@ tract_map_extreme_higher_plt
 
 <br><br>
 
-
-Our first map includes census tracts that influence accident duration at the higher end. The markers are individual accidents occurring within the extreme census tract.  Clicking on a marker will provide the accident ID, road category, and city.  There are a few points of interest we’ll examine.  First, upper right of the map you’ll find an accident pattern resembling upside down “T”.  Hovering over this area you’ll find the census tract GEOID of 25017350109.  This census tract is within the town of Andover.  Most accidents within this census tract occurred near the junction of I-93 and I-495.  Further up and to the right we find another cluster accidents within census tract 25025080100. These accidents occurred on a stretch of I-495 in the town of Merrimac.  These areas are of interest as they are not urban centers but are on interstate highways near the New Hampshire border.  Inspecting the map, you’ll find extreme census tracts in urban areas such as Boston and Framingham, have accidents occurring on roads and streets.  These are just some interesting points where accident duration is at the high end.  Viewers are encouraged to inspect more points. Inspecting the map, you’ll notice that there are no extreme census reacts on the high end of accident duration west of I-495.  
+Our first map includes census tracts that influence accident duration at the higher end. The markers are individual accidents occurring within the extreme census tract. Clicking on a marker will provide the accident ID, road category, and city. There are a few points of interest we’ll examine. First, upper right of the map you’ll find an accident pattern resembling upside down “T”. Hovering over this area you’ll find the census tract GEOID of 25017350109. This census tract is within the town of Andover. Most accidents within this census tract occurred near the junction of I-93 and I-495. Further up and to the right we find another cluster accidents within census tract 25025080100. These accidents occurred on a stretch of I-495 in the town of Merrimac. These areas are of interest as they are not urban centers but are on interstate highways near the New Hampshire border. Inspecting the map, you’ll find extreme census tracts in urban areas such as Boston and Framingham, have accidents occurring on roads and streets. These are just some interesting points where accident duration is at the high end. Viewers are encouraged to inspect more points. Inspecting the map, you’ll notice that there are no extreme census reacts on the high end of accident duration west of I-495.
 
 <br><br>
 
@@ -9674,7 +10072,7 @@ tract_map_extreme_lower_plt <- map_population_extreme_tract_lower %>%
 
 ```
 
-<br><br> 
+<br><br>
 
 <br><br>
 
@@ -9711,22 +10109,14 @@ tract_map_extreme_lower_plt
 
 ```
 
-
 <br><br>
 
+On our map of census tracts influencing a large reduction in accident duration, there are three census tracts west of I-495. These are in the cities of Worcester, Fitchburg, and the town of Longmeadow. There are also a greater number of census tract in the Boston metro area.
 
-On our map of census tracts influencing a large reduction in accident duration, there are three census tracts west of I-495.  These are in the cities of Worcester, Fitchburg, and the town of Longmeadow.  There are also a greater number of census tract in the Boston metro area.  
-
-An interesting area to investigate is the junction of I-93 and I-495, located near the New Hampshire border.  Recall from our previous map this area was within census tract 25009254402.  On our current map, the junction of I-93 and I-495 fall within census tract 25009254401 which borders census tract 25009254402.  Comparing the maps we notice that the pattern of accidents is different.  
-On our current map viewing census tract 25009254401, most accidents on I-93 are south of I-495 and accidents on I-495 are east of I-93.
-On our map previous map of census tracts influencing increase in duration, viewing census tract 25009254402, most accidents on I-495 are west of I-93 and most accidents on I-93 are north of I-495.  These accidents occurred on the same stretches of I-495 and I-93 yet fall into census tracts that have different impacts on accident duration.  Inspecting both maps, you’ll find other areas that have census tracts of different accident duration impacts in close proximity to each other.  
-
-
+An interesting area to investigate is the junction of I-93 and I-495, located near the New Hampshire border. Recall from our previous map this area was within census tract 25009254402. On our current map, the junction of I-93 and I-495 fall within census tract 25009254401 which borders census tract 25009254402. Comparing the maps we notice that the pattern of accidents is different.\
+On our current map viewing census tract 25009254401, most accidents on I-93 are south of I-495 and accidents on I-495 are east of I-93. On our map previous map of census tracts influencing increase in duration, viewing census tract 25009254402, most accidents on I-495 are west of I-93 and most accidents on I-93 are north of I-495. These accidents occurred on the same stretches of I-495 and I-93 yet fall into census tracts that have different impacts on accident duration. Inspecting both maps, you’ll find other areas that have census tracts of different accident duration impacts in close proximity to each other.
 
 <br><br>
-
-
-
 
 ```{r}
 #| eval: false
@@ -9774,9 +10164,6 @@ extreme_tract_df <- readRDS("extreme_tract_df.rds")
 
 ```
 
-
-
-
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -9787,7 +10174,6 @@ colNames <- c("ID", "GEOID", "City", "Street", "County", "Type Day", "Month", "R
 
 
 ```
-
 
 ```{r}
 #| code-fold: true
@@ -9810,7 +10196,6 @@ my.options <- list(autoWidth = TRUE,
 
 ```
 
-
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -9821,11 +10206,6 @@ header.style <- "th { font-family: 'Arial'; font-weight: bold; color: white; bac
 
 
 ```
-
-
-
-
-
 
 ```{r}
 #| eval: false
@@ -9891,7 +10271,6 @@ dt_extreme <- formatStyle(dt_extreme,
 
 ```
 
-
 ```{r}
 #| eval: false
 #| echo: false
@@ -9917,7 +10296,6 @@ dt_extreme
 
 
 ```
-
 
 ```{r}
 
@@ -10044,33 +10422,31 @@ print(ma_census4326 |>
 
 <br><br>
 
-##  Poisson Regression 
+## Poisson Regression
 
 Possion regression models are usefull for modeling count data. For our purposes, we'll be using poisson regression to model rate data, like predicting the count of accidents per unit (per capita). We'd like to predict the count of accidents per census tract (unit).
 
 <br>
 
-Our first model we fit was a poisson regression model (not included in our analysis).  The poisson model depends strongly on the assumption that the response variable (accident count) a poisson distribution.  The mean and variance are equal.  This means that as the mean increases, the spread of the distribution (variance) also increases. This did not happen with our poisson model, as the variance in the data appeared to be much higher than the mean.  This is called over-dispersion. Model over dispersion is where the variance of the target variable is greater than the mean assumed by the model. 
+Our first model we fit was a poisson regression model (not included in our analysis). The poisson model depends strongly on the assumption that the response variable (accident count) a poisson distribution. The mean and variance are equal. This means that as the mean increases, the spread of the distribution (variance) also increases. This did not happen with our poisson model, as the variance in the data appeared to be much higher than the mean. This is called over-dispersion. Model over dispersion is where the variance of the target variable is greater than the mean assumed by the model.
 
 <brt>
 
-To mitigate the effects of over-dispersion, we will use negative binomial model (also known as gamma poisson). A negative binomial model assumes that each poisson count observation has its own rate.  It estimates the shape of a gamma distribution to describe the poisson rate across cases. Predictor variables adjust the shape of this distribution, not the expected value of each observation.   The negative binomial distribution has two parameters, one for the mean (rate) and another for another for the dispersion (scale) of the rates across cases.
-
-  
+To mitigate the effects of over-dispersion, we will use negative binomial model (also known as gamma poisson). A negative binomial model assumes that each poisson count observation has its own rate. It estimates the shape of a gamma distribution to describe the poisson rate across cases. Predictor variables adjust the shape of this distribution, not the expected value of each observation. The negative binomial distribution has two parameters, one for the mean (rate) and another for another for the dispersion (scale) of the rates across cases.
 
 <br><br>
 
-Since we are predicting accident counts per unit, we need to include an exposure variable that describes the population size or area corresponding to each observation. In regression this is known as an offset. Our offset variable will be the total population of a census tract and we add it to our model by using the offset() function. 
+Since we are predicting accident counts per unit, we need to include an exposure variable that describes the population size or area corresponding to each observation. In regression this is known as an offset. Our offset variable will be the total population of a census tract and we add it to our model by using the offset() function.
 
 <br>
 
 In our model, the prior argument includes:
 
- prior(normal(0,0.5), class = "b" - this regularizes prior for fixed effects. 
- 
- <br>
+prior(normal(0,0.5), class = "b" - this regularizes prior for fixed effects.
 
- prior(exponential(1), class = "sd") - This is the prior for census tract varying intercept.
+<br>
+
+prior(exponential(1), class = "sd") - This is the prior for census tract varying intercept.
 
 <br>
 
@@ -10174,8 +10550,6 @@ brms_pos_shape <- round(summary(brms_poisson_2)$spec_pars, 2)
 
 ```
 
-
-
 ```{r}
 #| code-fold: true
 #| code-summary: "Show Code"
@@ -10208,7 +10582,7 @@ pos_shape_estimate <- readRDS("pos_shape_estimate.rds")
 
 ```
 
-<br><br> 
+<br><br>
 
 ```{r}
 #| echo: false
@@ -10221,9 +10595,9 @@ cat("Model Shape Estimate: ", pos_shape_estimate, "\n")
 
 <br><br>
 
-We'r going to test our model for spatial autocorrelation across tracts using Moran's I.  
+We'r going to test our model for spatial autocorrelation across tracts using Moran's I.
 
-<br><br> 
+<br><br>
 
 ```{r}
 #| eval: false
@@ -10236,7 +10610,7 @@ round(summary(brms_poisson_2)$random$GEOID,2)
 
 <br><br>
 
-We first are going to extract the random effects (posterior meawn, error, 95% crI) from our negative binomial model. 
+We first are going to extract the random effects (posterior meawn, error, 95% crI) from our negative binomial model.
 
 <br><br>
 
@@ -10313,12 +10687,9 @@ high_risk_tracts <- tract_ranef |>
 
 ```
 
-
-
-
 <br><br>
 
-We'll crerate a boundaries dataset by extracting GEOID, census_tract, and geometry from our census tract dastaset. 
+We'll crerate a boundaries dataset by extracting GEOID, census_tract, and geometry from our census tract dastaset.
 
 <br><br>
 
@@ -10354,14 +10725,9 @@ boundaries <- readRDS("boundaries.rds")
 
 <br><br>
 
-
-The st_make_valid function from the sf library is used to impose topological validity on our boundaries dataset. 
-
-
+The st_make_valid function from the sf library is used to impose topological validity on our boundaries dataset.
 
 <br><br>
-
-
 
 ```{r}
 #| code-fold: true
@@ -10376,7 +10742,6 @@ boundaries_clean <- boundaries %>%
 ```
 
 <br><br>
-
 
 ```{r}
 #| echo: false
@@ -10449,15 +10814,11 @@ map_sf
 
 <br><br>
 
-
-
-
 <br><br>
 
-From the output of the map_sf dataset, there are NAs in come of the columns.  We will filter the map_sf dataset to tinclude only tracts having estimated random effects. 
+From the output of the map_sf dataset, there are NAs in come of the columns. We will filter the map_sf dataset to tinclude only tracts having estimated random effects.
 
 <br><br>
-
 
 ```{r}
 #| code-fold: true
@@ -10508,7 +10869,7 @@ map_analysis
 
 <br><br>
 
-We'll use the poly2nb function from the spdep library to build a adjacency list.  This function takes the boundary points making up the polygon boundaries in the object passed as an sf object (map_analysis) with POLYGON or MULTIPOLYGON (MULTIPLOYGON in our case).  For each observation, the function  checks whether at least one (queen = TRUE), or at least two (rook, queen = FALSE) are wihinin distnace of each other. We're usiong Queen contiguity (sharing at least one border or corner point).  
+We'll use the poly2nb function from the spdep library to build a adjacency list. This function takes the boundary points making up the polygon boundaries in the object passed as an sf object (map_analysis) with POLYGON or MULTIPOLYGON (MULTIPLOYGON in our case). For each observation, the function checks whether at least one (queen = TRUE), or at least two (rook, queen = FALSE) are wihinin distnace of each other. We're usiong Queen contiguity (sharing at least one border or corner point).
 
 <br><br>
 
@@ -10561,11 +10922,9 @@ neighbors
 
 <br><br>
 
+From the output, there is one region with no links. This means we have observations with no neighbors. To handle these islands/isolated tracts (tracts with 0 neighbors) we will use the nb2listw function from the spdep library.
 
-
-From the output, there is one region with no links.  This means we have observations with no neighbors. To handle these islands/isolated tracts (tracts with 0 neighbors) we will use the nb2listw function from the spdep library. 
-
-Setting the zero.policy = TRUE allows tracts without neighbors to remain without causing and error.  Setting style = "W" (row-standardised) up-weights units around the edge of our analysis area that have fewer neighbors.  
+Setting the zero.policy = TRUE allows tracts without neighbors to remain without causing and error. Setting style = "W" (row-standardised) up-weights units around the edge of our analysis area that have fewer neighbors.\
 <br><br>
 
 ```{r}
@@ -10615,17 +10974,15 @@ weights_list
 
 <br><br>
 
-We can now calculate the Moran's I test. moran.test is from the spdep library. 
+We can now calculate the Moran's I test. moran.test is from the spdep library.
 
 Moran's I evaluates whether high-risk tracts neighbor other high-risk tracts more often than expected by chance:
 
-I > 0 with p < 0.05: Significant positiv spatial clustering.
+I \> 0 with p \< 0.05: Significant positiv spatial clustering.
 
-I approximatley = 0: Independent, random distribution across tracts. 
+I approximatley = 0: Independent, random distribution across tracts.
 
-I < 0: Dispersion/checkerboard pattern. 
-
-
+I \< 0: Dispersion/checkerboard pattern.
 
 ```{r}
 #| code-fold: true
@@ -10664,10 +11021,6 @@ moran_analytical <- readRDS("moran_analytical.rds")
 
 ```
 
-
-
-
-
 ```{r}
 #| echo: false
 
@@ -10680,12 +11033,11 @@ print(moran_analytical)
 
 Analyzing the Moran's I test on log-scale random effects:
 
-The Moran I statistic of 0.35 is significantly above 0 (null expectation).  High risk tracts are neighboring other high-risk tracts far more frequently than would occur by chance. 
+The Moran I statistic of 0.35 is significantly above 0 (null expectation). High risk tracts are neighboring other high-risk tracts far more frequently than would occur by chance.
 
-The p-value is less than 0.05. The analytical test is significant. 
+The p-value is less than 0.05. The analytical test is significant.
 
-
-Because the p-value is less than 0.05 and I is greater than 0: This means there is a statistically signficant spatital splillover between neighboring census tracts. 
+Because the p-value is less than 0.05 and I is greater than 0: This means there is a statistically signficant spatital splillover between neighboring census tracts.
 
 <br><br>
 
@@ -10695,12 +11047,12 @@ Because the p-value is less than 0.05 and I is greater than 0: This means there 
 
 <br><br> <br><br>
 
-The Moran's I test detected residual spatial clustering in our first Bayesian mixed effects poisson model. As such, to account for this spatial neighbor structure, we will build a spatial conditional autoregressive (CAR) for our next bayesian mixed effect model. 
+The Moran's I test detected residual spatial clustering in our first Bayesian mixed effects poisson model. As such, to account for this spatial neighbor structure, we will build a spatial conditional autoregressive (CAR) for our next bayesian mixed effect model.
 
 A CAR mnodel decomposes tract-level variation into two components:
 
-1. Spatial structure variation: Risk that is smoothed across adjancent neighboring tracts. 
-2. Unstructured variation: Tract specific idiosyncratic (unique or distinctive) risk. 
+1.  Spatial structure variation: Risk that is smoothed across adjancent neighboring tracts.
+2.  Unstructured variation: Tract specific idiosyncratic (unique or distinctive) risk.
 
 <br><br> <br><br>
 
@@ -10772,8 +11124,7 @@ map_statewide <- boundaries_clean |>
 
 <br><br>
 
-Spatial neighbor graph will be contructed. 
-
+Spatial neighbor graph will be contructed.
 
 <br><br>
 
@@ -10854,14 +11205,11 @@ if (length(islands) > 0) {
 
 ```
 
-
-
 <br><br>
 
-The census tract removed is located in Westport, MA. 
+The census tract removed is located in Westport, MA.
 
 <br><br>
-
 
 ```{r}
 #| echo: false
@@ -10902,7 +11250,6 @@ nb_statewide <- readRDS("nb_statewide.rds")
 
 ```
 
-
 ```{r}
 #| echo: false
 
@@ -10912,16 +11259,11 @@ print(nb_statewide)
 
 ```
 
-
-
 <br><br>
 
-We'll check that our spatial  graph is connected using the n.comp.nb() function from spdep library. 
-
+We'll check that our spatial graph is connected using the n.comp.nb() function from spdep library.
 
 <br><br>
-
-
 
 ```{r}
 #| code-fold: true
@@ -10966,17 +11308,13 @@ cat("Number of disjoint graph components:", comp$nc, "\n")
 
 <br><br>
 
-The result of 1 means that our graph does not contain disconnected regions.  If the value had been greater than 1, then that would have indicatd our graph still contained disconnected regions. 
-
-
-<br><br>
+The result of 1 means that our graph does not contain disconnected regions. If the value had been greater than 1, then that would have indicatd our graph still contained disconnected regions.
 
 <br><br>
 
+<br><br>
 
-
-
-A strictly binary  matrix will be built. nb2mat() function is from spdep library. style = "B" must be used for brms CAR models.  The "B" binary style gives a weight of unity to each neighbor relationship. 
+A strictly binary matrix will be built. nb2mat() function is from spdep library. style = "B" must be used for brms CAR models. The "B" binary style gives a weight of unity to each neighbor relationship.
 
 <br><br>
 
@@ -10994,13 +11332,11 @@ W_bin <- nb2mat(nb_statewide, style = "B", zero.policy = TRUE)
 
 ```
 
-
 <br><br>
 
-Creating strictly matching row and col names. 
+Creating strictly matching row and col names.
 
 <br><br>
-
 
 ```{r}
 #| code-fold: true
@@ -11036,9 +11372,7 @@ W_bin <- readRDS("W_bin.rds")
 
 ```
 
-
 <br><br>
-
 
 ```{r}
 #| eval: false
@@ -11074,11 +11408,7 @@ train_census_data_3 <- train_census_data_2 |>
 
 ```
 
-
 <br><br>
-
-
-
 
 ```{r}
 #| echo: false
@@ -11134,7 +11464,11 @@ Now that our data is prepared, we can fit the CAR model.
 
 <br><br>
 
-For our brm formula, within the car function we have the argument type = "icar".  This stands for "Intrinsic CAR".  It automatically enforces the sem-to-zero contraint. 
+For our brm formula, within the car function we have the argument type = "icar". This stands for "Intrinsic CAR". It automatically enforces the sem-to-zero contraint. Our random effect is gr = GEOID within the car function.
+
+For control, adapt_delta = 0.98 forces the brm model to take smaller steps, preventing chains from getting stuck along ridges in the spatial posterior geometry.
+
+max_treedepth = 12 prevents premature trajectory truncation in the car precision space.
 
 ```{r}
 #| code-fold: true
@@ -13511,7 +13845,7 @@ state_wide_bias_plt <- readRDS("state_wide_bias_plot.rds")
 
 <br><br>
 
-Mapping of the mean errors reveals whether the model's missies are randomly scattered across the state or clustered around specific highway corridors (like I-93, I-95, I-495)
+Mapping of the mean errors reveals whether the model's misses are randomly scattered across the state or clustered around specific highway corridors (like I-93, I-95, I-495)
 
 <br><br>
 
@@ -13531,3 +13865,35 @@ state_wide_bias_plt
 <br><br>
 
 <br><br>
+
+# Insights
+
+<br><br>
+
+# Acknowledgements
+
+<br><br>
+
+<br><br>
+
+# Resources
+
+<br><br>
+
+Barreda, S., & Silbert, N. (2023). *Bayesian multilevel models for repeated measures data*. Routledge.
+
+Burkner, “The R Journal: Advanced Bayesian Multilevel Modeling with the R Package brms”, The R Journal, 2018
+
+Carmen, R., Langeraert, W., & Van Daele, T. (2024, November 26). *Tutorial bayesian statistics*. Inbo.Be. https://tutorials.inbo.be/html/workshop_1_mcmc_en_brms_eng.html
+
+Gelman, A., Carlin, J. B., Stern, H. S., Dunson, D. B., Vehtari, A., & Rubin, D. B. (2013). *Bayesian data analysis*. Chapman & Hall/Crc.
+
+Jenkins, N. (2021, October 14). Bayesian Data Analysis with BRMS. Nick Jenkins. https://academic-demo.netlify.app/post/bda_in_r/bayes_with_brms/
+
+Kurz, A. S. (2025, April 15). Doing Bayesian Data Analysis in BRMS and the tidyverse. Bookdown.Org. https://bookdown.org/content/8ba612b7-90f2-4ebc-b329-0159008e2340/
+
+McElreath, R. (2020). *Statistical rethinking: A bayesian course with examples in R and Stan*. CRC Press.
+
+Pebesma, E. J., & Bivand, R. (2023). *Spatial data science: With applications in R*. CRC Press, Taylor & Francis Group.
+
+Walker, K. (2022). *Analyzing US Census Data*. CRC Press.
